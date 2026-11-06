@@ -58,5 +58,23 @@
     "vitest": "^3.2.7"
   },
   "author": "ssrjkk",
-  "description": "Corvid — CRM для фриланса. Автор: ssrjkk"
+  "description": "Corvid — CRM для фриланса. Автор: ssrjkk",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssrjkk/crm_ssrjkk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ssrjkk/crm_ssrjkk/issues"
+  },
+  "homepage": "https://github.com/ssrjkk/crm_ssrjkk#readme",
+  "keywords": [
+    "crm",
+    "freelance",
+    "nextjs",
+    "trpc",
+    "prisma",
+    "tailwind",
+    "saas"
+  ]
 }
