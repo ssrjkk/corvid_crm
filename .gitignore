@@ -39,3 +39,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# test database
+test.db
+
+# playwright
+test-results/
+playwright-report/
+ci.db
+
+# live database
+dev.db
+test.db
+*.db-journal
+
+# generated prisma client
+src/generated/

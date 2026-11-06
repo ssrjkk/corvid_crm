@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Миграции тестовой БД + тесты
+        run: npm test
+
+      - name: Линт
+        run: npm run lint
+
+      - name: Production-сборка
+        run: npm run build
+        env:
+          DATABASE_URL: "file:./ci.db"
+          BETTER_AUTH_SECRET: "ci-secret"
