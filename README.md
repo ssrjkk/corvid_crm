@@ -50,11 +50,12 @@ npm install
 #   BETTER_AUTH_URL="http://localhost:3000"
 
 npx prisma migrate dev
-npm run dev          # → http://localhost:3000
+npm run dev          # → http://localhost:3000 (в другом терминале:)
+npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпотентно)
 ```
 
-Первый зарегистрированный через `/sign-up` аккаунт — ваш. Демо-аккаунт в dev-базе:
-`test@corvid.dev` / `Test12345!`
+Первый зарегистрированный через `/sign-up` аккаунт — ваш (роль ADMIN по умолчанию).
+Демо-аккаунт создаётся сидом выше.
 
 ## 🧪 Качество
 
