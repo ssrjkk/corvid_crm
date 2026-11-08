@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
  * Импорт строк из CSV-файла. parseRow получает ячейки строки без заголовка
  * и возвращает input мутации; ошибки отдельных строк не прерывают импорт.
  */
+export const MAX_CSV_BYTES = 5 * 1024 * 1024 // защита от гигантских файлов
 export function ImportCsvButton({
   importRow,
   onDone,
@@ -23,6 +24,11 @@ export function ImportCsvButton({
   const [busy, setBusy] = useState(false)
 
   const handleFile = async (file: File) => {
+    if (file.size > MAX_CSV_BYTES) {
+      toast.error("Файл слишком большой (лимит 5 МБ)")
+      if (inputRef.current) inputRef.current.value = ""
+      return
+    }
     setBusy(true)
     try {
       const text = await file.text()

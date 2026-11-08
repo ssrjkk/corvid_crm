@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-ssrjkk-7c5cff.svg)](https://github.com/ssrjkk)
 ![Next.js](https://img.shields.io/badge/Next.js%2016-black)
-![Tests](https://img.shields.io/badge/tests-46%20%2B%20E2E-10b981)
+![Tests](https://img.shields.io/badge/tests-59%20%2B%20E2E-10b981)
 
 </div>
 
@@ -66,9 +66,9 @@ npm run lint
 npm run build
 ```
 
-- **46 тестов** Vitest: чистая логика (CSV RFC 4180, деньги, даты) + все ключевые
+- **59 тестов** Vitest: чистая логика (CSV RFC 4180 + защита от CSV-инъекций, деньги, даты) + все ключевые
   роутеры на изолированной тестовой БД, включая матрицу ролей
-- **Playwright E2E**: лендинг, защита маршрутов, вход, счета, скрытие сайдбара при печати
+- **Playwright E2E (setup + 6)**: лендинг, защита маршрутов, неверный пароль→тост, вход, счета, скрытие сайдбара при печати
 - **CI**: `.github/workflows/ci.yml` — тесты + линт + сборка на каждый push
 
 ## 🏗️ Стек

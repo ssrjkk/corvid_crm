@@ -153,6 +153,9 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   секрет только из окружения — в production без `BETTER_AUTH_SECRET` процесс падает
   сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db`/`e2e/.auth.json` в gitignore.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
+  аудит зависимостей (`npm audit`) показывает уязвимости только в dev-цепочках
+  (vitest/tinypool, shadcn-CLI/ts-morph) — в production-бандл они не попадают;
+  мажорные апгрейды ради них не делаются (ломающие изменения), фиксируется здесь;
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
   `useState(null) + useEffect` с eslint-комментарием; mount-флаг — `useSyncExternalStore`.
