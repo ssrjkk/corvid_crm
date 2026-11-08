@@ -31,7 +31,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <main className="flex min-h-screen items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
         <div className="flex flex-col items-center gap-3 text-center">
           <BrandMark size={72} />
@@ -66,6 +66,6 @@ export default function SignInPage() {
           </Link>
         </p>
       </form>
-    </div>
+    </main>
   )
 }

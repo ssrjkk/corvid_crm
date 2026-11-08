@@ -149,9 +149,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   (после удаления возврат `from "cn"` роняет build — так и задумано).
 - Паранойя: CSV-инъекции нейтрализуются префиксом `'` (CWE-1236, тест в `csv.test.ts`);
   секрет только из окружения — в production без `BETTER_AUTH_SECRET` процесс падает
-  сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db` в gitignore;
-  `signIn(page)` в e2e повторяет потерянный клик 1 раз (настоящий вис API всё равно
-  уронит тест — маскировки нет).
+  сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db`/`e2e/.auth.json` в gitignore.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
