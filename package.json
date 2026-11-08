@@ -1,5 +1,5 @@
 {
-  "name": "crm_ssrjkk",
+  "name": "corvid_crm",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -61,12 +61,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ssrjkk/crm_ssrjkk.git"
+    "url": "git+https://github.com/ssrjkk/corvid_crm.git"
   },
   "bugs": {
-    "url": "https://github.com/ssrjkk/crm_ssrjkk/issues"
+    "url": "https://github.com/ssrjkk/corvid_crm/issues"
   },
-  "homepage": "https://github.com/ssrjkk/crm_ssrjkk#readme",
+  "homepage": "https://github.com/ssrjkk/corvid_crm#readme",
   "keywords": [
     "crm",
     "freelance",

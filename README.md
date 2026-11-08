@@ -6,7 +6,7 @@
 
 **Гибкая CRM для фриланса и проектов — сделки, счета, клиенты, задачи и аналитика в одном месте.**
 
-[![CI](https://github.com/ssrjkk/crm_ssrjkk/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/crm_ssrjkk/actions/workflows/ci.yml)
+[![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-ssrjkk-7c5cff.svg)](https://github.com/ssrjkk)
 ![Next.js](https://img.shields.io/badge/Next.js%2016-black)
@@ -40,8 +40,8 @@
 ## 🚀 Быстрый старт
 
 ```bash
-git clone https://github.com/ssrjkk/crm_ssrjkk.git
-cd crm_ssrjkk
+git clone https://github.com/ssrjkk/corvid_crm.git
+cd corvid_crm
 npm install
 
 # .env
