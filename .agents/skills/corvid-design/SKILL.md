@@ -86,6 +86,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 - CSV-экспорт: сырые числа без `formatMoney`, лейблы из `@/lib/labels.ts` (канон с ё:
   `Завершён`, `Отменён`).
 - Ошибки auth-форм: только `toast.error` (sonner глобален), нативный `alert()` запрещён.
+- `--destructive` светлой темы затемнён до `oklch(0.5 0.205 29)` (контраст 5.06:1,
+  a11y-требование для `text-xs`); тёмная тема без изменений.
 
 ## Данные и графы
 
@@ -127,7 +129,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (51 тест: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета) + Playwright E2E (6: лендинг, 307-защита, вход, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт.
+Проект покрыт Vitest (55 тестов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge) + Playwright E2E (6: лендинг, 307-защита, вход, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт. Конфиг: `retries: 1` — доказанный флейк окружения последнего теста пачки (4 падения без навигации, ретрай всегда зелёный за 2–4с).
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.

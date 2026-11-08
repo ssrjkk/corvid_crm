@@ -99,13 +99,13 @@ export default function CalendarPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => setCurrentMonth((month) => (month ? subMonths(month, 1) : month))}>
+          <Button variant="outline" size="icon" aria-label="Предыдущий месяц" onClick={() => setCurrentMonth((month) => (month ? subMonths(month, 1) : month))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={() => setCurrentMonth(new Date())}>
             Сегодня
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setCurrentMonth((month) => (month ? addMonths(month, 1) : month))}>
+          <Button variant="outline" size="icon" aria-label="Следующий месяц" onClick={() => setCurrentMonth((month) => (month ? addMonths(month, 1) : month))}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

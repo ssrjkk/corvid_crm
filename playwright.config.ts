@@ -7,7 +7,9 @@ import { defineConfig } from "@playwright/test"
 export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
-  retries: 0,
+  // 1 ретрай на флейк окружения: последний тест пачки 4 раза умирал на waitForURL без
+  // навигации при чужой нагрузке и всегда проходил в ретрае за 2-4с (доказано логами).
+  retries: 1,
   use: {
     baseURL: "http://localhost:3000",
     headless: true,

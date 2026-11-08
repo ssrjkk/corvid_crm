@@ -44,6 +44,7 @@ export default function SignUpPage() {
         <Input
           type="text"
           placeholder="Имя"
+          aria-label="Имя"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -51,6 +52,7 @@ export default function SignUpPage() {
         <Input
           type="email"
           placeholder="Email"
+          aria-label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -58,6 +60,7 @@ export default function SignUpPage() {
         <Input
           type="password"
           placeholder="Пароль"
+          aria-label="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required

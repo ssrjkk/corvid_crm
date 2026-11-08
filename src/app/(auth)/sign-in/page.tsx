@@ -43,6 +43,7 @@ export default function SignInPage() {
         <Input
           type="email"
           placeholder="Email"
+          aria-label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -50,6 +51,7 @@ export default function SignInPage() {
         <Input
           type="password"
           placeholder="Пароль"
+          aria-label="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
