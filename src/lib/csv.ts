@@ -3,20 +3,24 @@ type CsvCell = string | number | null | undefined
 /**
  * Builds a UTF-8 CSV (semicolon separated, BOM for Excel) and triggers download.
  * Must be called from a client-side event handler.
+ *
+ * Защита от CSV-инъекций (CWE-1236): ячейка, начинающаяся с `= + - @` (после
+ * пробелов тоже), Tab или CR, получает префикс `'` — Excel/LibreOffice трактуют
+ * её как текст, а не формулу. Побочный эффект: телефоны "+7..." хранятся как
+ * текст — для телефонов это правильно (иначе Excel съедает плюс).
  */
+const INJECTION_LEAD = /^[\s]*[=+\-@\t\r]/
+
+function escapeCell(cell: CsvCell): string {
+  const value = cell == null ? "" : String(cell)
+  const safe = INJECTION_LEAD.test(value) ? `'${value}` : value
+  return `"${safe.replace(/"/g, '""')}"`
+}
+
 export function downloadCsv(filename: string, rows: CsvCell[][]) {
   const content =
     "\uFEFF" +
-    rows
-      .map((row) =>
-        row
-          .map((cell) => {
-            const value = cell == null ? "" : String(cell)
-            return `"${value.replace(/"/g, '""')}"`
-          })
-          .join(";")
-      )
-      .join("\r\n")
+    rows.map((row) => row.map(escapeCell).join(";")).join("\r\n")
 
   const blob = new Blob([content], { type: "text/csv;charset=utf-8;" })
   const url = URL.createObjectURL(blob)

@@ -129,7 +129,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (55 тестов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge) + Playwright E2E (6: лендинг, 307-защита, вход, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт. Конфиг: `retries: 1` — доказанный флейк окружения последнего теста пачки (4 падения без навигации, ретрай всегда зелёный за 2–4с).
+Проект покрыт Vitest (58 тестов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-инъекции + fail-closed секрет) + Playwright E2E (6: лендинг, 307-защита, вход, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт. Конфиг: `retries: 1` — доказанный флейк окружения последнего теста пачки (4 падения без навигации, ретрай всегда зелёный за 2–4с).
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
@@ -143,6 +143,11 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   фикс видимой ошибки = e2e-регресс (как неверный пароль→тост);
   фантом-зависимости запрещены: пакет `cn` удалён, `cn()` — только из `@/lib/utils`
   (после удаления возврат `from "cn"` роняет build — так и задумано).
+- Паранойя: CSV-инъекции нейтрализуются префиксом `'` (CWE-1236, тест в `csv.test.ts`);
+  секрет только из окружения — в production без `BETTER_AUTH_SECRET` процесс падает
+  сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db` в gitignore;
+  `signIn(page)` в e2e повторяет потерянный клик 1 раз (настоящий вис API всё равно
+  уронит тест — маскировки нет).
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн

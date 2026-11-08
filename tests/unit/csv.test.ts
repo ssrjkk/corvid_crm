@@ -51,4 +51,38 @@ describe("downloadCsv", () => {
     expect(content).toContain('"";"";"x"') // null/undefined → пустые ячейки
     expect(content).toContain("\r\n")
   })
+
+  it("нейтрализует CSV-инъекции префиксом ' (CWE-1236)", () => {
+    const append = vi.fn()
+    const remove = vi.fn()
+    const click = vi.fn()
+
+    const captured: { content: string }[] = []
+    vi.stubGlobal("Blob", class {
+      constructor(parts: string[]) {
+        captured.push({ content: parts.join("") })
+      }
+    })
+    vi.stubGlobal("URL", {
+      createObjectURL: () => "blob:mock",
+      revokeObjectURL: vi.fn(),
+    })
+    vi.stubGlobal("document", {
+      ...document,
+      createElement: () => ({ href: "", download: "", click }),
+      body: { appendChild: append, removeChild: remove },
+    })
+
+    downloadCsv("evil.csv", [
+      ["=cmd|'/C calc'!A0", "+79150000000", "-2+3", "@mention", " =1+1", "Иван"],
+    ])
+
+    const { content } = captured[0]
+    expect(content).toContain("\"'=cmd|'/C calc'!A0\"")
+    expect(content).toContain("\"'+79150000000\"")
+    expect(content).toContain("\"'-2+3\"")
+    expect(content).toContain("\"'@mention\"")
+    expect(content).toContain("\"' =1+1\"")
+    expect(content).toContain('"Иван"') // обычная ячейка без префикса
+  })
 })
