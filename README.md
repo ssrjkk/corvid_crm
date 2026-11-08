@@ -4,49 +4,49 @@
 
 # Corvid CRM
 
-**Гибкая CRM для фриланса и проектов — сделки, счета, клиенты, задачи и аналитика в одном месте.**
+**CRM для фриланса, которую не стыдно открыть при заказчике: сделки, счета, клиенты, задачи и аналитика — в одном месте.**
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-ssrjkk-7c5cff.svg)](https://github.com/ssrjkk)
-![Next.js](https://img.shields.io/badge/Next.js%2016-black)
-![Tests](https://img.shields.io/badge/tests-59%20%2B%20E2E-10b981)
+[![Tests](https://img.shields.io/badge/tests-59%20unit%20%2B%207%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
 
 </div>
 
 ---
 
-Дизайн, который не стыдно открыть при заказчике: тёмная «чернильная» база, фирменный
-фиолетовый акцент, типографика Manrope + Inter, светлая и тёмная темы.
+Тёмная «чернильная» база + один фиолетовый акцент (отлив воронова пера), типографика Manrope + Inter с кириллицей, светлая и тёмная темы из oklch-токенов. Сдержанность уровня Linear — ноль каруселей и градиентных баннеров.
 
-## ✨ Возможности
+## Что умеет
 
-| Модуль | Что умеет |
+| Модуль | Коротко |
 |---|---|
 | 📊 **Дашборд** | воронка продаж, выручка по месяцам, задачи на сегодня и просрочки |
 | 🎯 **Воронка** | Kanban с drag-and-drop; перенос в «Выиграна»/«Проиграна» закрывает сделку |
-| 🤝 **Сделки** | карточки с задачами, активностями, тегами; CSV; фильтры |
-| 🧾 **Счета** | позиции работ, автонумерация INV-0001…, статусы, печать/PDF, просрочки |
-| 👥 **Клиенты** | компании и контакты, **CSV-импорт и экспорт** |
-| ✅ **Задачи** | список + доска по статусам, приоритеты, дедлайны |
+| 🤝 **Сделки** | карточки: задачи, активности, теги (через запятую), CSV-экспорт, фильтры |
+| 🧾 **Счета** | позиции работ, автонумерация `INV-0001…`, статусы, просрочки, печать/PDF |
+| 👥 **Клиенты** | контакты и компании, CSV-импорт и экспорт |
+| ✅ **Задачи** | список + Kanban-доска по статусам, приоритеты, дедлайны |
 | 📅 **Календарь** | задачи и дедлайны проектов по месяцам |
-| 📁 **Проекты** | привязка к сделкам 1:1, статусы |
-| 💬 **Активности** | история звонков, писем, встреч по каждой сделке |
-| ⚙️ **Настройки** | свои этапы воронки: названия, цвета, порядок |
-| 🔎 **⌘K** | командная палитра: навигация и глобальный поиск |
-| 🌓 **Темы** | светлая и тёмная, переключатель в сайдбаре |
-| 👤 **Роли** | ADMIN / MANAGER / VIEWER — зритель только читает |
+| 📁 **Проекты** | привязка к сделке 1:1 (уровень БД), статусы |
+| 💬 **Активности** | звонки, письма, встречи, заметки — по сделкам, контактам, компаниям |
+| ⚙️ **Настройки** | этапы воронки: названия, цвета, порядок drag-and-drop |
+| 🔎 **⌘K** | командная палитра: навигация + глобальный поиск по сделкам, контактам, счетам |
+| 🌓 **Темы** | светлая и тёмная из oklch-токенов, переключатель в сайдбаре |
+| 👤 **Роли** | ADMIN / MANAGER / VIEWER — зритель только читает (проверено матрицей тестов) |
 
-## 🚀 Быстрый старт
+## Быстрый старт
 
 ```bash
 git clone https://github.com/ssrjkk/corvid_crm.git
 cd corvid_crm
 npm install
 
-# .env
+# .env — пример:
 #   DATABASE_URL="file:./dev.db"
-#   BETTER_AUTH_SECRET="свой-секрет"
+#   BETTER_AUTH_SECRET="сгенерируй: npx auth secret"
 #   BETTER_AUTH_URL="http://localhost:3000"
 
 npx prisma migrate dev
@@ -54,39 +54,32 @@ npm run dev          # → http://localhost:3000 (в другом термина
 npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпотентно)
 ```
 
-Первый зарегистрированный через `/sign-up` аккаунт — ваш (роль ADMIN по умолчанию).
-Демо-аккаунт создаётся сидом выше.
+Первый зарегистрированный через `/sign-up` пользователь получает роль ADMIN.
+Для e2e нужен запущенный `npm run start` — детали ниже.
 
-## 🧪 Качество
+## Качество: 59 unit + 7 e2e, всё зелёное
 
 ```bash
-npm test             # Vitest: unit + интеграционные тесты tRPC-роутеров (тестовая БД)
-npm run test:watch
-npm run e2e          # Playwright E2E (нужен запущенный npm run start; print-медиа включён)
-npm run lint
-npm run build
+npm test        # Vitest: 59 тестов — чистая логика + все tRPC-роутеры на изолированной test.db, матрица ролей
+npm run lint    # ESLint: 0 ошибок, 0 варнингов
+npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
+npm run e2e     # Playwright: setup-логин + лендинг, 307-защита, неверный пароль→тост, счета, печать (скрытие сайдбара в print)
 ```
 
-- **59 тестов** Vitest: чистая логика (CSV RFC 4180 + защита от CSV-инъекций, деньги, даты) + все ключевые
-  роутеры на изолированной тестовой БД, включая матрицу ролей
-- **Playwright E2E (setup + 6)**: лендинг, защита маршрутов, неверный пароль→тост, вход, счета, скрытие сайдбара при печати
-- **CI**: `.github/workflows/ci.yml` — тесты + линт + сборка на каждый push
+- Один логин на весь e2e-съют (setup-проект + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд, 4 отдельных логина упирались в 429.
+- CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
+- Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
 
-## 🏗️ Стек
+## Стек
 
-Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · TypeScript ·
-Tailwind CSS v4 (oklch-токены) · tRPC v11 + TanStack Query · Prisma 7 + SQLite ·
-Better Auth (email/пароль + роли) · recharts · dnd-kit · next-themes.
+Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · TypeScript 5 · Tailwind CSS v4 (oklch-токены) · tRPC v11 + TanStack Query · Prisma 7 + SQLite · Better Auth (email/пароль + роли) · recharts · dnd-kit · next-themes · Vitest + Playwright.
 
-Дизайн-система проекта живёт в `.agents/skills/corvid-design/SKILL.md` — токены,
-типографика, грабли Next 16 и чек-листы проверок подхватываются агентами автоматически.
+Дизайн-система проекта живёт в [`.agents/skills/corvid-design/SKILL.md`](.agents/skills/corvid-design/SKILL.md) — токены, типографика, грабли Next 16 и чек-листы подхватываются агентами автоматически.
 
-## 📦 Деплой
+## Деплой
 
-Подходит для Vercel/собственного сервера. Для продакшена с доступом с нескольких
-устройств переведите БД на PostgreSQL (`prisma/schema.prisma` → `provider = "postgresql"`,
-миграции те же). Локальный SQLite удобен для личного использования на одном ПК.
+Подходит для Vercel/собственного сервера. Для продакшена с доступом с нескольких устройств переведи БД на PostgreSQL (`prisma/schema.prisma` → `provider = "postgresql"`, миграции те же). Локальный SQLite удобен для личного использования на одном ПК.
 
-## 📄 Лицензия
+## Лицензия
 
 [MIT](LICENSE) © 2026 [Sergey Sitnikov (ssrjkk)](https://github.com/ssrjkk)
