@@ -6,7 +6,7 @@ import { ArrowLeft, Building2, Mail, Phone, Pencil, Plus, Send, User as UserIcon
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import type { RouterOutputs } from "@/server/routers/_app"
-import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -44,11 +44,7 @@ import { usePermissions } from "@/lib/use-permissions"
 type Contact = NonNullable<RouterOutputs["contacts"]["getById"]>
 type Company = RouterOutputs["companies"]["getAll"][number]
 
-function dealStatusBadge(status: string) {
-  if (status === "WON") return <Badge className="bg-green-600 text-white">Выиграна</Badge>
-  if (status === "LOST") return <Badge variant="destructive">Проиграна</Badge>
-  return <Badge variant="secondary">Открыта</Badge>
-}
+// Бейдж статуса — единый <StatusBadge kind="deal"> (семантика в @/lib/labels.ts).
 
 export default function ContactDetail({ contactId }: { contactId: string }) {
   const { canWrite } = usePermissions()
@@ -144,7 +140,7 @@ export default function ContactDetail({ contactId }: { contactId: string }) {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-medium">{formatMoney(deal.value, deal.currency)}</span>
-                        {dealStatusBadge(deal.status)}
+                        <StatusBadge kind="deal" status={deal.status} />
                       </div>
                     </Link>
                   ))}

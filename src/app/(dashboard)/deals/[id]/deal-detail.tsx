@@ -17,6 +17,7 @@ import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import type { RouterOutputs } from "@/server/routers/_app"
 import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -56,11 +57,7 @@ type Stage = RouterOutputs["pipeline"]["getStages"][number]
 type Company = RouterOutputs["companies"]["getAll"][number]
 type Contact = RouterOutputs["contacts"]["getAll"][number]
 
-function statusBadge(status: string) {
-  if (status === "WON") return <Badge className="bg-green-600 text-white">Выиграна</Badge>
-  if (status === "LOST") return <Badge variant="destructive">Проиграна</Badge>
-  return <Badge variant="secondary">Открыта</Badge>
-}
+// Бейдж статуса — единый <StatusBadge kind="deal"> (семантика в @/lib/labels.ts).
 
 export default function DealDetail({ dealId }: { dealId: string }) {
   const { canWrite } = usePermissions()
@@ -164,7 +161,7 @@ export default function DealDetail({ dealId }: { dealId: string }) {
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold">{formatMoney(deal.value, deal.currency)}</div>
-          <div className="mt-1 flex justify-end">{statusBadge(deal.status)}</div>
+          <div className="mt-1 flex justify-end"><StatusBadge kind="deal" status={deal.status} /></div>
         </div>
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           {canWrite && (

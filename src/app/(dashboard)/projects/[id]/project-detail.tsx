@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import type { RouterOutputs } from "@/server/routers/_app"
-import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -57,12 +57,7 @@ import { usePermissions } from "@/lib/use-permissions"
 
 type Project = NonNullable<RouterOutputs["projects"]["getById"]>
 
-function projectStatusBadge(status: string) {
-  if (status === "COMPLETED") return <Badge className="bg-green-600 text-white">Завершён</Badge>
-  if (status === "CANCELLED") return <Badge variant="destructive">Отменён</Badge>
-  if (status === "IN_PROGRESS") return <Badge>В работе</Badge>
-  return <Badge variant="secondary">{projectStatusLabels[status] ?? status}</Badge>
-}
+// Бейдж статуса — единый <StatusBadge kind="project"> (семантика в @/lib/labels.ts).
 
 function toDateInput(value?: Date | string | null) {
   if (!value) return ""
@@ -136,7 +131,7 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
           <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
           <div className="mt-1 flex items-center gap-2">
             <p className="text-muted-foreground">Карточка проекта</p>
-            {projectStatusBadge(project.status)}
+            <StatusBadge kind="project" status={project.status} />
           </div>
         </div>
         <Sheet open={editOpen} onOpenChange={setEditOpen}>

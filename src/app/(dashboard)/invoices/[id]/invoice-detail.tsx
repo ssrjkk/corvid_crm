@@ -5,16 +5,11 @@ import { ArrowLeft, Printer } from "lucide-react"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { formatMoney, invoiceStatusLabels } from "@/lib/labels"
-import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-function statusBadge(status: string) {
-  if (status === "PAID") return <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Оплачен</Badge>
-  if (status === "SENT") return <Badge className="bg-violet-500/15 text-violet-600 dark:text-violet-400">Выставлен</Badge>
-  if (status === "CANCELLED") return <Badge variant="destructive">Отменён</Badge>
-  return <Badge variant="secondary">Черновик</Badge>
-}
+// Бейдж статуса — единый <StatusBadge kind="invoice"> (семантика в @/lib/labels.ts).
 
 export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
   const { data: invoice, isLoading } = trpc.invoices.getById.useQuery({ id: invoiceId })
@@ -57,7 +52,7 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
             {invoice.dueDate ? ` · Оплатить до: ${new Date(invoice.dueDate).toLocaleDateString("ru-RU")}` : ""}
           </p>
         </div>
-        {statusBadge(invoice.status)}
+        <StatusBadge kind="invoice" status={invoice.status} />
         <Button variant="outline" onClick={() => window.print()}>
           <Printer className="mr-2 h-4 w-4" />
           Печать / PDF

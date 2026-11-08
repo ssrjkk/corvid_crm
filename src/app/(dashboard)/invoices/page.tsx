@@ -6,7 +6,7 @@ import { Plus, ReceiptText, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { formatMoney } from "@/lib/labels"
-import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -15,12 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-function statusBadge(status: string) {
-  if (status === "PAID") return <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Оплачен</Badge>
-  if (status === "SENT") return <Badge className="bg-violet-500/15 text-violet-600 dark:text-violet-400">Выставлен</Badge>
-  if (status === "CANCELLED") return <Badge variant="destructive">Отменён</Badge>
-  return <Badge variant="secondary">Черновик</Badge>
-}
+// Бейдж статуса — единый <StatusBadge kind="invoice"> (семантика в @/lib/labels.ts).
 
 type ItemDraft = { name: string; qty: string; price: string }
 
@@ -186,7 +181,7 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
             </div>
             <div className="grid items-end gap-2">
               <div className="text-right text-lg font-semibold tabular-nums">
-                Итого: {total.toLocaleString("ru-RU")} {currency === "RUB" ? "₽" : currency}
+                Итого: {formatMoney(total, currency)}
               </div>
             </div>
           </div>
@@ -260,7 +255,7 @@ export default function InvoicesPage() {
             <ReceiptText className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums">{sum("SENT").toLocaleString("ru-RU")} ₽</div>
+            <div className="text-2xl font-bold tabular-nums">{formatMoney(sum("SENT"))}</div>
           </CardContent>
         </Card>
         <Card>
@@ -269,7 +264,7 @@ export default function InvoicesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
-              {sum("PAID").toLocaleString("ru-RU")} ₽
+              {formatMoney(sum("PAID"))}
             </div>
           </CardContent>
         </Card>
@@ -278,7 +273,7 @@ export default function InvoicesPage() {
             <CardTitle className="text-sm font-medium">Просрочено</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">
+            <div className="text-2xl font-bold tabular-nums text-destructive">
               {overdue.length}
             </div>
           </CardContent>
@@ -313,7 +308,7 @@ export default function InvoicesPage() {
                 return (
                   <div
                     key={inv.id}
-                    className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 ${isOverdue ? "border-red-300 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20" : ""}`}
+                    className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 ${isOverdue ? "border-destructive/30 bg-destructive/10" : ""}`}
                   >
                     <div className="min-w-0">
                       <Link href={`/invoices/${inv.id}`} className="font-medium hover:underline">
@@ -326,7 +321,7 @@ export default function InvoicesPage() {
                     </div>
                     <div className="text-right font-semibold tabular-nums">{formatMoney(total, inv.currency)}</div>
                     <div className="flex flex-wrap items-center gap-2">
-                      {statusBadge(inv.status)}
+                      <StatusBadge kind="invoice" status={inv.status} />
                       {inv.status !== "SENT" && inv.status !== "PAID" && (
                         <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ id: inv.id, status: "SENT" })}>
                           Выставить

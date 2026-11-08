@@ -3,9 +3,11 @@
 import { useState } from "react"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { BrandMark } from "@/components/layout/brand"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -21,7 +23,7 @@ export default function SignInPage() {
       {
         onSuccess: () => router.push("/dashboard"),
         onError: (ctx) => {
-          alert(ctx.error.message)
+          toast.error(ctx.error.message)
           setLoading(false)
         },
       }
@@ -38,20 +40,18 @@ export default function SignInPage() {
             <p className="text-muted-foreground">Войдите в свой аккаунт</p>
           </div>
         </div>
-        <input
+        <Input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-md border px-3 py-2"
           required
         />
-        <input
+        <Input
           type="password"
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border px-3 py-2"
           required
         />
         <Button type="submit" className="w-full" disabled={loading}>

@@ -119,11 +119,11 @@ export default function CalendarPage() {
           </CardTitle>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-blue-500" />
+              <span className="h-2 w-2 rounded-full bg-primary" />
               Задачи
             </span>
             <span className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="h-2 w-2 rounded-full bg-chart-4" />
               Проекты
             </span>
           </div>
@@ -169,7 +169,7 @@ export default function CalendarPage() {
                           key={event.id}
                           href={event.href}
                           className={`flex items-start gap-1 rounded px-1 py-0.5 text-[11px] leading-tight hover:bg-accent ${
-                            event.kind === "task" ? "text-blue-700 dark:text-blue-300" : "text-amber-700 dark:text-amber-300"
+                            event.kind === "task" ? "text-primary" : "text-chart-4"
                           }`}
                           title={`${event.title} · ${event.status}`}
                         >

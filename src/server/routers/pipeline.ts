@@ -60,6 +60,8 @@ export const pipelineRouter = router({
   initDefault: adminProcedure.mutation(async () => {
     const count = await prisma.pipelineStage.count()
     if (count > 0) return { created: 0 }
+    // Цвета этапов — данные пользователя (не UI-хардкод): хранятся как hex,
+    // т.к. <input type="color"> принимает только hex. Рендер использует токен-фолбэк.
     await prisma.pipelineStage.createMany({
       data: [
         { name: "Новая", order: 0, color: "#94a3b8" },

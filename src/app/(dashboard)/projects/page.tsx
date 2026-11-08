@@ -11,12 +11,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { FilterSheet } from "@/components/filter-sheet"
+import { StatusBadge } from "@/components/status-badge"
 import { Plus, Calendar, FolderKanban, Download } from "lucide-react"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
 import { toast } from "sonner"
 import { usePermissions } from "@/lib/use-permissions"
 import { downloadCsv } from "@/lib/csv"
+import { projectStatusLabels } from "@/lib/labels"
 
 export default function ProjectsPage() {
   const { canWrite } = usePermissions()
@@ -57,34 +59,7 @@ export default function ProjectsPage() {
     })
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-      case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-      case "REVIEW":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-      case "ON_HOLD":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      PLANNING: "Планирование",
-      IN_PROGRESS: "В работе",
-      REVIEW: "На проверке",
-      COMPLETED: "Завершен",
-      ON_HOLD: "Приостановлен",
-      CANCELLED: "Отменен",
-    }
-    return labels[status] || status
-  }
+  // Лейблы статуса — только projectStatusLabels из @/lib/labels.ts. Локальных копий нет.
 
   const filteredProjects = useMemo(() => {
     return projects?.filter((project) => {
@@ -121,7 +96,7 @@ export default function ProjectsPage() {
       ["Название", "Статус", "Сделка", "Старт", "Дедлайн", "Задач", "Создан"],
       ...rows.map((project) => [
         project.name,
-        getStatusLabel(project.status),
+        projectStatusLabels[project.status] ?? project.status,
         project.deal?.title ?? "",
         project.startDate ? new Date(project.startDate).toISOString().slice(0, 10) : "",
         project.deadline ? new Date(project.deadline).toISOString().slice(0, 10) : "",
@@ -254,11 +229,11 @@ export default function ProjectsPage() {
       </div>
 
       {isLoading ? (
-        <div>Загрузка...</div>
+        <p className="py-10 text-center text-sm text-muted-foreground">Загрузка…</p>
       ) : (
         <>
           {filteredProjects?.length === 0 && (
-            <p className="text-sm text-muted-foreground">Нет проектов по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">Нет проектов по выбранным фильтрам</p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredProjects?.map((project) => (
@@ -271,9 +246,7 @@ export default function ProjectsPage() {
                       {project.name}
                     </Link>
                   </CardTitle>
-                  <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(project.status)}`}>
-                    {getStatusLabel(project.status)}
-                  </span>
+                  <StatusBadge kind="project" status={project.status} />
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">

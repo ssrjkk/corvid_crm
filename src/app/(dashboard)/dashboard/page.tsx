@@ -2,6 +2,7 @@
 
 import { trpc } from "@/lib/trpc/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatMoney } from "@/lib/labels"
 import { Handshake, CheckSquare, Users, FolderKanban } from "lucide-react"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
@@ -29,7 +30,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Сделки</CardTitle><Handshake className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalDeals}</div><p className="text-xs text-muted-foreground">На сумму {totalValue.toLocaleString()} ₽</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Сделки</CardTitle><Handshake className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold tabular-nums">{totalDeals}</div><p className="text-xs text-muted-foreground tabular-nums">На сумму {formatMoney(totalValue)}</p></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Активные задачи</CardTitle><CheckSquare className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{openTasks}</div></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Контакты</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalContacts}</div></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Проекты в работе</CardTitle><FolderKanban className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{activeProjects}</div></CardContent></Card>
@@ -42,10 +43,10 @@ export default function DashboardPage() {
             {funnel && funnel.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={funnel}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" fontSize={12} />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} />
+                  <YAxis allowDecimals={false} fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={32} />
+                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: "8px" }} />
                   <Bar dataKey="count" fill="var(--chart-1)" name="Сделок" radius={[6, 6, 0, 0]} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
@@ -61,10 +62,10 @@ export default function DashboardPage() {
             {revenue && revenue.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={revenue}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" fontSize={12} />
-                  <YAxis />
-                  <Tooltip formatter={(v) => `${Number(v).toLocaleString()} ₽`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="month" fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} />
+                  <YAxis fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={48} />
+                  <Tooltip formatter={(v) => formatMoney(Number(v))} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: "8px" }} />
                   <Line type="monotone" dataKey="total" stroke="var(--chart-3)" strokeWidth={2} name="Выручка" isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -85,10 +86,10 @@ export default function DashboardPage() {
                   <Link
                     key={t.id}
                     href={t.deal ? `/deals/${t.deal.id}` : "/tasks"}
-                    className="flex items-center justify-between rounded border p-2 text-sm hover:bg-accent"
+                    className="flex items-center justify-between gap-2 rounded-lg border p-2 text-sm hover:bg-accent"
                   >
-                    <span>{t.title}</span>
-                    <span className="text-muted-foreground">{t.status}</span>
+                    <span className="min-w-0 truncate">{t.title}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{t.status}</span>
                   </Link>
                 ))}
               </div>
@@ -108,10 +109,10 @@ export default function DashboardPage() {
                   <Link
                     key={t.id}
                     href={t.deal ? `/deals/${t.deal.id}` : "/tasks"}
-                    className="flex items-center justify-between rounded border border-red-200 bg-red-50 p-2 text-sm hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40"
+                    className="flex items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm hover:bg-destructive/15"
                   >
-                    <span>{t.title}</span>
-                    <span className="text-red-600">{t.status}</span>
+                    <span className="min-w-0 truncate">{t.title}</span>
+                    <span className="shrink-0 text-xs text-destructive">{t.status}</span>
                   </Link>
                 ))}
               </div>

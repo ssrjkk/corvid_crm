@@ -16,6 +16,15 @@ test.describe("Публичные страницы", () => {
 test.describe("Авторизованная зона", () => {
   test.use({ storageState: { cookies: [], origins: [] } })
 
+  test("неверный пароль показывает тост и остаётся на входе (без alert)", async ({ page }) => {
+    await page.goto("/sign-in")
+    await page.getByPlaceholder("Email").fill("test@corvid.dev")
+    await page.getByPlaceholder("Пароль").fill("WrongPass123!")
+    await page.getByRole("button", { name: "Войти" }).click()
+    await expect(page.getByText("Invalid email or password")).toBeVisible()
+    await expect(page).toHaveURL(/\/sign-in/)
+  })
+
   test("вход по форме открывает дашборд с данными", async ({ page }) => {
     await page.goto("/sign-in")
     await page.getByPlaceholder("Email").fill("test@corvid.dev")

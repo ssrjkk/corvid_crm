@@ -49,11 +49,11 @@ Inter (latin+cyrillic), recharts, sonner, next-themes.
 
 Тёмный «чернильный» сайдбар в обеих темах (токены `--sidebar*`). Структура: бренд →
 командная палитра (⌘K) → группы навигации с заголовками-надписями (`text-xs uppercase
-tracking-wider text-sidebar-foreground/50`): «Работа» (Дашборд, Воронка, Сделки),
-«Клиенты» (Контакты, Компании), «Задачи» (Задачи, Доска задач, Календарь),
-«Проекты» (Проекты, Активности). Активный пункт — `bg-sidebar-primary
-text-sidebar-primary-foreground`, ховер — `bg-sidebar-accent`. Внизу — пользователь
-(почта из `authClient.useSession()`) + переключатель темы + выход.
+tracking-wider text-sidebar-foreground/50`): «ОБЗОР» (Дашборд), «ПРОДАЖИ» (Воронка,
+Сделки, Счета), «КЛИЕНТЫ» (Контакты, Компании, Активности), «РАБОТА» (Задачи,
+Доска задач, Календарь, Проекты), «СИСТЕМА» (Настройки). Активный пункт —
+`bg-sidebar-primary text-sidebar-primary-foreground`, ховер — `bg-sidebar-accent`.
+Внизу — пользователь (почта из `authClient.useSession()`) + переключатель темы + выход.
 
 ## Тёмная тема
 
@@ -69,7 +69,23 @@ next-themes подключён в `layout.tsx` (`attribute="class"`, `defaultThe
 фиолетовый (primary), ожидание — янтарный, нейтральное — secondary. Бейдж = мягкий
 тонированный фон + текст того же тона (`bg-emerald-500/15 text-emerald-600 dark:text-emerald-400`),
 не сплошная заливка. Пустые состояния: `text-sm text-muted-foreground` по центру,
-одним предложением, без иконок-заглушек.
+одним предложением, без иконок-заглушек. Рендер — только через `<StatusBadge kind
+status>` из `@/components/status-badge`, цвета/лейблы — только из `@/lib/labels.ts`
+(`dealBadge`, `invoiceBadge`, `projectBadge`, `taskBadge`, `priorityToneClass`).
+Дублировать маппинг в страницах запрещено.
+
+## Принятые исключения (не «чинить», зафиксировано)
+
+- hex в `pipeline.ts`-сидах и `settings/page.tsx` (`useState` цвета): данные пользователя,
+  `<input type=color>` принимает только hex; рендер идёт через токен-фолбэк
+  (`bg-muted-foreground` + условный `style`).
+- `text-amber-700 dark:text-amber-300` поверх `bg-chart-4/20`: янтарь-текст для
+  контраста (`--chart-4` слишком светлый для текста).
+- `text-[10px]`, `w-72`, `min-h-28`, `max-h-[85vh]/[360px]`: плотность kanban/календаря
+  и диалогов, не типографика (заголовки групп — строго `text-xs`).
+- CSV-экспорт: сырые числа без `formatMoney`, лейблы из `@/lib/labels.ts` (канон с ё:
+  `Завершён`, `Отменён`).
+- Ошибки auth-форм: только `toast.error` (sonner глобален), нативный `alert()` запрещён.
 
 ## Данные и графы
 
@@ -111,7 +127,7 @@ next-themes подключён в `layout.tsx` (`attribute="class"`, `defaultThe
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (36 тестов) + Playwright E2E (5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт.
+Проект покрыт Vitest (51 тест: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета) + Playwright E2E (6: лендинг, 307-защита, вход, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
@@ -120,7 +136,9 @@ next-themes подключён в `layout.tsx` (`attribute="class"`, `defaultThe
   Контекст собирается вручную в `makeCaller(role)`: "ADMIN" | "MANAGER" | "VIEWER" | "ANON".
 - dev.db из тестов не трогается никогда; `test.db` в .gitignore.
 - Правила: новый мутационный роутер = тест на создание + роли (VIEWER писать не может,
-  delete — только ADMIN) + граничные значения; новый lib-модуль = unit-тест.
+  delete — только ADMIN) + граничные значения; новый lib-модуль = unit-тест;
+  новый маппинг статус→цвет/лейбл = unit-тест в `labels.test.ts` (без теста не сдавать);
+  фикс видимой ошибки = e2e-регресс (как неверный пароль→тост).
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн

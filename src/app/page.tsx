@@ -23,7 +23,7 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col items-center overflow-hidden px-4 py-20">
+    <main className="relative flex min-h-screen flex-col items-center overflow-hidden px-4 py-20">
       <div aria-hidden className="hero-glow pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
       <div className="relative flex w-full max-w-3xl flex-col items-center gap-10 text-center">
         <div className="flex flex-col items-center gap-5">
@@ -80,6 +80,6 @@ export default function Home() {
           © 2026 ssrjkk · Corvid CRM
         </p>
       </div>
-    </div>
+    </main>
   )
 }

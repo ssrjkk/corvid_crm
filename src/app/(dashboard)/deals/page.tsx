@@ -13,8 +13,9 @@ import { FilterSheet } from "@/components/filter-sheet"
 import { Plus, Trash2, CheckCircle, XCircle, Download } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { downloadCsv } from "@/lib/csv"
-import { dealStatusLabels } from "@/lib/labels"
+import { dealStatusLabels, formatMoney } from "@/lib/labels"
 import { usePermissions } from "@/lib/use-permissions"
 
 export default function DealsPage() {
@@ -63,16 +64,7 @@ export default function DealsPage() {
     })
   }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "WON":
-        return <Badge className="bg-green-500">Выиграна</Badge>
-      case "LOST":
-        return <Badge variant="destructive">Проиграна</Badge>
-      default:
-        return <Badge variant="secondary">Открыта</Badge>
-    }
-  }
+  // Бейдж статуса — единый <StatusBadge kind="deal"> (семантика в @/lib/labels.ts).
 
   const filteredDeals = useMemo(() => {
     return deals?.filter((deal) => {
@@ -238,11 +230,11 @@ export default function DealsPage() {
       </div>
 
       {isLoading ? (
-        <div>Загрузка...</div>
+        <p className="py-10 text-center text-sm text-muted-foreground">Загрузка сделок…</p>
       ) : (
         <>
           {filteredDeals?.length === 0 && (
-            <p className="text-sm text-muted-foreground">Нет сделок по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">Нет сделок по выбранным фильтрам</p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredDeals?.map((deal) => (
@@ -254,12 +246,12 @@ export default function DealsPage() {
                       {deal.title}
                     </Link>
                   </CardTitle>
-                  {getStatusBadge(deal.status)}
+                  <StatusBadge kind="deal" status={deal.status} />
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="text-2xl font-bold">
-                  {Number(deal.value || 0).toLocaleString()} {deal.currency}
+                <div className="text-2xl font-bold tabular-nums">
+                  {formatMoney(deal.value, deal.currency)}
                 </div>
                 {deal.company && (
                   <div className="text-sm text-muted-foreground">{deal.company.name}</div>
@@ -270,9 +262,9 @@ export default function DealsPage() {
                   </div>
                 )}
                 {deal.stage && (
-                  <div className="text-xs px-2 py-1 rounded-full bg-accent inline-block">
+                  <Badge variant="secondary">
                     {deal.stage.name}
-                  </div>
+                  </Badge>
                 )}
                 {canWrite && deal.status === "OPEN" && (
                   <div className="flex gap-2 pt-2">
@@ -281,7 +273,7 @@ export default function DealsPage() {
                   </div>
                 )}
                 {canDelete && (
-                  <Button size="sm" variant="ghost" className="text-red-600" onClick={() => deleteDeal.mutate({ id: deal.id })} disabled={deleteDeal.isPending}>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => deleteDeal.mutate({ id: deal.id })} disabled={deleteDeal.isPending}>
                     <Trash2 className="mr-1 h-3 w-3" />
                     Удалить
                   </Button>

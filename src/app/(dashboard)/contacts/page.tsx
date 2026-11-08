@@ -209,11 +209,11 @@ export default function ContactsPage() {
       </div>
 
       {isLoading ? (
-        <div>Загрузка...</div>
+        <p className="py-10 text-center text-sm text-muted-foreground">Загрузка…</p>
       ) : (
         <>
           {filteredContacts?.length === 0 && (
-            <p className="text-sm text-muted-foreground">Нет контактов по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">Нет контактов по выбранным фильтрам</p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredContacts?.map((contact) => (

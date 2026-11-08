@@ -59,7 +59,7 @@ function NavGroups({ pathname }: { pathname: string | null }) {
     <nav className="flex-1 overflow-y-auto px-3 pb-3">
       {navGroups.map((group) => (
         <div key={group.label}>
-          <p className="px-3 pt-4 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/50">
+          <p className="px-3 pt-4 pb-1.5 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/50">
             {group.label}
           </p>
           <div className="space-y-0.5">

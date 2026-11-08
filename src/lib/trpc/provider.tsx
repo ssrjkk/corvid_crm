@@ -3,6 +3,7 @@
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { httpBatchLink } from "@trpc/client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { trpc } from "./client"
 import superjson from "superjson"
 
@@ -13,6 +14,7 @@ function getBaseUrl() {
 }
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -22,7 +24,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
           onError: (error) => {
             const code = (error as { data?: { code?: string } }).data?.code
             if (code === "UNAUTHORIZED" && typeof window !== "undefined") {
-              window.location.href = "/sign-in"
+              router.push("/sign-in")
             }
           },
         }),

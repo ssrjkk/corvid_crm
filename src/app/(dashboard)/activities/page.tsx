@@ -63,17 +63,7 @@ export default function ActivitiesPage() {
     }
   }
 
-  const getTypeLabel = (activityType: string) => {
-    const labels: Record<string, string> = {
-      NOTE: "Заметка",
-      CALL: "Звонок",
-      EMAIL: "Письмо",
-      MEETING: "Встреча",
-      MESSAGE: "Сообщение",
-      OTHER: "Другое",
-    }
-    return labels[activityType] || activityType
-  }
+  // Тип активности — только activityTypeLabels из @/lib/labels.ts. Локальных копий нет.
 
   return (
     <div className="space-y-6">
@@ -132,16 +122,19 @@ export default function ActivitiesPage() {
       </div>
 
       {isLoading ? (
-        <div>Загрузка...</div>
+        <p className="py-10 text-center text-sm text-muted-foreground">Загрузка…</p>
       ) : (
         <div className="space-y-3">
+          {activities?.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">Активностей пока нет</p>
+          )}
           {activities?.map((activity) => (
             <Card key={activity.id}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     {getIcon(activity.type)}
-                    {activity.title || getTypeLabel(activity.type)}
+                    {activity.title || (activityTypeLabels[activity.type] ?? activity.type)}
                   </CardTitle>
                   <span className="text-xs text-muted-foreground">
                     {format(new Date(activity.createdAt), "dd MMM yyyy HH:mm", { locale: ru })}

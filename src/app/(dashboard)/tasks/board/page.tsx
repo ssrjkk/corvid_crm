@@ -27,11 +27,11 @@ type Task = RouterOutputs["tasks"]["getAll"][number]
 type TaskStatus = Task["status"]
 
 const columns: { id: TaskStatus; title: string; accent: string }[] = [
-  { id: "TODO", title: "К выполнению", accent: "bg-slate-400" },
-  { id: "IN_PROGRESS", title: "В работе", accent: "bg-blue-500" },
-  { id: "REVIEW", title: "На проверке", accent: "bg-amber-500" },
-  { id: "DONE", title: "Выполнено", accent: "bg-green-600" },
-  { id: "CANCELLED", title: "Отменено", accent: "bg-red-500" },
+  { id: "TODO", title: "К выполнению", accent: "bg-muted-foreground" },
+  { id: "IN_PROGRESS", title: "В работе", accent: "bg-primary" },
+  { id: "REVIEW", title: "На проверке", accent: "bg-chart-4" },
+  { id: "DONE", title: "Выполнено", accent: "bg-emerald-500" },
+  { id: "CANCELLED", title: "Отменено", accent: "bg-destructive" },
 ]
 
 function priorityVariant(priority: string): "default" | "secondary" | "destructive" | "outline" {

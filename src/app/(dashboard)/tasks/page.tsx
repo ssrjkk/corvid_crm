@@ -11,12 +11,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { FilterSheet } from "@/components/filter-sheet"
+import { StatusBadge } from "@/components/status-badge"
 import { Plus, Calendar, CheckCircle2, Clock, LayoutList, Download } from "lucide-react"
 import { format } from "date-fns"
 import { ru } from "date-fns/locale"
 import { toast } from "sonner"
 import { usePermissions } from "@/lib/use-permissions"
 import { downloadCsv } from "@/lib/csv"
+import { priorityLabels, priorityToneClass, taskStatusLabels } from "@/lib/labels"
 
 export default function TasksPage() {
   const { canWrite } = usePermissions()
@@ -60,50 +62,8 @@ export default function TasksPage() {
     })
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "DONE":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-      case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-      case "REVIEW":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      TODO: "К выполнению",
-      IN_PROGRESS: "В работе",
-      REVIEW: "На проверке",
-      DONE: "Выполнено",
-      CANCELLED: "Отменено",
-    }
-    return labels[status] || status
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "URGENT":
-        return "text-red-600"
-      case "HIGH":
-        return "text-orange-600"
-      default:
-        return "text-gray-600"
-    }
-  }
-
-  const getPriorityLabel = (priority: string) => {
-    const labels: Record<string, string> = {
-      LOW: "Низкий",
-      MEDIUM: "Средний",
-      HIGH: "Высокий",
-      URGENT: "Срочный",
-    }
-    return labels[priority] || priority
-  }
+  // Лейблы/тон статуса и приоритета — только из @/lib/labels.ts (taskStatusLabels,
+  // priorityLabels, priorityToneClass). Локальных копий мапов здесь нет.
 
   const filteredTasks = useMemo(() => {
     return tasks?.filter((task) => {
@@ -144,8 +104,8 @@ export default function TasksPage() {
       ...rows.map((task) => [
         task.title,
         task.description ?? "",
-        getStatusLabel(task.status),
-        getPriorityLabel(task.priority),
+        taskStatusLabels[task.status] ?? task.status,
+        priorityLabels[task.priority] ?? task.priority,
         task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 10) : "",
         task.deal?.title ?? "",
         task.project?.name ?? "",
@@ -284,11 +244,11 @@ export default function TasksPage() {
       </div>
 
       {isLoading ? (
-        <div>Загрузка...</div>
+        <p className="py-10 text-center text-sm text-muted-foreground">Загрузка задач…</p>
       ) : (
         <>
           {filteredTasks?.length === 0 && (
-            <p className="text-sm text-muted-foreground">Нет задач по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">Нет задач по выбранным фильтрам</p>
           )}
           <div className="space-y-2">
             {filteredTasks?.map((task) => (
@@ -297,19 +257,17 @@ export default function TasksPage() {
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     {task.status === "DONE" ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <Clock className="h-5 w-5 text-muted-foreground" />
                     )}
                     {task.title}
                   </CardTitle>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                      {getPriorityLabel(task.priority)}
+                    <span className={`text-xs font-medium ${priorityToneClass(task.priority)}`}>
+                      {priorityLabels[task.priority] ?? task.priority}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(task.status)}`}>
-                      {getStatusLabel(task.status)}
-                    </span>
+                    <StatusBadge kind="task" status={task.status} />
                     {canWrite && task.status !== "DONE" && (
                       <Button
                         size="sm"

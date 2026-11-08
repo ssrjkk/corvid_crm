@@ -3,9 +3,11 @@
 import { useState } from "react"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { BrandMark } from "@/components/layout/brand"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -22,7 +24,7 @@ export default function SignUpPage() {
       {
         onSuccess: () => router.push("/dashboard"),
         onError: (ctx) => {
-          alert(ctx.error.message)
+          toast.error(ctx.error.message)
           setLoading(false)
         },
       }
@@ -39,28 +41,25 @@ export default function SignUpPage() {
             <p className="text-muted-foreground">Создайте аккаунт</p>
           </div>
         </div>
-        <input
+        <Input
           type="text"
           placeholder="Имя"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-md border px-3 py-2"
           required
         />
-        <input
+        <Input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-md border px-3 py-2"
           required
         />
-        <input
+        <Input
           type="password"
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border px-3 py-2"
           required
           minLength={8}
         />

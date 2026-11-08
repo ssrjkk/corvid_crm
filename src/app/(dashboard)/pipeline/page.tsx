@@ -35,7 +35,7 @@ function DealCardBody({ deal }: { deal: StageDeal }) {
         >
           {deal.title}
         </Link>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground tabular-nums">
           {formatMoney(deal.value, deal.currency)}
         </div>
         {deal.company && <div className="text-xs text-muted-foreground">{deal.company.name}</div>}
@@ -74,8 +74,8 @@ function StageColumn({ stage, disabled }: { stage: Stage; disabled: boolean }) {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <div
-              className="h-3 w-3 rounded-full"
-              style={{ backgroundColor: stage.color || "#6b7280" }}
+              className="h-3 w-3 rounded-full bg-muted-foreground"
+              style={stage.color ? { backgroundColor: stage.color } : undefined}
             />
             {stage.name}
             <span className="ml-auto text-muted-foreground">{stage.deals.length}</span>

@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const utils = trpc.useUtils()
   const { data: stages = [], isLoading } = trpc.pipeline.getStages.useQuery()
 
+  // <input type="color"> требует hex — это исключение из правила токенов, не UI-хардкод.
   const [newName, setNewName] = useState("")
   const [newColor, setNewColor] = useState("#7c5cff")
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -137,8 +138,11 @@ export default function SettingsPage() {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="h-4 w-4 shrink-0 rounded-full"
-                    style={{ backgroundColor: editingId === stage.id ? editColor : (stage.color ?? "#94a3b8") }}
+                    className="h-4 w-4 shrink-0 rounded-full bg-muted-foreground"
+                    style={(() => {
+                      const c = editingId === stage.id ? editColor : stage.color
+                      return c ? { backgroundColor: c } : undefined
+                    })()}
                   />
                   {editingId === stage.id ? (
                     <div className="flex flex-1 flex-wrap items-center gap-2">
