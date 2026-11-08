@@ -83,6 +83,7 @@ export function CommandMenu() {
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Command.Input
                 autoFocus
+                aria-label="Глобальный поиск"
                 placeholder="Сделки, контакты, компании..."
                 className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
