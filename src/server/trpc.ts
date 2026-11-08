@@ -41,9 +41,10 @@ const enforceWriteAccess = t.middleware(({ ctx, type, next }) => {
 // Every read requires a session; mutations additionally require MANAGER or ADMIN.
 export const protectedProcedure = t.procedure.use(requireUser).use(enforceWriteAccess)
 
-// Kept as an alias so existing routers automatically become protected.
-export const publicProcedure = protectedProcedure
-export const writeProcedure = protectedProcedure
+// Имя publicProcedure удалено намеренно: оно звучало как "без авторизации",
+// хотя всегда требовало сессию. Читать/писать могут только залогиненные;
+// мутации — только MANAGER/ADMIN (см. enforceWriteAccess выше).
+export const authedProcedure = protectedProcedure
 
 // Destructive operations are reserved for administrators.
 export const adminProcedure = t.procedure.use(requireUser).use(({ ctx, next }) => {

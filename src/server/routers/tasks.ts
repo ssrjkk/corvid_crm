@@ -1,11 +1,11 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { TaskStatus, Priority } from "@/generated/prisma"
 import type { Prisma } from "@/generated/prisma"
 
 export const tasksRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.task.findMany({
       include: {
         deal: true,
@@ -16,7 +16,7 @@ export const tasksRouter = router({
     })
   }),
 
-  getById: publicProcedure
+  getById: authedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       return prisma.task.findUnique({
@@ -29,7 +29,7 @@ export const tasksRouter = router({
       })
     }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         title: z.string().min(1),
@@ -50,7 +50,7 @@ export const tasksRouter = router({
       })
     }),
 
-  update: publicProcedure
+  update: authedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -78,7 +78,7 @@ export const tasksRouter = router({
       })
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: authedProcedure
     .input(z.object({ id: z.string(), status: z.nativeEnum(TaskStatus) }))
     .mutation(async ({ input }) => {
       return prisma.task.update({

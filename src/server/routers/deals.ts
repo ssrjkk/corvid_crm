@@ -1,9 +1,9 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 export const dealsRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.deal.findMany({
       include: {
         stage: true,
@@ -18,7 +18,7 @@ export const dealsRouter = router({
     })
   }),
 
-  getById: publicProcedure
+  getById: authedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       return prisma.deal.findUnique({
@@ -41,7 +41,7 @@ export const dealsRouter = router({
       })
     }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         title: z.string().min(1),
@@ -71,7 +71,7 @@ export const dealsRouter = router({
       })
     }),
 
-  update: publicProcedure
+  update: authedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -93,7 +93,7 @@ export const dealsRouter = router({
       })
     }),
 
-  updateStage: publicProcedure
+  updateStage: authedProcedure
     .input(z.object({ id: z.string(), stageId: z.string() }))
     .mutation(async ({ input }) => {
       const stage = await prisma.pipelineStage.findUnique({ where: { id: input.stageId } })
@@ -108,7 +108,7 @@ export const dealsRouter = router({
       })
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: authedProcedure
     .input(z.object({ id: z.string(), status: z.enum(["OPEN", "WON", "LOST"]) }))
     .mutation(async ({ input }) => {
       return prisma.deal.update({

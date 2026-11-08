@@ -48,6 +48,8 @@ export function formatDate(value?: Date | string | null) {
 
 export function formatMoney(value: unknown, currency = "RUB") {
   const amount = Number(value || 0)
+  // Битые данные (NaN/Infinity из повреждённого Decimal) — прочерк, а не "NaN ₽".
+  if (!Number.isFinite(amount)) return "—"
   if (currency === "RUB") {
     return new Intl.NumberFormat("ru-RU", {
       style: "currency",

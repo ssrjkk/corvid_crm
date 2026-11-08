@@ -1,8 +1,8 @@
-import { router, publicProcedure } from "../trpc"
+import { router, authedProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 export const analyticsRouter = router({
-  getFunnel: publicProcedure.query(async () => {
+  getFunnel: authedProcedure.query(async () => {
     const stages = await prisma.pipelineStage.findMany({
       include: { _count: { select: { deals: true } } },
       orderBy: { order: "asc" },
@@ -10,7 +10,7 @@ export const analyticsRouter = router({
     return stages.map((s) => ({ name: s.name, count: s._count.deals, color: s.color }))
   }),
 
-  getRevenueByMonth: publicProcedure.query(async () => {
+  getRevenueByMonth: authedProcedure.query(async () => {
     const deals = await prisma.deal.findMany({
       where: { status: "WON", closedAt: { not: null } },
       select: { value: true, closedAt: true },
@@ -26,7 +26,7 @@ export const analyticsRouter = router({
       .map(([month, total]) => ({ month, total }))
   }),
 
-  getTaskWidgets: publicProcedure.query(async () => {
+  getTaskWidgets: authedProcedure.query(async () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const tomorrow = new Date(today)

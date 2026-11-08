@@ -1,10 +1,10 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { ActivityType } from "@/generated/prisma"
 
 export const activitiesRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.activity.findMany({
       include: {
         deal: true,
@@ -15,7 +15,7 @@ export const activitiesRouter = router({
     })
   }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         type: z.nativeEnum(ActivityType).default(ActivityType.NOTE),

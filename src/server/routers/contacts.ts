@@ -1,9 +1,9 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 export const contactsRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.contact.findMany({
       include: {
         company: true,
@@ -13,7 +13,7 @@ export const contactsRouter = router({
     })
   }),
 
-  getById: publicProcedure
+  getById: authedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       return prisma.contact.findUnique({
@@ -32,7 +32,7 @@ export const contactsRouter = router({
       })
     }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         firstName: z.string().min(1),
@@ -47,7 +47,7 @@ export const contactsRouter = router({
       return prisma.contact.create({ data: input })
     }),
 
-  update: publicProcedure
+  update: authedProcedure
     .input(
       z.object({
         id: z.string(),

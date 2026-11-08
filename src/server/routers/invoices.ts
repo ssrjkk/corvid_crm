@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { router, publicProcedure } from "../trpc"
+import { router, authedProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 const itemSchema = z.object({
@@ -9,7 +9,7 @@ const itemSchema = z.object({
 })
 
 export const invoicesRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.invoice.findMany({
       include: {
         items: true,
@@ -21,7 +21,7 @@ export const invoicesRouter = router({
     })
   }),
 
-  getById: publicProcedure
+  getById: authedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       return prisma.invoice.findUnique({
@@ -35,7 +35,7 @@ export const invoicesRouter = router({
       })
     }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         companyId: z.string().optional(),
@@ -73,7 +73,7 @@ export const invoicesRouter = router({
       })
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: authedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -90,7 +90,7 @@ export const invoicesRouter = router({
       })
     }),
 
-  delete: publicProcedure
+  delete: authedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
       return prisma.invoice.delete({ where: { id: input.id } })

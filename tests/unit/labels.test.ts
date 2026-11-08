@@ -73,6 +73,13 @@ describe("formatMoney", () => {
   it("принимает строковое значение (как из Decimal)", () => {
     expect(formatMoney("450000")).toMatch(/450[\s\u00A0]000\s₽/)
   })
+
+  it("битые числа (нечисловые строки/Infinity) — прочерк, а не мусор", () => {
+    // NaN — falsy и по контракту считается отсутствием значения (как null).
+    expect(formatMoney(NaN)).toMatch(/^0[\s\u00A0]₽$/)
+    expect(formatMoney(Infinity)).toBe("—")
+    expect(formatMoney("мусор")).toBe("—")
+  })
 })
 
 describe("formatDate", () => {

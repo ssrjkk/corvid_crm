@@ -1,10 +1,10 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { ProjectStatus } from "@/generated/prisma"
 
 export const projectsRouter = router({
-  getAll: publicProcedure.query(async () => {
+  getAll: authedProcedure.query(async () => {
     return prisma.project.findMany({
       include: {
         deal: true,
@@ -14,7 +14,7 @@ export const projectsRouter = router({
     })
   }),
 
-  getById: publicProcedure
+  getById: authedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       return prisma.project.findUnique({
@@ -26,7 +26,7 @@ export const projectsRouter = router({
       })
     }),
 
-  create: publicProcedure
+  create: authedProcedure
     .input(
       z.object({
         name: z.string().min(1),
@@ -46,7 +46,7 @@ export const projectsRouter = router({
       })
     }),
 
-  update: publicProcedure
+  update: authedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -69,7 +69,7 @@ export const projectsRouter = router({
       })
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: authedProcedure
     .input(z.object({ id: z.string(), status: z.nativeEnum(ProjectStatus) }))
     .mutation(async ({ input }) => {
       return prisma.project.update({

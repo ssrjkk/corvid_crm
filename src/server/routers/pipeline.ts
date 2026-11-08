@@ -1,9 +1,9 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 export const pipelineRouter = router({
-  getStages: publicProcedure.query(async () => {
+  getStages: authedProcedure.query(async () => {
     return prisma.pipelineStage.findMany({
       include: {
         deals: {

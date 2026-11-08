@@ -48,6 +48,7 @@ test.db
 # playwright
 test-results/
 playwright-report/
+e2e/.auth.json
 ci.db
 
 # live database
