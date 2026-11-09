@@ -1,8 +1,8 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
-import { TaskStatus, Priority } from "@/generated/prisma"
-import type { Prisma } from "@/generated/prisma"
+import { TaskStatus, Priority } from "@/generated/prisma/client"
+import type { Prisma } from "@/generated/prisma/client"
 
 export const tasksRouter = router({
   getAll: authedProcedure.query(async () => {

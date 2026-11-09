@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
-import { ActivityType } from "@/generated/prisma"
+import { ActivityType } from "@/generated/prisma/client"
 
 export const activitiesRouter = router({
   getAll: authedProcedure.query(async () => {

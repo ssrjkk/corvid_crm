@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { createCallerFactory, type Context } from "@/server/trpc"
 import { appRouter } from "@/server/routers/_app"
-import type { UserRole } from "@/generated/prisma"
+import type { UserRole } from "@/generated/prisma/client"
 
 /** Очищает бизнес-таблицы в порядке, безопасном по внешним ключам. */
 export async function resetDb() {
