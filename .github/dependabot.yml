@@ -12,6 +12,12 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      # eslint-config-next brings typescript-eslint, which still refuses TS 7
+      # ("does not support TS 7.0", peer typescript >=4.8.4 <6.1.0), so the
+      # major fails the lint step. Rises with the next eslint-config-next.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
