@@ -156,9 +156,13 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   проверен полным циклом: migrate → seed → login 200); fresh clone без сида не имеет
   test@corvid.dev — это состояние чинится сидом, а не документацией.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
-  аудит зависимостей (`npm audit`) показывает уязвимости только в dev-цепочках
-  (vitest/tinypool, shadcn-CLI/ts-morph) — в production-бандл они не попадают;
-  мажорные апгрейды ради них не делаются (ломающие изменения), фиксируется здесь;
+  аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
+  транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
+  @eslint/config-array, @typescript-eslint/typescript-estree, @ts-morph/common
+  (копия 3.1.5 под eslint-config-next вне уязвимого диапазона и не трогается),
+  shadcn-CLI — в devDependencies, поэтому deepmerge 4.3.1 (CVE-2026-93753, патча нет)
+  живёт только в dev-графе; алерт закрыт как tolerable risk с причиной.
+  Мажорные апгрейды ради dev-цепочек не делаются (ломающие изменения), фиксируется здесь;
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
   `useState(null) + useEffect` с eslint-комментарием; mount-флаг — `useSyncExternalStore`.
