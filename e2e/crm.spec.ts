@@ -29,6 +29,7 @@ test.describe("Публичные страницы и гость", () => {
     expect(res.headers()["x-content-type-options"]).toBe("nosniff")
     expect(res.headers()["referrer-policy"]).toBe("strict-origin-when-cross-origin")
     expect(res.headers()["permissions-policy"]).toContain("camera=()")
+    expect(res.headers()["content-security-policy"]).toContain("default-src 'self'")
   })
 })
 
@@ -61,5 +62,27 @@ test.describe("Авторизованная зона (сессия из setup-п
       (el) => getComputedStyle(el).display
     )
     expect(asideDisplay).toBe("none")
+  })
+
+  test("CSP не ломает приложение: гидрация, tRPC, графики без нарушений политики", async ({ page }) => {
+    const violations: string[] = []
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && /Content Security Policy|Refused to/i.test(msg.text())) {
+        violations.push(msg.text())
+      }
+    })
+
+    // Дашборд: данные «На сумму» приходят клиентским tRPC-запросом,
+    // графики recharts — чистый клиентский рендер. Если CSP режет скрипты —
+    // оба признака отсутствуют и тест падает.
+    await page.goto("/dashboard")
+    await expect(page.getByText("На сумму")).toBeVisible()
+    await expect(page.locator("svg.recharts-surface").first()).toBeVisible()
+
+    // Лендинг (статический prerender) — тоже без нарушений
+    await page.goto("/")
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Corvid")
+
+    expect(violations).toEqual([])
   })
 })

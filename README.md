@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-87%20vitest%20%2B%208%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-87%20vitest%20%2B%2014%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -55,18 +55,19 @@ npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпо
 ```
 
 Первый зарегистрированный через `/sign-up` пользователь получает роль ADMIN.
-Для e2e нужен запущенный `npm run start` — детали ниже.
+Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
+(админ test@corvid.dev) + `npm run db:seed-roles` (зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 87 vitest + 8 e2e, всё зелёное
+## Качество: 87 vitest + 14 e2e, всё зелёное
 
 ```bash
 npm test        # Vitest: 87 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright: setup-логин + лендинг, 307-защита, неверный пароль→тост, security-заголовки, счета, печать
+npm run e2e     # Playwright: setup-логины (админ + VIEWER), лендинг, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
 ```
 
-- Один логин на весь e2e-съют (setup-проект + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд, 4 отдельных логина упирались в 429.
+- Один логин на роль в e2e (setup-проекты + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
 - Удаление любых сущностей — только ADMIN (проверено тестами на всех роутерах); security-заголовки (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy) проверяются e2e-тестом.
@@ -77,9 +78,19 @@ Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · Type
 
 Дизайн-система проекта живёт в [`.agents/skills/corvid-design/SKILL.md`](.agents/skills/corvid-design/SKILL.md) — токены, типографика, грабли Next 16 и чек-листы подхватываются агентами автоматически.
 
+## Безопасность
+
+- **Роли**: ADMIN / MANAGER / VIEWER; мутации — только MANAGER+ADMIN, удаление любой сущности — только ADMIN (серверные `adminProcedure` + UI-гейты `usePermissions`, проверены тестами на всех 11 роутерах и e2e под ролью VIEWER).
+- **Заголовки** (проверяются e2e-тестом): `Content-Security-Policy` (script-src self, SRI-хеши на чанках — experimental `sri`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera/microphone/geolocation выключены).
+- **Секрет**: без `BETTER_AUTH_SECRET` в production процесс падает при старте (fail-closed), поддельные сессии невозможны.
+- **CSV**: инъекции формул (`= + - @ Tab CR`, CWE-1236) нейтрализуются префиксом `'`; импорт ограничен 5 МБ.
+- **Аудит зависимостей**: продакшен-дерево `dependencies` без известных уязвимостей (см. SKILL.md про dev-цепочки).
+
 ## Деплой
 
 Подходит для Vercel/собственного сервера. Для продакшена с доступом с нескольких устройств переведи БД на PostgreSQL (`prisma/schema.prisma` → `provider = "postgresql"`, миграции те же). Локальный SQLite удобен для личного использования на одном ПК.
+
+Обязательные переменные окружения: `DATABASE_URL`, `BETTER_AUTH_SECRET` (≥32 символов, `npx auth secret`), `BETTER_AUTH_URL` — точный адрес, по которому открывается приложение: better-auth отбивает запросы с чужим `Origin` (403 INVALID_ORIGIN).
 
 ## Лицензия
 

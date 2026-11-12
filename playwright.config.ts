@@ -16,15 +16,29 @@ export default defineConfig({
   retries: 1,
   projects: [
     {
+      // Анкер нужен: без него regex совпадает и с viewer-auth.setup.ts
+      // (общий хвост) — проекты задваивают логины и упираются в rate-limit.
       name: "setup",
-      testMatch: /auth\.setup\.ts/,
+      testMatch: /(^|[\\/])auth\.setup\.ts$/,
     },
     {
       name: "crm",
-      testMatch: /crm\.spec\.ts/,
+      testMatch: /(^|[\\/])crm\.spec\.ts$/,
       dependencies: ["setup"],
       use: {
         storageState: "e2e/.auth.json",
+      },
+    },
+    {
+      name: "setup-viewer",
+      testMatch: /(^|[\\/])viewer-auth\.setup\.ts$/,
+    },
+    {
+      name: "viewer",
+      testMatch: /(^|[\\/])viewer\.spec\.ts$/,
+      dependencies: ["setup-viewer"],
+      use: {
+        storageState: "e2e/.auth-viewer.json",
       },
     },
   ],

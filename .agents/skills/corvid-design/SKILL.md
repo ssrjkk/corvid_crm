@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (8: setup-логин, лендинг, 307-защита, неверный пароль→тост, security-заголовки, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт, и security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy из next.config headers()). Конфиг: проект `setup` (один логин на сьют → `e2e/.auth.json`, gitignored) + проект `crm` с зависимостью, `retries: 1` как страховка. Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд; 4 отдельных логина в пачке упирались в 429 (доказано: 5 быстрых POST → 403,403,403,429,429; после перехода на 1 логин сьют идёт 8/8 за ~13с).
+Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (14: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` + `npm run db:seed-roles` — viewer@corvid.dev / Test12345!). E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer` с зависимостями, `retries: 1` как страховка. Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 14/14 за ~13с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
@@ -172,6 +172,14 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
   `useState(null) + useEffect` с eslint-комментарием; mount-флаг — `useSyncExternalStore`.
+- CSP (V23): nonce-вариант НЕсовместим со статикой/PPR (доки Next — все страницы
+  стали бы динамическими), принят documented fallback: CSP в next.config + experimental
+  `sri` (integrity-хеши на внешних чанках) + `'unsafe-inline'` в script-src — inline
+  скрипты гидрации Next остаются inline (проверено пробой HTML: 11 штук), React
+  экранирует вывод, `dangerouslySetInnerHTML` в src нет. `style-src 'self' 'unsafe-inline'`
+  — recharts/sonner ставят style-атрибуты. Dev-режим добавляет `'unsafe-eval'` (React dev).
+- БД: FK-индексы на всех foreign-key колонках (миграция `add_fk_indexes`, 16 CREATE INDEX);
+  Session/Account userId — для better-auth. Новые FK-поля = индекс в схеме.
 
 ## Чек-лист «все виды проверок» перед сдачей работы
 

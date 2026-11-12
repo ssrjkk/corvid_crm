@@ -45,6 +45,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Account {
@@ -64,6 +66,7 @@ model Account {
   updatedAt             DateTime  @updatedAt
 
   @@unique([providerId, accountId])
+  @@index([userId])
 }
 
 model Verification {
@@ -107,6 +110,8 @@ model Contact {
   updatedAt DateTime  @updatedAt
   activities Activity[]
   invoices   Invoice[]
+
+  @@index([companyId])
 }
 
 model PipelineStage {
@@ -142,6 +147,11 @@ model Deal {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   closedAt    DateTime?
+
+  @@index([companyId])
+  @@index([contactId])
+  @@index([stageId])
+  @@index([ownerId])
 }
 
 enum DealStatus {
@@ -175,6 +185,10 @@ model Invoice {
   items     InvoiceItem[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
 }
 
 model InvoiceItem {
@@ -185,6 +199,8 @@ model InvoiceItem {
   position  Int     @default(0)
   invoiceId String
   invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
 }
 
 model Project {
@@ -226,6 +242,10 @@ model Task {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   completedAt DateTime?
+
+  @@index([dealId])
+  @@index([projectId])
+  @@index([assigneeId])
 }
 
 enum TaskStatus {
@@ -256,6 +276,9 @@ model Activity {
   user      User?        @relation(fields: [userId], references: [id])
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+
+  @@index([dealId])
+  @@index([contactId])
 }
 
 enum ActivityType {
