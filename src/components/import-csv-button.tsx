@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { FileUp } from "lucide-react"
 import { toast } from "sonner"
-import { parseCsvLines } from "@/lib/csv"
+import { importCsvRows, EmptyCsvError } from "@/lib/csv"
 import { Button } from "@/components/ui/button"
 
 /**
@@ -32,25 +32,15 @@ export function ImportCsvButton({
     setBusy(true)
     try {
       const text = await file.text()
-      const rows = parseCsvLines(text)
-      if (rows.length < 2) {
-        toast.error("В файле нет строк с данными (нужны заголовок и хотя бы одна строка)")
-        return
-      }
-      let imported = 0
-      let failed = 0
-      for (const cells of rows.slice(1)) {
-        try {
-          await importRow(cells)
-          imported++
-        } catch {
-          failed++
-        }
-      }
+      const { imported, failed } = await importCsvRows(text, importRow)
       toast.success(`Импортировано: ${imported}${failed ? `, пропущено: ${failed}` : ""}`)
       onDone()
-    } catch {
-      toast.error("Не удалось прочитать файл")
+    } catch (error) {
+      if (error instanceof EmptyCsvError) {
+        toast.error(error.message)
+      } else {
+        toast.error("Не удалось прочитать файл")
+      }
     } finally {
       setBusy(false)
       if (inputRef.current) inputRef.current.value = ""

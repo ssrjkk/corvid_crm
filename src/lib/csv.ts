@@ -79,3 +79,34 @@ export function parseCsvLines(text: string): string[][] {
   if (cell !== "" || row.length > 0) pushRow()
   return rows
 }
+
+/** CSV-файл без строк с данными (только заголовок или пустой). */
+export class EmptyCsvError extends Error {}
+
+/**
+ * Импортирует строки данных CSV (первая строка = заголовок) через колбэк.
+ * Ошибка отдельной строки не прерывает импорт — она считается в `failed`.
+ * Чистая логика без DOM — используется ImportCsvButton и unit-тестами.
+ */
+export async function importCsvRows(
+  text: string,
+  importRow: (cells: string[]) => Promise<unknown>,
+): Promise<{ imported: number; failed: number }> {
+  const rows = parseCsvLines(text)
+  if (rows.length < 2) {
+    throw new EmptyCsvError(
+      "В файле нет строк с данными (нужны заголовок и хотя бы одна строка)"
+    )
+  }
+  let imported = 0
+  let failed = 0
+  for (const cells of rows.slice(1)) {
+    try {
+      await importRow(cells)
+      imported++
+    } catch {
+      failed++
+    }
+  }
+  return { imported, failed }
+}

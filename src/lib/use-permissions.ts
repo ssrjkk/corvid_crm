@@ -4,6 +4,24 @@ import { trpc } from "@/lib/trpc/client"
 
 export type Role = "ADMIN" | "MANAGER" | "VIEWER"
 
+export type Permissions = {
+  canWrite: boolean
+  canDelete: boolean
+  isViewer: boolean
+}
+
+/**
+ * Чистая матрица прав по роли — единый источник для UI-гейтов.
+ * ADMIN: всё; MANAGER: пишет, не удаляет; VIEWER: только читает.
+ */
+export function permissionsFor(role: Role | null): Permissions {
+  return {
+    canWrite: role === "ADMIN" || role === "MANAGER",
+    canDelete: role === "ADMIN",
+    isViewer: role === "VIEWER",
+  }
+}
+
 /**
  * Reads the current user's role from the server. The role itself is never
  * stored client-side; the server resolves it from the database for every
@@ -19,8 +37,6 @@ export function usePermissions() {
   return {
     role,
     isLoading,
-    canWrite: role === "ADMIN" || role === "MANAGER",
-    canDelete: role === "ADMIN",
-    isViewer: role === "VIEWER",
+    ...permissionsFor(role),
   }
 }

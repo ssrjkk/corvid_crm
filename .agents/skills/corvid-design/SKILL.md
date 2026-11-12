@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (59 тестов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-инъекции + fail-closed секрет + NaN-guard) + Playwright E2E (setup-логин + 5: лендинг, 307-защита, неверный пароль→тост, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт. Конфиг: проект `setup` (один логин на сьют → `e2e/.auth.json`, gitignored) + проект `crm` с зависимостью, `retries: 1` как страховка. Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд; 4 отдельных логина в пачке упирались в 429 (доказано: 5 быстрых POST → 403,403,403,429,429; после перехода на 1 логин сьют идёт 7/7 за ~5с).
+Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (8: setup-логин, лендинг, 307-защита, неверный пароль→тост, security-заголовки, счета, печать). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000, демо-аккаунт test@corvid.dev / Test12345!). E2E включает print-медиа тест: при emulateMedia(print) aside скрыт, и security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy из next.config headers()). Конфиг: проект `setup` (один логин на сьют → `e2e/.auth.json`, gitignored) + проект `crm` с зависимостью, `retries: 1` как страховка. Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд; 4 отдельных логина в пачке упирались в 429 (доказано: 5 быстрых POST → 403,403,403,429,429; после перехода на 1 логин сьют идёт 8/8 за ~13с).
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
@@ -146,9 +146,15 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 - Правила: новый мутационный роутер = тест на создание + роли (VIEWER писать не может,
   delete — только ADMIN) + граничные значения; новый lib-модуль = unit-тест;
   новый маппинг статус→цвет/лейбл = unit-тест в `labels.test.ts` (без теста не сдавать);
-  фикс видимой ошибки = e2e-регресс (как неверный пароль→тост);
+  фикс видимой ошибки = e2e-регресс (как неверный пароль→тост, security-заголовки);
   фантом-зависимости запрещены: пакет `cn` удалён, `cn()` — только из `@/lib/utils`
   (после удаления возврат `from "cn"` роняет build — так и задумано).
+- Матрица прав: сервер и UI-гейт обязаны совпадать. `delete` всех сущностей —
+  `adminProcedure` (регресс V22: invoices.delete был authedProcedure → VIEWER мог
+  удалять счета; починено + тест). UI-гейты — только через `usePermissions()`:
+  `permissionsFor(role)` (чистая функция, тестируется) → `canWrite` (ADMIN+MANAGER),
+  `canDelete` (ADMIN). Админ-only процедуры на сервере = гейт `canDelete` в UI
+  (settings-этапы — adminProcedure, поэтому кнопки этапов скрыты от MANAGER).
 - Паранойя: CSV-инъекции нейтрализуются префиксом `'` (CWE-1236, тест в `csv.test.ts`);
   секрет только из окружения — в production без `BETTER_AUTH_SECRET` процесс падает
   сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db`/`e2e/.auth.json` в gitignore.
@@ -171,6 +177,9 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 - [ ] `npm test` — все тесты зелёные (unit + server/роли)
 - [ ] `npm run lint` — 0 ошибок
+- [ ] `npx tsc --noEmit` — 0 ошибок типов (tsconfig не включает tests/ — их валидирует Vitest)
+- [ ] `npm audit` — уязвимости только в dev-цепочках (vitest/tinypool, shadcn/ts-morph, eslint/typescript-eslint); продакшен-дерево dependencies чистое
 - [ ] `npm run build` — production-сборка проходит (prerender ловит client-хуки)
+- [ ] `npm run e2e` на свежем `npm run start` (старые серверы → chunk-mismatch)
 - [ ] E2E-смоук в браузере: дашборд, воронка, счета открываются, шрифты/тема на месте
 - [ ] Обе темы + кириллица визуально

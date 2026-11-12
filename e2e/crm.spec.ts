@@ -22,6 +22,14 @@ test.describe("Публичные страницы и гость", () => {
     await expect(page.getByText("Invalid email or password")).toBeVisible()
     await expect(page).toHaveURL(/\/sign-in/)
   })
+
+  test("security-заголовки отдаются сервером (регресс V22)", async ({ request }) => {
+    const res = await request.get("http://localhost:3000/")
+    expect(res.headers()["x-frame-options"]).toBe("DENY")
+    expect(res.headers()["x-content-type-options"]).toBe("nosniff")
+    expect(res.headers()["referrer-policy"]).toBe("strict-origin-when-cross-origin")
+    expect(res.headers()["permissions-policy"]).toContain("camera=()")
+  })
 })
 
 test.describe("Авторизованная зона (сессия из setup-проекта, один логин на сьют)", () => {

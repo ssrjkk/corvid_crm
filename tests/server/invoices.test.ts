@@ -66,6 +66,21 @@ describe("invoices.delete", () => {
     const found = await caller.invoices.getById({ id: invoice.id })
     expect(found).toBeNull()
   })
+
+  it("регресс V22: VIEWER и MANAGER не могут удалять счёт (право только у ADMIN)", async () => {
+    const admin = makeCaller("ADMIN")
+    const invoice = await admin.invoices.create({
+      items: [{ name: "A", qty: 1, price: 1 }],
+    })
+    await expect(
+      makeCaller("VIEWER").invoices.delete({ id: invoice.id })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    await expect(
+      makeCaller("MANAGER").invoices.delete({ id: invoice.id })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    // Счёт пережил обе попытки и удаляется только админом
+    expect(await admin.invoices.getById({ id: invoice.id })).not.toBeNull()
+  })
 })
 
 describe("invoices.getById", () => {

@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label"
 import { usePermissions } from "@/lib/use-permissions"
 
 export default function SettingsPage() {
-  const { canWrite } = usePermissions()
+  // Правка этапов воронки — adminProcedure на сервере, гейт в UI должен совпадать.
+  const { canDelete } = usePermissions()
   const utils = trpc.useUtils()
   const { data: stages = [], isLoading } = trpc.pipeline.getStages.useQuery()
 
@@ -76,7 +77,7 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Этапы воронки продаж</p>
       </div>
 
-      {canWrite && (
+      {canDelete && (
         <Card>
           <CardHeader>
             <CardTitle>Новый этап</CardTitle>
@@ -180,7 +181,7 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                {canWrite && editingId !== stage.id && (
+                {canDelete && editingId !== stage.id && (
                   <div className="flex items-center gap-1">
                     <Button size="icon" variant="ghost" aria-label="Выше" disabled={index === 0 || reorder.isPending} onClick={() => move(index, -1)}>
                       <ChevronUp className="h-4 w-4" />

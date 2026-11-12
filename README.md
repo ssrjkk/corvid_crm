@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-59%20unit%20%2B%207%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-87%20vitest%20%2B%208%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -57,18 +57,19 @@ npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпо
 Первый зарегистрированный через `/sign-up` пользователь получает роль ADMIN.
 Для e2e нужен запущенный `npm run start` — детали ниже.
 
-## Качество: 59 unit + 7 e2e, всё зелёное
+## Качество: 87 vitest + 8 e2e, всё зелёное
 
 ```bash
-npm test        # Vitest: 59 тестов — чистая логика + все tRPC-роутеры на изолированной test.db, матрица ролей
+npm test        # Vitest: 87 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright: setup-логин + лендинг, 307-защита, неверный пароль→тост, счета, печать (скрытие сайдбара в print)
+npm run e2e     # Playwright: setup-логин + лендинг, 307-защита, неверный пароль→тост, security-заголовки, счета, печать
 ```
 
 - Один логин на весь e2e-съют (setup-проект + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд, 4 отдельных логина упирались в 429.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
+- Удаление любых сущностей — только ADMIN (проверено тестами на всех роутерах); security-заголовки (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy) проверяются e2e-тестом.
 
 ## Стек
 

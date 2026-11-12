@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Plus, ReceiptText, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
+import { usePermissions } from "@/lib/use-permissions"
 import { formatMoney } from "@/lib/labels"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
@@ -203,6 +204,7 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
 }
 
 export default function InvoicesPage() {
+  const { canDelete } = usePermissions()
   const { data: invoices, isLoading, refetch } = trpc.invoices.getAll.useQuery()
   const updateStatus = trpc.invoices.updateStatus.useMutation({
     onSuccess: () => {
@@ -332,12 +334,14 @@ export default function InvoicesPage() {
                           Отметить оплаченным
                         </Button>
                       )}
-                      <Button
-                        size="sm" variant="ghost" aria-label={`Удалить ${inv.number}`}
-                        onClick={() => remove.mutate({ id: inv.id })}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="sm" variant="ghost" aria-label={`Удалить ${inv.number}`}
+                          onClick={() => remove.mutate({ id: inv.id })}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )

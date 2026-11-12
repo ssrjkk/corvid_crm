@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { router, authedProcedure } from "../trpc"
+import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 
 const itemSchema = z.object({
@@ -90,7 +90,7 @@ export const invoicesRouter = router({
       })
     }),
 
-  delete: authedProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
       return prisma.invoice.delete({ where: { id: input.id } })
