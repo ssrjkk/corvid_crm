@@ -28,6 +28,20 @@ jobs:
       - name: Линт
         run: npm run lint
 
+      - name: Браузер для Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (сборка уже с этим же ci.db; сервер поднимает webServer)
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed-demo
+          npx playwright test
+        env:
+          DATABASE_URL: "file:./ci.db"
+          BETTER_AUTH_SECRET: "ci-secret"
+          BETTER_AUTH_URL: "http://localhost:3000"
+          CI: "true"
+
       - name: Production-сборка
         run: npm run build
         env:

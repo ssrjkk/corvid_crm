@@ -11,8 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "db:seed-demo": "node scripts/seed-demo.mjs",
-    "db:seed-roles": "node scripts/seed-viewer.mjs"
+    "db:seed-demo": "node scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -46,8 +45,10 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/turbopack": "^4",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",

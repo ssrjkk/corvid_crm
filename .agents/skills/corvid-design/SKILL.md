@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (14: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` + `npm run db:seed-roles` — viewer@corvid.dev / Test12345!). E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer` с зависимостями, `retries: 1` как страховка. Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 14/14 за ~13с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (18: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 18/18 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
@@ -157,10 +157,17 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   (settings-этапы — adminProcedure, поэтому кнопки этапов скрыты от MANAGER).
 - Паранойя: CSV-инъекции нейтрализуются префиксом `'` (CWE-1236, тест в `csv.test.ts`);
   секрет только из окружения — в production без `BETTER_AUTH_SECRET` процесс падает
-  сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db`/`e2e/.auth.json` в gitignore.
-  Демо-доступ на чистой БД: `npm run db:seed-demo` (идемпотентный сид через sign-up API,
-  проверен полным циклом: migrate → seed → login 200); fresh clone без сида не имеет
-  test@corvid.dev — это состояние чинится сидом, а не документацией.
+  сразу (тест в `auth-secret.test.ts`), `.env`/`dev.db`/`test.db`/`e2e/.auth*.json` в gitignore.
+  Демо-доступ на чистой БД: `npm run db:seed-demo` — сеет ОБА аккаунта (test@corvid.dev
+  ADMIN + viewer@corvid.dev VIEWER, оба Test12345!) ПРЯМО В БД через `better-auth/crypto`
+  (формат salt:hash сверен логином 200), идемпотентно, без запущенного сервера —
+  работает и в CI (sign-up API не умеет пересаживать пароль существующему аккаунту).
+  Глобальные границы: `app/error.tsx` (краш сегмента → брендированная карточка с reset),
+  `app/global-error.tsx` (краш root-layout, свой <html>), `app/not-found.tsx` (404).
+  SQLite-надёжность: `prisma.ts` выставляет `journal_mode=WAL` (персистентно, один раз)
+  + `timeout: 5000` (busy_timeout) в адаптере. a11y: e2e-проект `a11y` (axe-core 4,
+  WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета) —
+  19 e2e всего: 2 setup + 8 crm + 4 viewer + 5 a11y.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
   транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
@@ -170,6 +177,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   живёт только в dev-графе; алерт закрыт как tolerable risk с причиной.
   Мажорные апгрейды ради dev-цепочек не делаются (ломающие изменения), фиксируется здесь;
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
+  WAL в prisma.ts убирает взаимоблокировку читателей/писателя на файле БД;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
   `useState(null) + useEffect` с eslint-комментарием; mount-флаг — `useSyncExternalStore`.
 - CSP (V23): nonce-вариант НЕсовместим со статикой/PPR (доки Next — все страницы

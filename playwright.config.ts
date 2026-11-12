@@ -14,6 +14,19 @@ export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
   retries: 1,
+  // В CI Playwright сам поднимает сервер (env CI=true ставится в ci.yml).
+  // Локально — ручная гигиена: свежий npm run build → свежий npm run start
+  // (старый сервер со старой сборкой даёт chunk-mismatch, reuse тут опасен).
+  ...(process.env.CI
+    ? {
+        webServer: {
+          command: "npm run start",
+          port: 3000,
+          timeout: 120_000,
+          reuseExistingServer: false,
+        },
+      }
+    : {}),
   projects: [
     {
       // Анкер нужен: без него regex совпадает и с viewer-auth.setup.ts
@@ -39,6 +52,16 @@ export default defineConfig({
       dependencies: ["setup-viewer"],
       use: {
         storageState: "e2e/.auth-viewer.json",
+      },
+    },
+    {
+      // a11y-аудит: гостевые страницы через test.use, авторизованные —
+      // сессия админа из setup-проекта.
+      name: "a11y",
+      testMatch: /(^|[\\/])a11y\.spec\.ts$/,
+      dependencies: ["setup"],
+      use: {
+        storageState: "e2e/.auth.json",
       },
     },
   ],

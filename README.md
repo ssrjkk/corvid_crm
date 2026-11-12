@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-87%20vitest%20%2B%2014%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-87%20vitest%20%2B%2019%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -58,15 +58,17 @@ npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпо
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 (админ test@corvid.dev) + `npm run db:seed-roles` (зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 87 vitest + 14 e2e, всё зелёное
+## Качество: 87 vitest + 19 e2e, всё зелёное
 
 ```bash
 npm test        # Vitest: 87 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright: setup-логины (админ + VIEWER), лендинг, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
+npm run e2e     # Playwright (14): setup-логины (админ + VIEWER), лендинг, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
+npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах
 ```
 
+- CI гоняет ВСЁ: test + lint + build + полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`).
 - Один логин на роль в e2e (setup-проекты + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
