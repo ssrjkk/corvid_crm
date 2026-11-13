@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/status-badge"
 import { downloadCsv } from "@/lib/csv"
 import { dealStatusLabels, formatMoney } from "@/lib/labels"
+import { roundMoney } from "@/lib/money"
 import { usePermissions } from "@/lib/use-permissions"
 
 export default function DealsPage() {
@@ -104,7 +105,7 @@ export default function DealsPage() {
       ["Название", "Сумма", "Валюта", "Статус", "Этап", "Компания", "Контакт", "Создана"],
       ...(filteredDeals ?? []).map((deal) => [
         deal.title,
-        Number(deal.value || 0),
+        roundMoney(Number(deal.value || 0)),
         deal.currency,
         dealStatusLabels[deal.status] ?? deal.status,
         deal.stage?.name ?? "",

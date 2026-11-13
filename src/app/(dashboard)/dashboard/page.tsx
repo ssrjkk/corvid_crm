@@ -3,6 +3,7 @@
 import { trpc } from "@/lib/trpc/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatMoney } from "@/lib/labels"
+import { roundMoney } from "@/lib/money"
 import { Handshake, CheckSquare, Users, FolderKanban } from "lucide-react"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
@@ -17,7 +18,7 @@ export default function DashboardPage() {
   const { data: taskWidgets } = trpc.analytics.getTaskWidgets.useQuery()
 
   const totalDeals = deals?.length || 0
-  const totalValue = deals?.reduce((sum, deal) => sum + Number(deal.value || 0), 0) || 0
+  const totalValue = roundMoney(deals?.reduce((sum, deal) => sum + Number(deal.value || 0), 0) ?? 0)
   const openTasks = tasks?.filter((t) => t.status !== "DONE" && t.status !== "CANCELLED").length || 0
   const totalContacts = contacts?.length || 0
   const activeProjects = projects?.filter((p) => p.status === "IN_PROGRESS").length || 0

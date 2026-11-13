@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
+import { createInvoiceWithNumber, formatInvoiceNumber } from "../invoice-number"
 
 const itemSchema = z.object({
   name: z.string().min(1),
@@ -48,29 +49,34 @@ export const invoicesRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Номер: INV-0001 по количеству уже существующих счетов.
-      const count = await prisma.invoice.count()
-      const number = `INV-${String(count + 1).padStart(4, "0")}`
-      return prisma.invoice.create({
-        data: {
-          number,
-          currency: input.currency,
-          note: input.note,
-          dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
-          companyId: input.companyId,
-          contactId: input.contactId,
-          dealId: input.dealId,
-          items: {
-            create: input.items.map((item, index) => ({
-              name: item.name,
-              qty: item.qty,
-              price: item.price,
-              position: index,
-            })),
-          },
-        },
-        include: { items: true, company: true, contact: true, deal: true },
-      })
+      // Номер: INV-0001 по количеству уже существующих счетов; при гонке
+      // (одинаковый count у двух параллельных create) — ретрай с пересчётом,
+      // иначе UNIQUE-конфликт доходил бы до тоста как «Внутренняя ошибка».
+      return createInvoiceWithNumber(
+        3,
+        async () => formatInvoiceNumber(await prisma.invoice.count()),
+        (number) =>
+          prisma.invoice.create({
+            data: {
+              number,
+              currency: input.currency,
+              note: input.note,
+              dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
+              companyId: input.companyId,
+              contactId: input.contactId,
+              dealId: input.dealId,
+              items: {
+                create: input.items.map((item, index) => ({
+                  name: item.name,
+                  qty: item.qty,
+                  price: item.price,
+                  position: index,
+                })),
+              },
+            },
+            include: { items: true, company: true, contact: true, deal: true },
+          })
+      )
     }),
 
   updateStatus: authedProcedure

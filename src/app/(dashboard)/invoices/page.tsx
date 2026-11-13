@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { usePermissions } from "@/lib/use-permissions"
 import { formatMoney } from "@/lib/labels"
+import { invoiceTotal, roundMoney } from "@/lib/money"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -229,9 +230,11 @@ export default function InvoicesPage() {
 
   const list = invoices ?? []
   const sum = (status: string) =>
-    list
-      .filter((inv) => inv.status === status)
-      .reduce((acc, inv) => acc + inv.items.reduce((s, i) => s + i.qty * i.price, 0), 0)
+    roundMoney(
+      list
+        .filter((inv) => inv.status === status)
+        .reduce((acc, inv) => acc + invoiceTotal(inv.items), 0)
+    )
 
   const overdue =
     now === null
@@ -301,7 +304,7 @@ export default function InvoicesPage() {
           ) : (
             <div className="space-y-2">
               {list.map((inv) => {
-                const total = inv.items.reduce((s, i) => s + i.qty * i.price, 0)
+                const total = invoiceTotal(inv.items)
                 const isOverdue =
                   now !== null &&
                   inv.status === "SENT" &&

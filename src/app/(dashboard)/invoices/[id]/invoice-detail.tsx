@@ -5,6 +5,7 @@ import { ArrowLeft, Printer } from "lucide-react"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { formatMoney, invoiceStatusLabels } from "@/lib/labels"
+import { invoiceTotal, lineTotal } from "@/lib/money"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,7 +36,7 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
     )
   }
 
-  const total = invoice.items.reduce((sum, item) => sum + item.qty * item.price, 0)
+  const total = invoiceTotal(invoice.items)
   const clientName = invoice.company?.name
     ?? (invoice.contact ? `${invoice.contact.firstName} ${invoice.contact.lastName ?? ""}`.trim() : null)
 
@@ -132,7 +133,7 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
                     <td className="py-2 pr-4 text-right tabular-nums">{item.qty}</td>
                     <td className="py-2 pr-4 text-right tabular-nums">{formatMoney(item.price, invoice.currency)}</td>
                     <td className="py-2 text-right font-medium tabular-nums">
-                      {formatMoney(item.qty * item.price, invoice.currency)}
+                      {formatMoney(lineTotal(item), invoice.currency)}
                     </td>
                   </tr>
                 ))}

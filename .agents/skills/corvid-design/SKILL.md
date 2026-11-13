@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (95 тестов, 18 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError)) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (108 тестов, 20 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber)) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -189,6 +189,16 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   — recharts/sonner ставят style-атрибуты. Dev-режим добавляет `'unsafe-eval'` (React dev).
 - БД: FK-индексы на всех foreign-key колонках (миграция `add_fk_indexes`, 16 CREATE INDEX);
   Session/Account userId — для better-auth. Новые FK-поля = индекс в схеме.
+- Денежная арифметика (V26 «Целостность»): ТОЛЬКО через `@/lib/money` —
+  `roundMoney` (копейки), `lineTotal` (qty×price строки), `invoiceTotal`
+  (итого = сумма приведённых строк; инвариант печати: Итого == сумме строк).
+  Флоат-артефакты (0.1×3=0.30000000000000004) не должны попадать в сводки/CSV —
+  дублировать `items.reduce(...)` в страницах запрещено.
+- Номер счёта (V26): `src/server/invoice-number.ts` — `formatInvoiceNumber(count)`
+  + `createInvoiceWithNumber(3, recount, create)`: два одновременных create читают
+  одинаковый count → одинаковый номер → P2002; ретрай пересчитывает номер
+  (SQLite сериализует запись), не-уникальные ошибки пробрасываются сразу.
+  Тест recovery/exhaustion — юнит с инъекцией deps; сериальная гонка невоспроизводима.
 - Русские тосты (V25 «последняя миля»): ВСЁ, что пользователь читает в ошибках,
   на русском —
   (1) `src/server/zod-ru.ts` включает локаль zod v4 (`z.config(ru())` из

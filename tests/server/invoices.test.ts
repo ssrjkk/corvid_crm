@@ -36,6 +36,38 @@ describe("invoices.create", () => {
   })
 })
 
+describe("invoices.create: целостность номеров (V26)", () => {
+  it("серия создаёт уникальные возрастающие номера", async () => {
+    const caller = makeCaller("ADMIN")
+    // К этому моменту первый describe уже создал INV-0001…INV-0003.
+    const fourth = await caller.invoices.create({
+      items: [{ name: "Работы", qty: 1, price: 100 }],
+    })
+    expect(fourth.number).toBe("INV-0004")
+
+    const fifth = await caller.invoices.create({
+      items: [{ name: "Работы", qty: 1, price: 100 }],
+    })
+    expect(fifth.number).toBe("INV-0005")
+    expect(fifth.number).not.toBe(fourth.number)
+  })
+
+  it("после удаления номера не конфликтуют (UNIQUE), счёт создаётся", async () => {
+    const caller = makeCaller("ADMIN")
+    const victim = await caller.invoices.create({
+      items: [{ name: "Работы", qty: 1, price: 100 }],
+    })
+    await caller.invoices.delete({ id: victim.id })
+
+    // Семантика «номер по количеству»: следующий счёт может занять номер
+    // удалённого — это допустимо, UNIQUE-конфликта быть не должно.
+    const again = await caller.invoices.create({
+      items: [{ name: "Работы", qty: 1, price: 100 }],
+    })
+    expect(again.number).toMatch(/^INV-\d{4}$/)
+  })
+})
+
 describe("invoices.updateStatus", () => {
   it("PAID ставит paidAt, возврат в DRAFT сбрасывает", async () => {
     const caller = makeCaller("ADMIN")
