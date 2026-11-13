@@ -176,7 +176,11 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   (копия 3.1.5 под eslint-config-next вне уязвимого диапазона и не трогается),
   shadcn-CLI — в devDependencies, поэтому deepmerge 4.3.1 (CVE-2026-93753, патча нет)
   живёт только в dev-графе; алерт закрыт как tolerable risk с причиной.
-  Мажорные апгрейды ради dev-цепочек не делаются (ломающие изменения), фиксируется здесь;
+  vitest 5.1.0 ПРИНЯТ (интеграция с Dependabot-мёржами remote, ребейз V22-V26 поверх):
+  tinypool и @vitest/mocker исчезли из дерева целиком — 2 critical устранены без
+  overrides; итог `npm audit` = 3 low, `--omit=dev` = 0. Смена пути импорта
+  сгенерённого клиента Prisma: `@/generated/prisma/client` (было `@/generated/prisma`) —
+  затрагивает prisma.ts, trpc.ts и всё, что импортирует типы/клиент; regen = `npx prisma generate`.
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
   WAL в prisma.ts убирает взаимоблокировку читателей/писателя на файле БД;
   `Date.now()` в клиентских компонентах запрещён при prerender — паттерн
