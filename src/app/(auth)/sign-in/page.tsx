@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { authClient } from "@/lib/auth-client"
+import { ruAuthError } from "@/lib/auth-errors"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { BrandMark } from "@/components/layout/brand"
@@ -23,7 +24,8 @@ export default function SignInPage() {
       {
         onSuccess: () => router.push("/dashboard"),
         onError: (ctx) => {
-          toast.error(ctx.error.message)
+          console.error("[auth]", ctx.error.code, ctx.error.message)
+          toast.error(ruAuthError(ctx.error))
           setLoading(false)
         },
       }

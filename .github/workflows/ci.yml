@@ -19,6 +19,12 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Кеш браузеров Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Установка зависимостей
         run: npm ci
 

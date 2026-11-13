@@ -1,10 +1,29 @@
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import type { UserRole } from "@/generated/prisma/client"
+import { trpcToastMessage } from "./error-format"
 import type { Context } from "./context"
+// Русская локаль zod — включить ДО создания схем роутеров (см. zod-ru.ts).
+import "./zod-ru"
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
+  // Форматтер для пути HTTP/клиент: тосты показывают shape.message.
+  // Провал валидации (cause = ZodError) → русские читаемые сообщения;
+  // INTERNAL → общий текст, причина уходит в лог сервера.
+  errorFormatter({ shape, error }) {
+    if (error.code === "INTERNAL_SERVER_ERROR") {
+      console.error("[tRPC] INTERNAL", error.cause)
+    }
+    return {
+      ...shape,
+      message: trpcToastMessage({
+        code: error.code,
+        message: shape.message,
+        cause: error.cause,
+      }),
+    }
+  },
 })
 
 type SessionUser = NonNullable<Context["user"]> & { role?: UserRole }

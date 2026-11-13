@@ -135,9 +135,10 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (87 тестов, 17 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor) + Playwright E2E (18: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 18/18 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (95 тестов, 18 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError)) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
-- `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge).
+- `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
+  `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
 - `e2e/crm.spec.ts` — Playwright: лендинг+авторство, 307-защита, вход, счета, печать.
 - `tests/server/` — интеграционные тесты tRPC-роутеров через `createCallerFactory`
   на ОТДЕЛЬНОЙ тестовой БД (`file:./test.db`, миграции в `tests/global-setup.ts`).
@@ -188,13 +189,31 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   — recharts/sonner ставят style-атрибуты. Dev-режим добавляет `'unsafe-eval'` (React dev).
 - БД: FK-индексы на всех foreign-key колонках (миграция `add_fk_indexes`, 16 CREATE INDEX);
   Session/Account userId — для better-auth. Новые FK-поля = индекс в схеме.
+- Русские тосты (V25 «последняя миля»): ВСЁ, что пользователь читает в ошибках,
+  на русском —
+  (1) `src/server/zod-ru.ts` включает локаль zod v4 (`z.config(ru())` из
+  `zod/v4/locales/ru.js`, side-effect импорт в trpc.ts; расширение .js обязательно —
+  exports zod маппит субпуть без расширения и node-ESM не добавляет его сам);
+  (2) `src/server/error-format.ts` `trpcToastMessage()` + errorFormatter в trpc.ts:
+  БЕЗ него тост валидации показывал сырой JSON — в zod v4 `ZodError.message`
+  это JSON.stringify(issues), а tRPC v11 кидает TRPCError без message и берёт
+  cause.message; INTERNAL → общий русский текст, причина уходит в лог сервера;
+  (3) `src/lib/auth-errors.ts` `ruAuthError()` — map кодов better-auth (их дефолтные
+  message английские: «Invalid email or password»); rate-limit better-auth отдаёт
+  429 БЕЗ code — маппится по статусу; неизвестный код → общий русский текст,
+  оригинал пишется в консоль вызывающим кодом. Регресс: e2e проверяет русский
+  текст тоста («Неверная почта или пароль») — до V25 тест закреплял английский.
+- `shadcn` в devDependencies (перенос V25): это CLI-генератор компонентов,
+  в рантайме не импортируется; в dependencies тянул deepmerge/ts-morph/minimatch
+  в prod-аудит. `prisma` остаётся в dependencies — нужен для migrate deploy
+  при деплое.
 
 ## Чек-лист «все виды проверок» перед сдачей работы
 
 - [ ] `npm test` — все тесты зелёные (unit + server/роли)
 - [ ] `npm run lint` — 0 ошибок
 - [ ] `npx tsc --noEmit` — 0 ошибок типов (tsconfig не включает tests/ — их валидирует Vitest)
-- [ ] `npm audit` — уязвимости только в dev-цепочках (vitest/tinypool, shadcn/ts-morph, eslint/typescript-eslint); продакшен-дерево dependencies чистое
+- [ ] `npm audit` — уязвимости только в dev-цепочках (vitest/tinypool через peerOptional better-auth, shadcn/ts-morph в devDeps, eslint/typescript-eslint); production-бандл проверен grep'ом .next — vitest/tinypool отсутствуют
 - [ ] `npm run build` — production-сборка проходит (prerender ловит client-хуки)
 - [ ] `npm run e2e` на свежем `npm run start` (старые серверы → chunk-mismatch)
 - [ ] E2E-смоук в браузере: дашборд, воронка, счета открываются, шрифты/тема на месте

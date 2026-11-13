@@ -19,7 +19,8 @@ test.describe("Публичные страницы и гость", () => {
     await page.getByPlaceholder("Email").fill("test@corvid.dev")
     await page.getByPlaceholder("Пароль").fill("WrongPass123!")
     await page.getByRole("button", { name: "Войти" }).click()
-    await expect(page.getByText("Invalid email or password")).toBeVisible()
+    // Регресс V25: better-auth ошибки локализованы (было "Invalid email or password").
+    await expect(page.getByText("Неверная почта или пароль")).toBeVisible()
     await expect(page).toHaveURL(/\/sign-in/)
   })
 
