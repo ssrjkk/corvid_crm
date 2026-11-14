@@ -30,6 +30,7 @@ const genId = () => crypto.randomUUID().replace(/-/g, "")
 
 async function main() {
   const db = new Database(DB_PATH)
+  let adminUserId
 
   for (const demo of DEMO) {
     const passwordHash = await hashPassword(demo.password)
@@ -61,6 +62,60 @@ async function main() {
         "INSERT INTO account (id, accountId, providerId, userId, password, createdAt, updatedAt) VALUES (?, ?, 'credential', ?, ?, ?, ?)"
       ).run(genId(), userId, userId, passwordHash, stamp, stamp)
     }
+    if (demo.role === "ADMIN") adminUserId = userId
+  }
+
+  // Демо-ДАННЫЕ для e2e и дашборда (идемпотентно: сеются ТОЛЬКО в пустые таблицы,
+  // существующие данные не трогаются). Зачем: e2e в CI гоняется против свежей
+  // ci.db — раньше e2e молча полагался на данные, накопленные в локальном dev.db,
+  // и падал на пустой базе (INV-0001 нет → клик по таймауту; воронка пуста →
+  // recharts-svg не рендерится → CSP-тест падает).
+  const STAGES = [
+    { name: "Новая", order: 0, color: "#94a3b8" },
+    { name: "Переговоры", order: 1, color: "#3b82f6" },
+    { name: "Договор", order: 2, color: "#f59e0b" },
+    { name: "Выиграна", order: 3, color: "#10b981" },
+    { name: "Проиграна", order: 4, color: "#ef4444" },
+  ]
+
+  let firstStageId
+  const stageCount = db.prepare("SELECT COUNT(*) AS c FROM PipelineStage").get().c
+  if (stageCount === 0) {
+    const insertStage = db.prepare(
+      'INSERT INTO PipelineStage (id, name, "order", color, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)'
+    )
+    for (const stage of STAGES) {
+      const id = genId()
+      firstStageId ??= id
+      insertStage.run(id, stage.name, stage.order, stage.color, now(), now())
+    }
+    console.log(`created: ${STAGES.length} этапов воронки`)
+  } else {
+    firstStageId = db.prepare('SELECT id FROM PipelineStage ORDER BY "order" ASC LIMIT 1').get()?.id
+  }
+
+  let demoDealId
+  const dealCount = db.prepare("SELECT COUNT(*) AS c FROM Deal").get().c
+  if (dealCount === 0 && firstStageId) {
+    demoDealId = genId()
+    db.prepare(
+      "INSERT INTO Deal (id, title, value, currency, status, stageId, ownerId, createdAt, updatedAt) VALUES (?, ?, ?, 'RUB', 'OPEN', ?, ?, ?, ?)"
+    ).run(demoDealId, "Демо-сайт для «Ромашка»", 150000, firstStageId, adminUserId, now(), now())
+    console.log("created: демо-сделка")
+  }
+
+  const invoiceCount = db.prepare("SELECT COUNT(*) AS c FROM Invoice").get().c
+  if (invoiceCount === 0) {
+    const invoiceId = genId()
+    db.prepare(
+      "INSERT INTO Invoice (id, number, status, issueDate, currency, note, dealId, createdAt, updatedAt) VALUES (?, 'INV-0001', 'DRAFT', ?, 'RUB', ?, ?, ?, ?)"
+    ).run(invoiceId, now(), "Демо-счёт для проверки печатной формы", demoDealId ?? null, now(), now())
+    const insertItem = db.prepare(
+      "INSERT INTO InvoiceItem (id, name, qty, price, position, invoiceId) VALUES (?, ?, ?, ?, ?, ?)"
+    )
+    insertItem.run(genId(), "Дизайн главной страницы", 1, 30000, 0, invoiceId)
+    insertItem.run(genId(), "Вёрстка и валидация", 3, 10000, 1, invoiceId)
+    console.log("created: INV-0001 с двумя позициями")
   }
 
   db.close()

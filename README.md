@@ -51,7 +51,7 @@ npm install
 
 npx prisma migrate dev
 npm run dev          # → http://localhost:3000 (в другом терминале:)
-npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпотентно)
+npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvid.dev, оба Test12345!) + демо-данные: этапы воронки, сделка, счёт INV-0001 (идемпотентно, трогает только пустые таблицы)
 ```
 
 Первый зарегистрированный через `/sign-up` пользователь получает роль ADMIN.
