@@ -212,6 +212,15 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   db:backup` (`scripts/db-backup.mjs`): wal_checkpoint(TRUNCATE) → копия → quick_check
   НА КОПИИ → ротация BACKUP_KEEP (10); наивное копирование живой WAL-базы теряет
   транзакции из -wal файла.
+- Миграции/CI (V28): (1) drift guard `npm run db:check` = `prisma migrate diff
+  --from-migrations … --to-schema … --exit-code` (0 чисто, 2 дрейф; без него правка
+  schema.prisma без миграции проходила CI молча — deploy применял старые миграции,
+  падение откладывалось до первого запроса к новой колонке). (2) порядок в ci.yml:
+  build СТРОГО до e2e — webServer стартует `npm run start`, а без .next он падает
+  («Could not find a production build», провал V27 CI); бэкап-регресс локальной
+  гигиены не отменён. (3) concurrency ci-${{ github.ref }} cancel-in-progress +
+  timeout-minutes: 30. PowerShell-грабля: Set-Content -Encoding UTF8 пишет BOM →
+  P1012 у prisma diff; временные схемы-копии писать через node fs (без BOM).
 - Русские тосты (V25 «последняя миля»): ВСЁ, что пользователь читает в ошибках,
   на русском —
   (1) `src/server/zod-ru.ts` включает локаль zod v4 (`z.config(ru())` из

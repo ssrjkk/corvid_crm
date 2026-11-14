@@ -68,7 +68,7 @@ npm run e2e     # Playwright (14): setup-логины (админ + VIEWER), л�
 npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах
 ```
 
-- CI гоняет ВСЁ: test + lint + build + полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`).
+- CI гоняет ВСЁ: drift guard (`npm run db:check` — схема обязана соответствовать миграциям, иначе красный) → test → lint → **build ДО e2e** (webServer в e2e стартует собранный `.next`) → полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`); новый пуш отменяет устаревший прогон ветки.
 - Один логин на роль в e2e (setup-проекты + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
@@ -114,6 +114,8 @@ Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · Type
 Подходит для Vercel/собственного сервера. Для продакшена с доступом с нескольких устройств переведи БД на PostgreSQL (`prisma/schema.prisma` → `provider = "postgresql"`, миграции те же). Локальный SQLite удобен для личного использования на одном ПК.
 
 Обязательные переменные окружения: `DATABASE_URL`, `BETTER_AUTH_SECRET` (≥32 символов, `npx auth secret`), `BETTER_AUTH_URL` — точный адрес, по которому открывается приложение: better-auth отбивает запросы с чужим `Origin` (403 INVALID_ORIGIN).
+
+Порядок выкладки: `npm run db:backup` → `npx prisma migrate deploy` → `npm run build` → старт сервера. Миграции применяются до старта, бэкап — до миграций (sqlite-файл возвращается на место при откате). Схема без миграции не пройдёт и CI: `npm run db:check` (exit 2 = дрейф).
 
 ## Лицензия
 
