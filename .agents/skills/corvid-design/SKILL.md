@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (108 тестов, 20 файлов: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber)) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (117 тестов, 21 файл: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -203,6 +203,15 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   одинаковый count → одинаковый номер → P2002; ретрай пересчитывает номер
   (SQLite сериализует запись), не-уникальные ошибки пробрасываются сразу.
   Тест recovery/exhaustion — юнит с инъекцией deps; сериальная гонка невоспроизводима.
+- Ресурсы (V27): (1) виджеты дашборда НЕ тянут getAll ради count/суммы —
+  аналитические запросы (`analytics.getSummary`: count + aggregate._sum + Promise.all,
+  никаких include); новые виджеты — так же. (2) tRPC `provider.tsx`:
+  `defaultOptions.queries.staleTime = 30_000` (фокус окна не перезапрашивает свежие
+  данные; мутации инвалидируют кэш явно — invalidate() refetch'ит независимо от
+  staleTime, поэтому потоки «создал → перешёл в список» не ломаются). (3) `npm run
+  db:backup` (`scripts/db-backup.mjs`): wal_checkpoint(TRUNCATE) → копия → quick_check
+  НА КОПИИ → ротация BACKUP_KEEP (10); наивное копирование живой WAL-базы теряет
+  транзакции из -wal файла.
 - Русские тосты (V25 «последняя миля»): ВСЁ, что пользователь читает в ошибках,
   на русском —
   (1) `src/server/zod-ru.ts` включает локаль zod v4 (`z.config(ru())` из

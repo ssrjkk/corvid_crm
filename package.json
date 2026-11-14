@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "db:seed-demo": "node scripts/seed-demo.mjs"
+    "db:seed-demo": "node scripts/seed-demo.mjs",
+    "db:backup": "node scripts/db-backup.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

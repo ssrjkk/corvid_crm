@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-108%20vitest%20%2B%2019%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-117%20vitest%20%2B%2019%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -56,12 +56,12 @@ npm run db:seed-demo # создаёт test@corvid.dev / Test12345! (идемпо
 
 Первый зарегистрированный через `/sign-up` пользователь получает роль ADMIN.
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
-(админ test@corvid.dev) + `npm run db:seed-roles` (зритель viewer@corvid.dev) — оба `Test12345!`.
+сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 108 vitest + 19 e2e, всё зелёное
+## Качество: 117 vitest + 19 e2e, всё зелёное
 
 ```bash
-npm test        # Vitest: 108 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов
+npm test        # Vitest: 117 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
 npm run e2e     # Playwright (14): setup-логины (админ + VIEWER), лендинг, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
@@ -73,6 +73,26 @@ npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA,
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
 - Удаление любых сущностей — только ADMIN (проверено тестами на всех роутерах); security-заголовки (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy) проверяются e2e-тестом.
+
+## Данные и бэкапы
+
+SQLite живёт в WAL-режиме (`journal_mode=WAL` — быстрые записи, читатели не блокируют писателя).
+Следствие: наивное копирование `dev.db` при работающем приложении теряет последние транзакции —
+они лежат в `dev.db-wal`, а не в основном файле.
+
+```bash
+npm run db:backup    # снапшот в backups/corvid-YYYYMMDD-HHmmss.db
+```
+
+Скрипт делает безопасно:
+
+1. `PRAGMA wal_checkpoint(TRUNCATE)` — сливает wal в основной файл и обрезает его;
+2. копирует файл в `backups/`;
+3. **доказывает целостность копии** (`PRAGMA quick_check` на копии; битая копия удаляется, скрипт падает);
+4. ротация: хранит `BACKUP_KEEP` (по умолчанию 10) свежих бэкапов, старые удаляет.
+
+Восстановление: остановить сервер → заменить `dev.db` файлом из `backups/` → запустить.
+`backups/` в git не попадает.
 
 ## Стек
 

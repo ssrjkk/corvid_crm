@@ -1,7 +1,32 @@
 import { router, authedProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
+import { roundMoney } from "@/lib/money"
 
 export const analyticsRouter = router({
+  /**
+   * Сводка дашборда (V27 «Ресурсы»): 5 чисел одним запросом.
+   * Раньше клиент тянул deals.getAll (полные связи: owner, tasks+assignee,
+   * activities, project) + tasks.getAll + contacts.getAll + projects.getAll —
+   * четыре тяжёлых выборки только ради count/суммы. Здесь — count/aggregate,
+   * никаких связей. Новые виджеты дашборда — так же: аналитические запросы, не getAll.
+   */
+  getSummary: authedProcedure.query(async () => {
+    const [totalDeals, valueAgg, openTasks, totalContacts, activeProjects] = await Promise.all([
+      prisma.deal.count(),
+      prisma.deal.aggregate({ _sum: { value: true } }),
+      prisma.task.count({ where: { status: { notIn: ["DONE", "CANCELLED"] } } }),
+      prisma.contact.count(),
+      prisma.project.count({ where: { status: "IN_PROGRESS" } }),
+    ])
+    return {
+      totalDeals,
+      totalValue: roundMoney(Number(valueAgg._sum.value ?? 0)),
+      openTasks,
+      totalContacts,
+      activeProjects,
+    }
+  }),
+
   getFunnel: authedProcedure.query(async () => {
     const stages = await prisma.pipelineStage.findMany({
       include: { _count: { select: { deals: true } } },

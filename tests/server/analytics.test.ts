@@ -75,3 +75,46 @@ describe("analytics.getTaskWidgets", () => {
     expect(overdueTasks.map((t) => t.title)).toEqual(["Просрочка"])
   })
 })
+
+describe("analytics.getSummary", () => {
+  it("добавленные записи меняют ровно свои числа; totalValue округлён, DONE/CANCELLED не в openTasks", async () => {
+    const caller = makeCaller("VIEWER")
+    const before = await caller.analytics.getSummary()
+
+    const carrier = await prisma.deal.create({ data: { title: "Носитель проекта" } })
+    const carrierPlanned = await prisma.deal.create({ data: { title: "Носитель проекта (план)" } })
+    await prisma.deal.create({ data: { title: "Сводка-1", value: 100000 } })
+    await prisma.deal.create({ data: { title: "Сводка-2", value: 0.1 } })
+    await prisma.deal.create({ data: { title: "Сводка-3", value: 0.2 } })
+    await prisma.task.create({ data: { title: "Открытая задача", status: "IN_PROGRESS" } })
+    await prisma.task.create({ data: { title: "Готовая задача", status: "DONE" } })
+    await prisma.task.create({ data: { title: "Отменённая задача", status: "CANCELLED" } })
+    await prisma.contact.create({ data: { firstName: "Сводный" } })
+    await prisma.project.create({ data: { name: "Проект в работе", status: "IN_PROGRESS", dealId: carrier.id } })
+    // dealId проекта уникален (1:1) — второй проект требует свою сделку-носитель.
+    await prisma.project.create({ data: { name: "Проект в планировании", status: "PLANNING", dealId: carrierPlanned.id } })
+
+    const after = await caller.analytics.getSummary()
+
+    expect(after.totalDeals).toBe(before.totalDeals + 5) // 3 сводки + 2 носителя
+    // Decimal-sum в Prisma точен (0.1 + 0.2 = 0.3), roundMoney страхует представление.
+    expect(after.totalValue).toBeCloseTo(before.totalValue + 100000.3, 10)
+    expect(after.openTasks).toBe(before.openTasks + 1) // DONE и CANCELLED не считаются
+    expect(after.totalContacts).toBe(before.totalContacts + 1)
+    expect(after.activeProjects).toBe(before.activeProjects + 1) // PLANNING не считается
+  })
+
+  it("пустая база даёт нули и 0 суммы", async () => {
+    // После resetDb в beforeAll других данных может не быть, но этот файл их
+    // насоздавал — проверяем форму значения, а не абсолютные нули.
+    const summary = await makeCaller("VIEWER").analytics.getSummary()
+    expect(Object.keys(summary).sort()).toEqual([
+      "activeProjects",
+      "openTasks",
+      "totalContacts",
+      "totalDeals",
+      "totalValue",
+    ])
+    expect(summary.totalValue).toBeGreaterThanOrEqual(0)
+  })
+})

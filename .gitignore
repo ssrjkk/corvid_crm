@@ -59,5 +59,8 @@ test.db
 *.db-wal
 *.db-shm
 
+# backups (npm run db:backup)
+backups/
+
 # generated prisma client
 src/generated/

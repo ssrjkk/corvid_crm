@@ -18,6 +18,15 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        // V27 «Ресурсы»: по умолчанию staleTime=0 — каждый фокус окна (alt-tab)
+        // перезапрашивал ВСЕ списки. 30 секунд держат данные свежими без болтовни;
+        // мутации работают как раньше — они инвалидируют кэш явно (invalidate()),
+        // а инвалидированные данные refetch'атся независимо от staleTime.
+        defaultOptions: {
+          queries: {
+            staleTime: 30_000,
+          },
+        },
         queryCache: new QueryCache({
           // Протухшая сессия: proxy пропускает по наличию cookie, но API отвечает
           // UNAUTHORIZED — вместо вечной «Загрузки…» отправляем на вход.

@@ -3,25 +3,23 @@
 import { trpc } from "@/lib/trpc/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatMoney } from "@/lib/labels"
-import { roundMoney } from "@/lib/money"
 import { Handshake, CheckSquare, Users, FolderKanban } from "lucide-react"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 
 export default function DashboardPage() {
-  const { data: deals } = trpc.deals.getAll.useQuery()
-  const { data: tasks } = trpc.tasks.getAll.useQuery()
-  const { data: contacts } = trpc.contacts.getAll.useQuery()
-  const { data: projects } = trpc.projects.getAll.useQuery()
+  // V27 «Ресурсы»: сводка одним lightweight-запросом (count/aggregate на сервере),
+  // а не четыре getAll с полными связями — ради пяти чисел на карточках.
+  const { data: summary } = trpc.analytics.getSummary.useQuery()
   const { data: funnel } = trpc.analytics.getFunnel.useQuery()
   const { data: revenue } = trpc.analytics.getRevenueByMonth.useQuery()
   const { data: taskWidgets } = trpc.analytics.getTaskWidgets.useQuery()
 
-  const totalDeals = deals?.length || 0
-  const totalValue = roundMoney(deals?.reduce((sum, deal) => sum + Number(deal.value || 0), 0) ?? 0)
-  const openTasks = tasks?.filter((t) => t.status !== "DONE" && t.status !== "CANCELLED").length || 0
-  const totalContacts = contacts?.length || 0
-  const activeProjects = projects?.filter((p) => p.status === "IN_PROGRESS").length || 0
+  const totalDeals = summary?.totalDeals ?? 0
+  const totalValue = summary?.totalValue ?? 0
+  const openTasks = summary?.openTasks ?? 0
+  const totalContacts = summary?.totalContacts ?? 0
+  const activeProjects = summary?.activeProjects ?? 0
 
   return (
     <div className="space-y-6">
