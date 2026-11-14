@@ -16,7 +16,11 @@ export default function DashboardPage() {
   const { data: taskWidgets } = trpc.analytics.getTaskWidgets.useQuery()
 
   const totalDeals = summary?.totalDeals ?? 0
-  const totalValue = summary?.totalValue ?? 0
+  // Валюты не смешиваются: каждая сумма форматируется своим кодом (V29).
+  const valueLine =
+    summary && summary.valueByCurrency.length > 0
+      ? summary.valueByCurrency.map(({ currency, total }) => formatMoney(total, currency)).join(" · ")
+      : formatMoney(0)
   const openTasks = summary?.openTasks ?? 0
   const totalContacts = summary?.totalContacts ?? 0
   const activeProjects = summary?.activeProjects ?? 0
@@ -29,7 +33,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Сделки</CardTitle><Handshake className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold tabular-nums">{totalDeals}</div><p className="text-xs text-muted-foreground tabular-nums">На сумму {formatMoney(totalValue)}</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Сделки</CardTitle><Handshake className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold tabular-nums">{totalDeals}</div><p className="text-xs text-muted-foreground tabular-nums">На сумму {valueLine}</p></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Активные задачи</CardTitle><CheckSquare className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{openTasks}</div></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Контакты</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalContacts}</div></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Проекты в работе</CardTitle><FolderKanban className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{activeProjects}</div></CardContent></Card>

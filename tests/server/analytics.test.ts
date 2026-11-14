@@ -97,11 +97,32 @@ describe("analytics.getSummary", () => {
     const after = await caller.analytics.getSummary()
 
     expect(after.totalDeals).toBe(before.totalDeals + 5) // 3 сводки + 2 носителя
-    // Decimal-sum в Prisma точен (0.1 + 0.2 = 0.3), roundMoney страхует представление.
-    expect(after.totalValue).toBeCloseTo(before.totalValue + 100000.3, 10)
+    // Decimal-sum в Prisma точен (0.1 + 0.2 = 0.3), сумма приведена к копейкам.
+    const rubBefore = before.valueByCurrency.find((v) => v.currency === "RUB")?.total ?? 0
+    const rubAfter = after.valueByCurrency.find((v) => v.currency === "RUB")?.total ?? 0
+    expect(rubAfter).toBeCloseTo(rubBefore + 100000.3, 10)
     expect(after.openTasks).toBe(before.openTasks + 1) // DONE и CANCELLED не считаются
     expect(after.totalContacts).toBe(before.totalContacts + 1)
     expect(after.activeProjects).toBe(before.activeProjects + 1) // PLANNING не считается
+  })
+
+  it("суммы группируются по валютам — USD не смешивается с RUB", async () => {
+    const caller = makeCaller("VIEWER")
+    const before = await caller.analytics.getSummary()
+    const usdBefore = before.valueByCurrency.find((v) => v.currency === "USD")?.total ?? 0
+
+    await prisma.deal.create({ data: { title: "Долларовая-1", value: 1200, currency: "USD" } })
+    await prisma.deal.create({ data: { title: "Долларовая-2", value: 0.5, currency: "usd" } })
+    await prisma.deal.create({ data: { title: "Рублёвая", value: 70000, currency: "RUB" } })
+
+    const after = await caller.analytics.getSummary()
+    const usdAfter = after.valueByCurrency.find((v) => v.currency === "USD")?.total ?? 0
+    const rubAfter = after.valueByCurrency.find((v) => v.currency === "RUB")?.total ?? 0
+    const rubBefore = before.valueByCurrency.find((v) => v.currency === "RUB")?.total ?? 0
+
+    // Строчный код схлопнулся в USD и не влил 1200.5 в рублёвую сумму.
+    expect(usdAfter).toBeCloseTo(usdBefore + 1200.5, 10)
+    expect(rubAfter).toBeCloseTo(rubBefore + 70000, 10)
   })
 
   it("пустая база даёт нули и 0 суммы", async () => {
@@ -113,8 +134,9 @@ describe("analytics.getSummary", () => {
       "openTasks",
       "totalContacts",
       "totalDeals",
-      "totalValue",
+      "valueByCurrency",
     ])
-    expect(summary.totalValue).toBeGreaterThanOrEqual(0)
+    const rub = summary.valueByCurrency.find((v) => v.currency === "RUB")?.total ?? 0
+    expect(rub).toBeGreaterThanOrEqual(0)
   })
 })

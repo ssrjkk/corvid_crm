@@ -1,6 +1,6 @@
 import { router, authedProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
-import { roundMoney } from "@/lib/money"
+import { sumByCurrency } from "@/lib/currency"
 
 export const analyticsRouter = router({
   /**
@@ -9,18 +9,26 @@ export const analyticsRouter = router({
    * activities, project) + tasks.getAll + contacts.getAll + projects.getAll —
    * четыре тяжёлых выборки только ради count/суммы. Здесь — count/aggregate,
    * никаких связей. Новые виджеты дашборда — так же: аналитические запросы, не getAll.
+   *
+   * V29 «Валюты»: сумма по сделкам группируется ПО ВАЛЮТАМ (groupBy) —
+   * рубли и доллары не складываются в одно число.
    */
   getSummary: authedProcedure.query(async () => {
-    const [totalDeals, valueAgg, openTasks, totalContacts, activeProjects] = await Promise.all([
+    const [totalDeals, byCurrency, openTasks, totalContacts, activeProjects] = await Promise.all([
       prisma.deal.count(),
-      prisma.deal.aggregate({ _sum: { value: true } }),
+      prisma.deal.groupBy({ by: ["currency"], _sum: { value: true } }),
       prisma.task.count({ where: { status: { notIn: ["DONE", "CANCELLED"] } } }),
       prisma.contact.count(),
       prisma.project.count({ where: { status: "IN_PROGRESS" } }),
     ])
     return {
       totalDeals,
-      totalValue: roundMoney(Number(valueAgg._sum.value ?? 0)),
+      valueByCurrency: sumByCurrency(
+        byCurrency.map((row) => ({
+          amount: Number(row._sum.value ?? 0),
+          currency: row.currency,
+        }))
+      ),
       openTasks,
       totalContacts,
       activeProjects,

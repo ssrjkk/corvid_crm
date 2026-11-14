@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
+import { currencySchema, defaultCurrencySchema } from "../currency"
 
 export const dealsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -47,7 +48,7 @@ export const dealsRouter = router({
         title: z.string().min(1),
         description: z.string().optional(),
         value: z.number().optional(),
-        currency: z.string().default("RUB"),
+        currency: defaultCurrencySchema,
         companyId: z.string().optional(),
         contactId: z.string().optional(),
         stageId: z.string().optional(),
@@ -78,7 +79,7 @@ export const dealsRouter = router({
         title: z.string().min(1).optional(),
         description: z.string().optional(),
         value: z.number().optional(),
-        currency: z.string().optional(),
+        currency: currencySchema.optional(),
         companyId: z.string().optional().nullable(),
         contactId: z.string().optional().nullable(),
         stageId: z.string().optional().nullable(),

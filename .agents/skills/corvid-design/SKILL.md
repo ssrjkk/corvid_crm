@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (117 тестов, 21 файл: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (129 тестов, 23 файла: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -203,8 +203,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   одинаковый count → одинаковый номер → P2002; ретрай пересчитывает номер
   (SQLite сериализует запись), не-уникальные ошибки пробрасываются сразу.
   Тест recovery/exhaustion — юнит с инъекцией deps; сериальная гонка невоспроизводима.
-- Ресурсы (V27): (1) виджеты дашборда НЕ тянут getAll ради count/суммы —
-  аналитические запросы (`analytics.getSummary`: count + aggregate._sum + Promise.all,
+- Ресурсы (V27): (1) виджеты дашборда НЕ тянут getAll ради count/суммы —  аналитические запросы (`analytics.getSummary`: count + aggregate._sum + Promise.all,
   никаких include); новые виджеты — так же. (2) tRPC `provider.tsx`:
   `defaultOptions.queries.staleTime = 30_000` (фокус окна не перезапрашивает свежие
   данные; мутации инвалидируют кэш явно — invalidate() refetch'ит независимо от
@@ -221,6 +220,13 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   гигиены не отменён. (3) concurrency ci-${{ github.ref }} cancel-in-progress +
   timeout-minutes: 30. PowerShell-грабля: Set-Content -Encoding UTF8 пишет BOM →
   P1012 у prisma diff; временные схемы-копии писать через node fs (без BOM).
+- Валюты (V29): коды — ровно 3 латинские буквы в верхнем регистре. Вход tRPC —
+  `currencySchema` (`src/server/currency.ts`: regex + uppercase transform;
+  раньше z.string() принимал любую строку в БД). Сводки НЕ смешивают валюты:
+  `sumByCurrency` (`src/lib/currency.ts`) группирует, приводит к копейкам,
+  сортирует по убыванию суммы; `getSummary` отдаёт `valueByCurrency` через
+  prisma groupBy (лёгкость V27 сохранена); карточки счетов рендерят по строке
+  на валюту. `formatMoney(total, currency)` — всегда со своей валютой.
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —
   раньше сьют молча полагался на данные локального dev.db (INV-0001, этапы):
   «печать счёта» падала кликом по несуществующему INV-0001, CSP-тест — отсутствием

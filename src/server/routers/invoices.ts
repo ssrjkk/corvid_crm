@@ -2,6 +2,7 @@ import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { createInvoiceWithNumber, formatInvoiceNumber } from "../invoice-number"
+import { defaultCurrencySchema } from "../currency"
 
 const itemSchema = z.object({
   name: z.string().min(1),
@@ -43,7 +44,7 @@ export const invoicesRouter = router({
         contactId: z.string().optional(),
         dealId: z.string().optional(),
         dueDate: z.string().optional(),
-        currency: z.string().default("RUB"),
+        currency: defaultCurrencySchema,
         note: z.string().optional(),
         items: z.array(itemSchema).min(1),
       })

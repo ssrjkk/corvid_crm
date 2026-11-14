@@ -7,7 +7,8 @@ import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { usePermissions } from "@/lib/use-permissions"
 import { formatMoney } from "@/lib/labels"
-import { invoiceTotal, roundMoney } from "@/lib/money"
+import { sumByCurrency } from "@/lib/currency"
+import { invoiceTotal } from "@/lib/money"
 import { StatusBadge } from "@/components/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -229,11 +230,33 @@ export default function InvoicesPage() {
   useEffect(() => setNow(Date.now()), [])
 
   const list = invoices ?? []
-  const sum = (status: string) =>
-    roundMoney(
+  // Валюты не смешиваются (V29): сводки группируются по коду валюты,
+  // основная (большая) сумма — первой строкой.
+  const totalsFor = (status: string) =>
+    sumByCurrency(
       list
         .filter((inv) => inv.status === status)
-        .reduce((acc, inv) => acc + invoiceTotal(inv.items), 0)
+        .map((inv) => ({ amount: invoiceTotal(inv.items), currency: inv.currency }))
+    )
+  const moneyLines = (
+    totals: ReturnType<typeof sumByCurrency>,
+    tone?: string
+  ) =>
+    totals.length === 0 ? (
+      <div className={`text-2xl font-bold tabular-nums ${tone ?? ""}`}>{formatMoney(0)}</div>
+    ) : (
+      totals.map(({ currency, total }, index) => (
+        <div
+          key={currency}
+          className={
+            index === 0
+              ? `text-2xl font-bold tabular-nums ${tone ?? ""}`
+              : "text-base font-semibold text-muted-foreground tabular-nums"
+          }
+        >
+          {formatMoney(total, currency)}
+        </div>
+      ))
     )
 
   const overdue =
@@ -259,18 +282,14 @@ export default function InvoicesPage() {
             <CardTitle className="text-sm font-medium">Выставлено</CardTitle>
             <ReceiptText className="text-muted-foreground h-4 w-4" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold tabular-nums">{formatMoney(sum("SENT"))}</div>
-          </CardContent>
+          <CardContent>{moneyLines(totalsFor("SENT"))}</CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Получено</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
-              {formatMoney(sum("PAID"))}
-            </div>
+            {moneyLines(totalsFor("PAID"), "text-emerald-600 dark:text-emerald-400")}
           </CardContent>
         </Card>
         <Card>

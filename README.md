@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-117%20vitest%20%2B%2019%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-129%20vitest%20%2B%2019%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -58,10 +58,10 @@ npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvi
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 117 vitest + 19 e2e, всё зелёное
+## Качество: 129 vitest + 19 e2e, всё зелёное
 
 ```bash
-npm test        # Vitest: 117 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов
+npm test        # Vitest: 129 тестов — вся чистая логика + ВСЕ 11 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
 npm run e2e     # Playwright (14): setup-логины (админ + VIEWER), лендинг, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
