@@ -32,6 +32,27 @@ test.describe("Публичные страницы и гость", () => {
     expect(res.headers()["permissions-policy"]).toContain("camera=()")
     expect(res.headers()["content-security-policy"]).toContain("default-src 'self'")
   })
+
+  test("визитка: OG-мета и robots.txt отдаются (регресс V30)", async ({ request }) => {
+    const home = await request.get("http://localhost:3000/")
+    const html = await home.text()
+    expect(html).toContain('property="og:title"')
+    expect(html).toContain('property="og:image"')
+    expect(html).toContain('name="twitter:card"')
+
+    // OG-изображение рендерится next/og в статический маршрут.
+    const og = await request.get("http://localhost:3000/opengraph-image")
+    expect(og.status()).toBe(200)
+    expect(og.headers()["content-type"]).toContain("image/png")
+
+    // Приватная зона закрыта от индексации, лендинг открыт.
+    const robots = await request.get("http://localhost:3000/robots.txt")
+    expect(robots.status()).toBe(200)
+    const robotsText = await robots.text()
+    expect(robotsText).toContain("Disallow: /dashboard")
+    expect(robotsText).toContain("Disallow: /sign-in")
+    expect(robotsText).not.toContain("Disallow: /$")
+  })
 })
 
 test.describe("Авторизованная зона (сессия из setup-проекта, один логин на сьют)", () => {

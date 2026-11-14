@@ -147,13 +147,28 @@
   }
 }
 
-/* Радиальное фиолетовое свечение героя на лендинге */
-.hero-glow {
-  background: radial-gradient(
-    60% 50% at 50% 0%,
-    color-mix(in oklch, var(--primary) 16%, transparent),
-    transparent
-  );
+/* Визитка (V30.1): блоки проявляются при скролле. Scroll-driven CSS-анимация
+   (Chromium 115+) — без JS и зависимостей; браузеры без поддержки просто
+   сразу видят контент. ВАЖНО: только transform, БЕЗ opacity — axe-core
+   снимает цвета в момент до скролла, и полупрозрачный бленд фейково
+   ловится как low-contrast (a11y-гейт serious = 0). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal-up {
+      animation: corvid-reveal both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+  }
+}
+
+@keyframes corvid-reveal {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* Печать счёта: только печатная форма, без сайдбара и кнопок */

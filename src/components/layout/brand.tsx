@@ -5,14 +5,17 @@ import { cn } from "@/lib/utils"
 export function BrandMark({
   size = 36,
   className,
+  alt = "Corvid",
 }: {
   size?: number
   className?: string
+  /** Внутри ссылки-бренда логотип декоративен (alt=""), иначе — имя ссылки дублируется. */
+  alt?: string
 }) {
   return (
     <Image
       src="/corvid-logo.svg"
-      alt="Corvid"
+      alt={alt}
       width={size}
       height={size}
       unoptimized
@@ -30,7 +33,7 @@ export function Brand({
 }) {
   return (
     <Link href="/dashboard" className={cn("flex items-center gap-2.5", className)}>
-      <BrandMark size={size} />
+      <BrandMark size={size} alt="" />
       <span className="font-heading text-xl font-bold tracking-tight">Corvid</span>
     </Link>
   )

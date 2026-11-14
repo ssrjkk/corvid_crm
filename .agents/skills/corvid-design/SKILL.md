@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (129 тестов, 23 файла: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (19: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 19/19 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (129 тестов, 23 файла: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -168,7 +168,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   SQLite-надёжность: `prisma.ts` выставляет `journal_mode=WAL` (персистентно, один раз)
   + `timeout: 5000` (busy_timeout) в адаптере. a11y: e2e-проект `a11y` (axe-core 4,
   WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета) —
-  19 e2e всего: 2 setup + 8 crm + 4 viewer + 5 a11y.
+  20 e2e всего: 2 setup + 9 crm + 4 viewer + 5 a11y.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
   транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
@@ -227,6 +227,45 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   сортирует по убыванию суммы; `getSummary` отдаёт `valueByCurrency` через
   prisma groupBy (лёгкость V27 сохранена); карточки счетов рендерят по строке
   на валюту. `formatMoney(total, currency)` — всегда со своей валютой.
+- Визитка (V30, пересобрана в V30.1 по вердикту пользователя «AI-слоп»):
+  НОЛЬ ФЕЙКА — ни одной выдуманной сущности. ЗАПРЕЩЕНО: нарисованные
+  «мок-канбаны» с придуманными компаниями/сделками (даже собранные из
+  настоящих примитивов), бенто-сетка фич с иконками, радиальные свечения
+  (hero-glow удалён и с лендинга, и с sign-in, CSS-класс удалён), чипы
+  с пульсирующими точками, карусели, фейковые цитаты/логотипы/цифры.
+  ПРАВИЛЬНО (паттерн Linear): липкая nav (blur + border/60) с брендом,
+  якорями, GitHub и «Войти»; герой — h1 text-5xl + одна строка сути +
+  2 CTA (Войти/GitHub) + mono-строка стека; под ним НАСТОЯЩИЙ интерфейс —
+  скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
+  сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
+  width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
+  при поднятой `npm run start`); далее strip цифр (129 Vitest · 20
+  Playwright · 0 serious a11y · 0 prod-уязвимостей — синхронизировать
+  с README) и 2 чередующихся строки «скриншот + фактический текст»,
+  блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
+  подвал. (1) Метаданные в layout.tsx: metadataBase из
+  `NEXT_PUBLIC_SITE_URL ?? localhost:3000`, title template, OG/Twitter
+  (twitter:image падает на opengraph-image автоматически), robots.ts закрывает
+  приватную зону (Disallow: /dashboard… /sign-in, /api) — регресс e2e «OG-мета
+  и robots.txt отдаются». (2) OG-карточка `opengraph-image.tsx` (next/og,
+  satori, статический рендер на билде): satori НЕ видит globals.css/CSS-переменные
+  → inline-литералы = точные копии токенов тёмной темы (задокументированное
+  hex-исключение, значения получены oklch→hex конвертацией); fontkit в next/og
+  не читает woff2 (и EOT!) — только TTF: CSS API Google Fonts отдаёт TTF по
+  легаси-UA (Android 2.2; IE UA даёт EOT, современный — woff2), шрифт vendored
+  `public/fonts/manrope-latin-800.ttf` + OFL-Manrope.txt; дефолтный шрифт
+  satori без жирных начертаний — «Corvid» выходит тонким. Текст OG — латиницей.
+  (3) Scroll-driven reveal (`.reveal-up`, `animation-timeline: view()`): ТОЛЬКО
+  transform, без opacity — axe-core снимает цвета в момент до скролла, и
+  полупрозрачный бленд (opacity из кейфрейма) фейково ловится как
+  color-contrast serious (поймано a11y-гейтом V30); браузеры без поддержки
+  видят контент сразу, обёрнуто в prefers-reduced-motion. (4) `BrandMark alt`:
+  внутри ссылки-бренда логотип декоративен (`alt=""` в `Brand`), иначе имя
+  ссылки дублируется («Corvid Corvid»). (5) Hero-анимация входа —
+  `motion-safe:animate-in` из уже установленной tw-animate-css; новых
+  анимационных зависимостей НЕ добавлять (аудит остаётся 3 low/prod 0).
+  (6) E2E-замки визитки: h1 содержит «Corvid» и строка
+  «© 2026 ssrjkk · Corvid CRM» в подвале — не переименовать.
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —
   раньше сьют молча полагался на данные локального dev.db (INV-0001, этапы):
   «печать счёта» падала кликом по несуществующему INV-0001, CSP-тест — отсутствием
@@ -235,7 +274,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   INV-0001 с 2 позициями), идемпотентно — только в пустые таблицы. Проверка
   пайплайна локально = симуляция CI: DATABASE_URL=file:./ci.db → migrate deploy
   → db:seed-demo ×2 (второй прогон = обновления, дублей нет) → сервер с этим env
-  → e2e 19/19.
+  → e2e 20/20.
 - Русские тосты (V25 «последняя миля»): ВСЁ, что пользователь читает в ошибках,
   на русском —
   (1) `src/server/zod-ru.ts` включает локаль zod v4 (`z.config(ru())` из
