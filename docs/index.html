@@ -18,105 +18,105 @@
 <meta property="og:image" content="https://ssrjkk.github.io/corvid_crm/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23141414'/%3E%3Ccircle cx='30' cy='26' r='7' fill='%23e8a33d'/%3E%3Cpath d='M10 30 L26 34 L12 38 Z' fill='%23ffffff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='30' fill='%23EEF2FF'/%3E%3Cellipse cx='64' cy='82' rx='31' ry='29' fill='%23333D55'/%3E%3Ccircle cx='64' cy='45' r='26' fill='%23333D55'/%3E%3Cellipse cx='54' cy='44' rx='7.5' ry='8.5' fill='%23fff'/%3E%3Cellipse cx='74' cy='44' rx='7.5' ry='8.5' fill='%23fff'/%3E%3Cpath d='M57 52.5c4.5-2.7 9.5-2.7 14 0-1.6 4.2-4 7.4-7 9.5-3-2.1-5.4-5.3-7-9.5z' fill='%23F59E0B'/%3E%3C/svg%3E">
 <link rel="canonical" href="https://ssrjkk.github.io/corvid_crm/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;800&family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#fafafa; --ink:#141414; --soft:#6f6f6f; --line:#e4e4e4;
-  --amber:#e8a33d; --mono:'JetBrains Mono',monospace; --text:'Golos Text',sans-serif;
+  --bg:#f7f8fc; --card:#ffffff; --ink:#23283b; --ink2:#333d55;
+  --soft:#6b7391; --indigo:#5b5fc7; --indigo-deep:#3f44a8;
+  --amber:#f59e0b; --blush:#fb7185; --line:#c7d2fe; --hairline:#e4e7f4;
+  --head:'Manrope',sans-serif; --body:'Inter',sans-serif; --mono:'Geist Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font:15px/1.7 var(--text);
+body{background:var(--bg);color:var(--ink);font:15.5px/1.7 var(--body);
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 /* ── шапка: лого справа сверху ───────────────── */
 header{
-  max-width:1200px;margin:0 auto;padding:26px 30px;
-  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  position:sticky;top:0;z-index:10;
+  background:rgba(247,248,252,.86);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--hairline);
 }
-.menu{display:flex;gap:26px;font-size:14px}
+header .in{max-width:1160px;margin:0 auto;padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px}
+.menu{display:flex;gap:28px;font-size:14px;color:var(--soft)}
 .menu a{color:var(--soft);text-decoration:none}
-.menu a:hover{color:var(--ink)}
-.logo{font:800 20px var(--text);letter-spacing:.14em;color:var(--ink);text-decoration:none}
-.logo b{color:var(--amber)}
-/* ── хиро: ворон слева, текст справа ─────────── */
-.hero{
-  max-width:1200px;margin:0 auto;padding:60px 30px 90px;
-  display:grid;grid-template-columns:minmax(300px,460px) 1fr;
-  gap:40px;align-items:center;
+.menu a:hover{color:var(--indigo)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo img{width:44px;height:44px;border-radius:12px}
+.logo span{font:800 19px var(--head);letter-spacing:.01em;color:var(--ink)}
+.logo span b{color:var(--indigo)}
+/* ── хиро: ворона слева, текст справа ────────── */
+.hero{max-width:1160px;margin:0 auto;padding:64px 28px 96px;
+  display:grid;grid-template-columns:minmax(300px,430px) 1fr;
+  gap:44px;align-items:center}
+.crow-wrap{position:relative}
+.crow-wrap svg,.crow-wrap .crow-img{width:100%;max-width:420px;display:block;
+  filter:drop-shadow(0 24px 40px rgba(63,68,168,.18))}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font:500 13.5px var(--mono);color:var(--soft);margin-bottom:22px;
 }
-.crow{width:100%;max-width:440px;display:block;margin:0 auto}
-.crow .eye{transform-origin:150px 104px;animation:blink 4.4s infinite}
-@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.06)}}
-.crow .ring{fill:none;stroke:var(--amber);stroke-width:2.4;opacity:.85}
-.crow .dot{fill:var(--amber)}
-.hero h1{
-  font:800 clamp(44px,6.4vw,84px)/1.04 var(--text);
-  letter-spacing:-.02em;margin:0 0 20px;
-}
-.hero h1 span{color:var(--soft)}
-.hero p.lead{font-size:17px;color:var(--soft);max-width:52ch;margin-bottom:34px}
+.kicker i{font-style:normal;color:var(--amber)}
+h1{font:800 clamp(42px,5.8vw,76px)/1.06 var(--head);letter-spacing:-.025em;
+  margin-bottom:20px}
+h1 span{color:var(--indigo)}
+.hero p.lead{font-size:17px;color:var(--soft);max-width:50ch;margin-bottom:36px}
 .cta{display:flex;gap:14px;flex-wrap:wrap}
-.btn{padding:15px 30px;border-radius:999px;text-decoration:none;font:600 14.5px var(--text);
-  border:1.6px solid var(--ink);color:var(--ink)}
-.btn.solid{background:var(--ink);color:var(--paper)}
-.btn:hover{background:var(--amber);border-color:var(--amber);color:var(--ink);transition:.2s}
+.btn{padding:15px 30px;border-radius:14px;text-decoration:none;
+  font:600 14.5px var(--body);border:1.5px solid transparent}
+.btn.solid{background:var(--indigo);color:#fff;box-shadow:0 14px 30px rgba(91,95,199,.3)}
+.btn.solid:hover{background:var(--indigo-deep)}
+.btn.ghost{border-color:var(--line);color:var(--ink);background:var(--card)}
+.btn.ghost:hover{border-color:var(--indigo)}
 /* ── секции ──────────────────────────────────── */
-section{max-width:1200px;margin:0 auto;padding:80px 30px;border-top:1px solid var(--line)}
-.k{font:600 12px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:14px}
-h2{font:800 clamp(30px,4vw,50px)/1.15 var(--text);letter-spacing:-.02em;margin-bottom:18px}
-section p.intro{color:var(--soft);max-width:64ch;margin-bottom:40px}
-/* модули — строки */
-.mods{border-top:1px solid var(--line)}
-.mod{
-  display:grid;grid-template-columns:70px 1fr auto;gap:20px;align-items:baseline;
-  padding:26px 4px;border-bottom:1px solid var(--line);
+section{max-width:1160px;margin:0 auto;padding:84px 28px;border-top:1px solid var(--hairline)}
+h2{font:800 clamp(30px,4vw,48px)/1.14 var(--head);letter-spacing:-.02em;margin-bottom:14px;max-width:24ch}
+section p.intro{color:var(--soft);max-width:60ch;margin-bottom:44px;font-size:16px}
+/* модули: две колонки, спокойно */
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:14px 44px;max-width:900px}
+.mod{display:flex;gap:18px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--hairline)}
+.mod b{font:700 19px var(--head);min-width:130px;color:var(--ink2)}
+.mod p{font-size:14.5px;color:var(--soft)}
+/* четыре шага: стрелочный поток, не чипы */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;max-width:1000px}
+.flow .st{flex:1;min-width:210px;padding:24px 26px;background:var(--card);
+  border:1.5px solid var(--hairline);border-radius:18px;position:relative}
+.flow .st + .st{margin-left:34px}
+.flow .st::after{
+  content:"";position:absolute;right:-25px;top:50%;width:16px;height:16px;margin-top:-8px;
+  border-top:2px solid var(--indigo);border-right:2px solid var(--indigo);
+  transform:rotate(45deg);
 }
-.mod .i{font:600 13px var(--mono);color:var(--amber)}
-.mod b{font:600 20px var(--text)}
-.mod span{font-size:13.5px;color:var(--soft);text-align:right;max-width:38ch}
-/* четыре шага */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
-.step{border-top:2px solid var(--ink);padding-top:16px}
-.step b{font:800 15px var(--mono);color:var(--amber);display:block;margin-bottom:8px}
-.step h3{font:600 17px var(--text);margin-bottom:6px}
-.step p{font-size:13px;color:var(--soft)}
-/* проверено */
-.proof{display:flex;gap:16px;flex-wrap:wrap}
-.proof .box{
-  padding:24px 30px;border:1px solid var(--line);border-radius:12px;min-width:200px;
-}
-.proof b{display:block;font:800 30px var(--text);letter-spacing:-.01em}
-.proof span{font-size:12.5px;color:var(--soft)}
+.flow .st:last-child::after{display:none}
+.flow h3{font:700 17px var(--head);margin-bottom:6px}
+.flow p{font-size:13.5px;color:var(--soft)}
+/* проверено: тихая строка фактов */
+.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:960px}
+.pf{background:var(--card);border:1.5px solid var(--hairline);border-radius:16px;padding:22px 24px}
+.pf b{display:block;font:800 26px var(--head);color:var(--ink2);margin-bottom:4px}
+.pf span{font-size:13px;color:var(--soft)}
 /* запуск */
-.run{background:var(--ink);color:var(--paper);border-radius:14px;padding:26px 30px;
-  font:14px/1.9 var(--mono);max-width:640px;overflow-wrap:anywhere}
-.run .c{color:#8f8f8f}
-.run .a{color:var(--amber)}
-/* ── лента-марки ─────────────────────────────── */
-.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  overflow:hidden;padding:16px 0;white-space:nowrap}
-.marquee span{
-  display:inline-block;font:600 13px var(--mono);letter-spacing:.28em;
-  text-transform:uppercase;color:var(--soft);
-  animation:mq 30s linear infinite;
-}
-@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.run{background:var(--ink2);color:#dfe3f5;border-radius:20px;padding:30px 34px;
+  font:14px/1.95 var(--mono);max-width:660px;overflow-wrap:anywhere}
+.run .c{color:#8b94b8}
 /* ── подвал ──────────────────────────────────── */
-footer{max-width:1200px;margin:0 auto;padding:34px 30px 60px;
+footer{border-top:1px solid var(--hairline);background:var(--card)}
+footer .in{max-width:1160px;margin:0 auto;padding:30px 28px 44px;
   display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
   font-size:13.5px;color:var(--soft)}
-footer a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--amber)}
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;padding-top:30px}
+footer a{color:var(--indigo);text-decoration:none}
+@media(max-width:920px){
+  .hero{grid-template-columns:1fr;padding-top:36px}
+  .crow-wrap{max-width:280px;margin:0 auto}
   .menu{display:none}
-  .crow{max-width:300px}
-  .steps{grid-template-columns:1fr 1fr}
-  .mod{grid-template-columns:50px 1fr}
-  .mod span{grid-column:2;text-align:left}
+  .mods{grid-template-columns:1fr}
+  .flow .st + .st{margin-left:0;margin-top:34px}
+  .flow .st::after{display:none}
+  .proof{grid-template-columns:1fr 1fr}
 }
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -127,131 +127,126 @@ footer a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--a
 <body>
 
 <header>
-  <nav class="menu">
-    <a href="#modules">модули</a>
-    <a href="#steps">четыре шага</a>
-    <a href="#proof">проверено</a>
-    <a href="#run">запуск</a>
-  </nav>
-  <a class="logo" href="#">COR<b>VID</b>.</a>
+  <div class="in">
+    <nav class="menu">
+      <a href="#modules">модули</a>
+      <a href="#steps">маршрут сделки</a>
+      <a href="#proof">проверено</a>
+      <a href="#run">запуск</a>
+    </nav>
+    <a class="logo" href="#">
+      <img src="corvid-logo.svg" width="44" height="44" alt="">
+      <span>COR<b>VID</b> CRM</span>
+    </a>
+  </div>
 </header>
 
 <div class="hero">
-  <!-- ворон-маскот: слева -->
-  <svg class="crow" viewBox="0 0 420 420" role="img" aria-label="Ворон-маскот Corvid">
-    <g fill="#141414">
-      <path d="M188 62 C 150 52, 118 66, 104 96 L 38 122 L 106 140 C 102 172, 116 214, 146 244 L 176 262 C 160 292, 170 318, 196 330 L 356 356 C 348 316, 330 292, 298 268 C 322 232, 326 178, 300 132 C 278 92, 236 60, 188 62 Z"/>
-      <path d="M300 300 L 398 322 L 386 372 L 296 348 Z"/>
-    </g>
-    <g class="eye">
-      <circle class="ring" cx="150" cy="104" r="13"/>
-      <circle class="dot" cx="150" cy="104" r="6.5"/>
-    </g>
-    <g stroke="#141414" stroke-width="5" stroke-linecap="round">
-      <line x1="196" y1="336" x2="192" y2="384"/>
-      <line x1="236" y1="340" x2="238" y2="384"/>
-    </g>
-  </svg>
+  <div class="crow-wrap">
+    <!-- фирменная ворона из public/corvid-logo.svg — крыло машет -->
+    <img class="crow-img" src="corvid-logo.svg" alt="Corvid — добрая ворона машет крылом">
+  </div>
 
   <div>
-    <span class="k" style="margin-bottom:22px">CRM для фриланса · Next.js 16 · tRPC</span>
-    <h1>Фриланс<br><span>под контролем.</span></h1>
-    <p class="lead">Сделки, счета, клиенты, задачи и аналитика — один ворон ведёт весь
-    учёт. Вы ведёте дела; Corvid помнит остальное.</p>
+    <span class="kicker"><i>◆</i> CRM для фриланса · Next.js 16 · tRPC · Prisma</span>
+    <h1>Фриланс под <span>контролем.</span></h1>
+    <p class="lead">Сделки, счета, клиенты, задачи и аналитика в одном месте.
+    Corvid ведёт учёт так же надёжно, как ворона хранит то, что ей дорого, —
+    вы занимаетесь делом.</p>
     <div class="cta">
-      <a class="btn solid" href="https://github.com/ssrjkk/corvid_crm">Открыть репозиторий →</a>
-      <a class="btn" href="https://github.com/ssrjkk/corvid_crm#readme">Склонировать и запустить</a>
+      <a class="btn solid" href="https://github.com/ssrjkk/corvid_crm">Склонировать и запустить</a>
+      <a class="btn ghost" href="https://github.com/ssrjkk/corvid_crm#readme">Как это устроено</a>
     </div>
   </div>
 </div>
 
-<div class="marquee" aria-hidden="true">
-  <span>сделки · счета · клиенты · задачи · аналитика · воронка · учебная сделка · сделки · счета · клиенты · задачи · аналитика · воронка · учебная сделка · </span>
-</div>
-
 <section id="modules">
-  <span class="k">модули</span>
-  <h2>Весь контур работы</h2>
-  <p class="intro">Пять модулей закрывают цикл фрилансера: от первого контакта до цифр, по которым видно, чем вы живёте.</p>
+  <h2>Весь контур работы фрилансера</h2>
+  <p class="intro">Пять модулей закрывают цикл от первого контакта до цифр, по которым видно, чем вы живёте.</p>
   <div class="mods">
-    <div class="mod"><span class="i">01</span><b>Сделки</b><span>воронка от заявки до оплаты, статусы и суммы</span></div>
-    <div class="mod"><span class="i">02</span><b>Счета</b><span>выставление и учёт оплат по каждой сделке</span></div>
-    <div class="mod"><span class="i">03</span><b>Клиенты</b><span>карточки, история, контакты — ворон помнит всех</span></div>
-    <div class="mod"><span class="i">04</span><b>Задачи</b><span>что и когда по каждой сделке, без внешних таск-трекеров</span></div>
-    <div class="mod"><span class="i">05</span><b>Аналитика</b><span>цифры месяца: доход, конверсии, узкие места</span></div>
+    <div class="mod"><b>Сделки</b><p>воронка от заявки до оплаты: этапы, суммы, дедлайны</p></div>
+    <div class="mod"><b>Счета</b><p>выставление и учёт оплат по каждой сделке</p></div>
+    <div class="mod"><b>Клиенты</b><p>карточки, история, контакты — ворон помнит всех</p></div>
+    <div class="mod"><b>Задачи</b><p>что и когда по каждой сделке, без внешних таск-трекеров</p></div>
+    <div class="mod"><b>Аналитика</b><p>доход, конверсии и узкие места — цифрами месяца</p></div>
+    <div class="mod"><b>Поля сделок</b><p>TEXT/NUMBER/DATE/SELECT — свои поля с валидацией</p></div>
   </div>
 </section>
 
 <section id="steps">
-  <span class="k">маршрут</span>
   <h2>От заявки до аналитики — четыре шага</h2>
-  <p class="intro">Учебная сделка в воронке показывает весь путь до первого запуска.</p>
-  <div class="steps">
-    <div class="step"><b>01</b><h3>Заявка</h3><p>контакт и потребность падают в воронку</p></div>
-    <div class="step"><b>02</b><h3>Сделка</h3><p>этапы, сумма, дедлайн — видно всё</p></div>
-    <div class="step"><b>03</b><h3>Работа</h3><p>задачи и счета по сделке</p></div>
-    <div class="step"><b>04</b><h3>Аналитика</h3><p>итоги складываются в цифры</p></div>
+  <p class="intro">Учебная сделка уже лежит в воронке после первого запуска — путь виден сразу.</p>
+  <div class="flow">
+    <div class="st"><h3>Заявка</h3><p>контакт и потребность попадают в воронку</p></div>
+    <div class="st"><h3>Сделка</h3><p>этапы, сумма и дедлайн на одной карточке</p></div>
+    <div class="st"><h3>Работа</h3><p>задачи и счета ведутся по сделке</p></div>
+    <div class="st"><h3>Аналитика</h3><p>итоги месяца собираются сами</p></div>
   </div>
 </section>
 
 <section id="proof">
-  <span class="k">проверено, а не обещано</span>
-  <h2>Ворон проверяет сам</h2>
-  <p class="intro">Стек: Next.js 16, tRPC, Prisma. CI гоняет тесты и аудит на каждый push.</p>
+  <h2>Проверено, а не обещано</h2>
+  <p class="intro">Тесты и аудит гоняются на каждый push — ворон не любит сюрпризов.</p>
   <div class="proof">
-    <div class="box"><b>tRPC</b><span>типизированные контракты API</span></div>
-    <div class="box"><b>Prisma</b><span>схема и миграции под контролем</span></div>
-    <div class="box"><b>CI</b><span>тесты и аудит на каждый push</span></div>
-    <div class="box"><b>k8s</b><span>готово к размещению</span></div>
+    <div class="pf"><b>180</b><span>тестов: контракты, валидация, транзакции</span></div>
+    <div class="pf"><b>tRPC</b><span>типизация API от клиента до сервера</span></div>
+    <div class="pf"><b>Prisma</b><span>схема и миграции под контролем</span></div>
+    <div class="pf"><b>CI</b><span>e2e и a11y-аудит на каждый push</span></div>
   </div>
 </section>
 
 <section id="run">
-  <span class="k">запуск</span>
   <h2>Склонировать и запустить</h2>
-  <p class="intro">Учебная сделка уже в воронке — открывается сразу после первого старта.</p>
+  <p class="intro">Next.js 16, tRPC, Prisma. Один npm install — и ворон уже в воронке.</p>
   <div class="run">
     <span class="c"># клон и зависимости</span><br>
     git clone https://github.com/ssrjkk/corvid_crm.git<br>
     cd corvid_crm && npm install<br>
-    <span class="c"># первая учебная сделка уже ждёт в воронке</span><br>
+    <span class="c"># учебная сделка ждёт в воронке</span><br>
     npm run dev
   </div>
 </section>
 
 <footer>
-  <span>Corvid CRM · фриланс под контролем</span>
-  <span><a href="https://github.com/ssrjkk/corvid_crm">GitHub ↗</a> · <a href="https://ssrjkk.github.io/">все проекты ↗</a></span>
+  <div class="in">
+    <span>Corvid CRM · фриланс под контролем</span>
+    <span><a href="https://github.com/ssrjkk/corvid_crm">GitHub ↗</a> · <a href="https://ssrjkk.github.io/">все проекты ↗</a></span>
+  </div>
 </footer>
+
+<!-- символ для шапки -->
+
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script>
 (function(){
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  if (!window.gsap || !window.ScrollTrigger) return;
-  gsap.registerPlugin(ScrollTrigger);
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced || !window.gsap) return;
+  if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
 
-  /* ворон прилетает слева */
-  gsap.from(".crow", {duration:1.1, x:-70, opacity:0, ease:"power3.out"});
-  gsap.from(".hero h1, .hero .k, .hero p.lead, .cta", {
-    duration:.85, y:24, opacity:0, stagger:.1, ease:"power2.out", delay:.15
+  /* один orchestrated moment: ворона машет крылом — файл лого анимируется наклоном */
+  var crowImg = document.querySelector(".crow-img");
+  if (crowImg){
+    gsap.from(crowImg, {rotation:-6, transformOrigin:"50% 85%", duration:1, ease:"back.out(1.6)", delay:.4});
+    gsap.to(crowImg, {rotation:2.5, duration:1.1, repeat:-1, yoyo:true, ease:"sine.inOut", delay:1.5});
+  }
+
+  gsap.from(".hero .kicker, .hero h1, .hero p.lead, .cta", {
+    duration:.85, y:20, opacity:0, stagger:.09, ease:"power2.out", delay:.25
   });
+  gsap.from(".crow-wrap svg", {duration:1, x:-46, opacity:0, ease:"power3.out"});
 
-  /* ворон кланяется головой на скролл мимо него */
-  gsap.to(".crow", {rotation:4, transformOrigin:"55% 30%", ease:"none",
-    scrollTrigger:{trigger:".hero", start:"top top", end:"bottom top", scrub:1}});
-
-  /* секции — чёткие входы */
+  if (!window.ScrollTrigger) return;
   gsap.utils.toArray("section").forEach(function(sec){
-    gsap.from(sec.querySelectorAll(".k, h2, p.intro"), {
-      duration:.8, y:22, opacity:0, stagger:.08, ease:"power2.out",
-      scrollTrigger:{trigger:sec, start:"top 74%", once:true}
+    gsap.from(sec.querySelectorAll("h2, p.intro"), {
+      duration:.7, y:18, opacity:0, ease:"power2.out",
+      scrollTrigger:{trigger:sec, start:"top 72%", once:true}
     });
-    var rows = sec.querySelectorAll(".mod, .step, .box, .run");
+    var rows = sec.querySelectorAll(".mod, .st, .pf, .run");
     if (rows.length) gsap.from(rows, {
-      duration:.7, y:20, opacity:0, stagger:.09, ease:"power2.out",
-      scrollTrigger:{trigger:sec, start:"top 66%", once:true}
+      duration:.6, y:16, opacity:0, stagger:.07, ease:"power2.out",
+      scrollTrigger:{trigger:sec, start:"top 64%", once:true}
     });
   });
 })();
