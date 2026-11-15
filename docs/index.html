@@ -3,607 +3,255 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Corvid CRM — фриланс под контролем — SSRJKK</title>
-<meta name="description" content="CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma, Tailwind v4. 59 unit- и 7 e2e-тестов, светлый и тёмный режим из oklch-токенов, MIT.">
-<meta name="theme-color" content="#ffffff">
+<title>Corvid CRM — фриланс под контролем</title>
+<meta name="description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SSRJKK">
+<meta property="og:title" content="Corvid CRM — фриланс под контролем">
+<meta property="og:description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
+<meta property="og:url" content="https://ssrjkk.github.io/corvid_crm/">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Corvid CRM — фриланс под контролем">
+<meta name="twitter:description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
+<meta name="twitter:image" content="https://ssrjkk.github.io/corvid_crm/og-card.png">
+<meta property="og:image" content="https://ssrjkk.github.io/corvid_crm/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23141414'/%3E%3Ccircle cx='30' cy='26' r='7' fill='%23e8a33d'/%3E%3Cpath d='M10 30 L26 34 L12 38 Z' fill='%23ffffff'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://ssrjkk.github.io/corvid_crm/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Family: белый холст, tight 500-заголовки, чёрные пилюли */
-  --paper:#ffffff;--ink:#121212;--graphite:#474645;--black:#171717;
-  --canvas:#fbfaf9;--oat:#f6f4ee;--line:#f2f0ed;--pebble:#6f6d6c;
-  --blue:#0086fc;--orange:#ff3e00;--gold:#d48f00;--mint:#00c978;
-  /* AA-варианты акцентов для мелкого текста (сами акценты остаются декоративными) */
-  --blue-t:#005fc0;--mint-t:#00814e;--gold-t:#8f5f00;--orange-t:#c23200;
-  --mintwash:#e3f5f3;--peri:#f1f3fa;
-  --display:'Plus Jakarta Sans','Inter',-apple-system,'Segoe UI',sans-serif;
-  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-  --mono:ui-monospace,'SFMono-Regular',SFMono,Menlo,Consolas,'Liberation Mono',monospace;
+  --paper:#fafafa; --ink:#141414; --soft:#6f6f6f; --line:#e4e4e4;
+  --amber:#e8a33d; --mono:'JetBrains Mono',monospace; --text:'Golos Text',sans-serif;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.53 var(--sans);letter-spacing:-.013em;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible{outline:2px solid var(--blue-t);outline-offset:3px}
-.skip{position:absolute;left:-9999px;top:10px;background:var(--black);color:var(--paper);padding:10px 16px;border-radius:32px;font:500 14px var(--sans);z-index:20}
-.skip:focus{left:16px}
-.wrap{max-width:1112px;margin:0 auto;padding:0 20px}
-
-/* топбар: прозрачная панель с волосяной линией */
-.topbar{background:var(--paper);border-bottom:1px solid var(--line)}
-.bar{height:88px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font:600 17px/1 var(--sans);letter-spacing:-.2px}
-.brand .mark{width:24px;height:24px;border-radius:7px;background:var(--black);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;font:500 13px/1 var(--display)}
-.topnav{display:flex;gap:4px}
-.topnav a{padding:8px 12px;border-radius:6px;font:500 15px/1.47 var(--sans);letter-spacing:-.09px;color:var(--ink)}
-.topnav a:hover{background:var(--canvas)}
-.actions{display:flex;gap:8px}
-
-/* пилюли: Wallet Black и Oat, 32px радиус */
-.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:32px;font:500 17px/1.4 var(--sans);letter-spacing:-.22px;white-space:nowrap;cursor:pointer}
-.pill.sm{height:32px;padding:0 14px;font:500 15px/1 var(--sans);letter-spacing:-.13px}
-.pill.sm2{height:40px;padding:0 18px;font:500 15px/1 var(--sans);letter-spacing:-.13px}
-.pill.lg{height:48px;padding:0 24px}
-.pill.black{background:var(--black);color:var(--paper)}
-.pill.black:hover{background:#000}
-.pill.oat{background:var(--oat);color:var(--ink)}
-.pill.oat:hover{background:#efece4}
-
-/* хиро */
-.hero{position:relative;text-align:center;padding:72px 0 0}
-.hero h1{font:500 clamp(40px,6.4vw,68px)/1.1 var(--display);letter-spacing:-.02em;margin:0 auto 20px;max-width:780px}
-.hero .lead{font:400 19px/1.42 var(--sans);letter-spacing:-.015em;color:var(--graphite);max-width:660px;margin:0 auto 32px}
-.btnrow{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.stackline{margin:26px 0 0;font:400 14px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-
-/* product-мокап: дашборд (воронка + выручка по месяцам) */
-.mockwrap{max-width:980px;margin:52px auto 0}
-.mockup{background:var(--paper);border-radius:18px;box-shadow:inset 0 0 0 1px var(--line),0 1px 6px rgba(0,0,0,.04),0 28px 56px -30px rgba(0,0,0,.14);text-align:left;overflow:hidden}
-.mch{display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:1px solid var(--line)}
-.mdot{width:9px;height:9px;border-radius:50%;background:#e0ddd8;flex:none}
-.maddr{margin-left:10px;background:var(--canvas);border-radius:999px;padding:5px 14px;font:400 12px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-.mkbd{margin-left:auto;background:var(--oat);border-radius:7px;padding:4px 10px;font:500 11.5px/1.5 var(--mono);color:var(--graphite);flex:none}
-.mbody{display:flex}
-.mside{width:172px;flex:none;border-right:1px solid var(--line);padding:14px 12px;display:flex;flex-direction:column;gap:3px}
-.msbrand{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);letter-spacing:-.1px;padding:4px 6px 12px}
-.msbrand i{width:18px;height:18px;border-radius:6px;background:var(--black);color:var(--paper);font:500 11px/1 var(--display);font-style:normal;display:inline-flex;align-items:center;justify-content:center}
-.msit{font:500 12.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--pebble);padding:6px 9px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.msit.on{background:var(--canvas);color:var(--ink)}
-.mmain{flex:1;min-width:0;padding:16px 18px 18px}
-.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.mhead b{font:500 16px/1.2 var(--sans);letter-spacing:-.2px}
-.mperiod{background:var(--oat);border-radius:999px;padding:5px 12px;font:500 11.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--graphite);white-space:nowrap}
-.mkpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.mkpi{background:var(--canvas);border-radius:11px;padding:12px 14px;min-width:0}
-.mkpi span{display:block;font:500 11px/1.3 var(--sans);letter-spacing:-.09px;color:var(--pebble);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mkpi b{display:block;margin-top:4px;font:500 20px/1.1 var(--display);letter-spacing:-.02em}
-.mkpi i{display:block;margin-top:3px;font:500 11px/1.3 var(--sans);letter-spacing:-.09px;font-style:normal;color:var(--pebble);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mkpi i.up{color:var(--mint-t)}
-.mgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-top:12px}
-.mcard{background:var(--paper);border-radius:12px;box-shadow:inset 0 0 0 1px var(--line);padding:14px;min-width:0}
-.mchead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
-.mchead span{font:500 12.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--graphite)}
-.mchead b{font:500 12px/1.3 var(--sans);letter-spacing:-.09px;color:var(--pebble);white-space:nowrap}
-.mfunnel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.mfcol{background:var(--canvas);border-radius:9px;padding:8px;min-width:0}
-.mfl{display:block;font:500 10.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--graphite);margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mfcard{background:var(--paper);border-radius:7px;box-shadow:inset 0 0 0 1px var(--line);padding:7px 8px;margin-bottom:6px}
-.mfcard:last-child{margin-bottom:0}
-.mfcard b{display:block;font:500 11px/1.3 var(--sans);letter-spacing:-.13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mfcard i{display:block;margin-top:2px;font:400 10.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--pebble);font-style:normal}
-.mfcard.done b{color:var(--mint-t)}
-.mchart{display:flex;align-items:flex-end;gap:9px;height:118px;margin-top:6px}
-.mchart i{flex:1;min-width:0;height:var(--h);background:var(--blue);border-radius:5px 5px 2px 2px}
-.mchart i.hot{background:var(--mint)}
-.mmonth{display:flex;gap:9px;margin-top:8px}
-.mmonth span{flex:1;min-width:0;text-align:center;font:400 10px/1.3 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-.mockcap{margin:14px 0 0;font:400 13px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-
-/* секции */
-.section{margin-top:104px}
-.eyebrow{font:600 14px/1.43 var(--sans);letter-spacing:-.09px;margin:0 0 12px}
-.blue-t{color:var(--blue-t)}.mint-t{color:var(--mint-t)}.gold-t{color:var(--gold-t)}.orange-t{color:var(--orange-t)}
-h2{font:500 44px/1.09 var(--display);letter-spacing:-.031em;margin:0 0 14px}
-.section-lead{font:400 19px/1.42 var(--sans);letter-spacing:-.015em;color:var(--graphite);max-width:640px;margin:0}
-
-/* метрики доверия */
-.mgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
-.metric{background:var(--canvas);border-radius:13px;padding:24px 20px}
-.metric b{display:block;font:500 34px/1.05 var(--display);letter-spacing:-.025em}
-.metric span{display:block;margin-top:8px;font:400 13.5px/1.45 var(--sans);letter-spacing:-.09px;color:var(--graphite)}
-
-/* модули: белые карточки с Linen-кольцом и тайлами Mint Wash / Periwinkle Wash */
-.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
-.mod{background:var(--paper);border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);padding:24px}
-.tile{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--blue)}
-.tile.mintwash{background:var(--mintwash)}
-.tile.peri{background:var(--peri)}
-.tile svg{width:21px;height:21px;display:block}
-.mod h3{font:500 18px/1.3 var(--sans);letter-spacing:-.3px;margin:16px 0 0}
-.mod p{font:400 14px/1.5 var(--sans);letter-spacing:-.09px;color:var(--graphite);margin:7px 0 0}
-
-/* процесс: четыре шага с чёрными номерами */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:44px}
-.step{position:relative}
-.num{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:999px;background:var(--black);color:var(--paper);font:600 12.5px/1 var(--sans);letter-spacing:.3px}
-.step h3{font:500 23px/1.09 var(--display);letter-spacing:-.02em;margin:14px 0 0}
-.step p{font:400 15px/1.5 var(--sans);letter-spacing:-.09px;color:var(--graphite);margin:8px 0 0}
-.step:not(:last-child)::after{content:'→';position:absolute;right:-24px;top:4px;color:var(--pebble);font-size:17px}
-
-/* демо: Canvas-панель с учебной воронкой */
-.demo-split{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center}
-.demo-copy .desc{font:400 17px/1.53 var(--sans);letter-spacing:-.013em;color:var(--graphite);margin:0}
-.demo-panel{background:var(--canvas);border-radius:12px;padding:22px}
-.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.kcol{background:var(--paper);border-radius:10px;box-shadow:inset 0 0 0 1px var(--line);padding:10px;min-height:172px;display:flex;flex-direction:column}
-.khead{display:flex;justify-content:space-between;align-items:center;gap:6px;font:500 12.5px/1.3 var(--sans);letter-spacing:-.09px;color:var(--graphite);padding:2px 4px 8px}
-.khead b{flex:none}
-.kstack{display:flex;flex-direction:column;gap:8px;flex:1}
-.kcard{background:var(--paper);border-radius:10px;padding:12px;box-shadow:0 1px 6px rgba(0,0,0,.06),0 0 20px rgba(0,0,0,.05),inset 0 0 0 1px var(--line)}
-.kcard b{display:block;font:500 14px/1.35 var(--sans);letter-spacing:-.13px}
-.kcard.closed b{color:var(--mint-t)}
-.kcard .sub{display:block;font:400 12.5px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble);margin-top:3px}
-.kcard .chip{display:inline-block;margin-top:8px;background:var(--mintwash);color:#08614b;border-radius:999px;padding:3px 10px;font:500 12px/1.3 var(--sans);letter-spacing:-.09px}
-.demo-controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
-.status{margin:12px 0 0;font:400 14px/1.4 var(--sans);letter-spacing:-.09px;color:var(--graphite)}
-.fineprint{margin:6px 0 0;font:400 13px/1.45 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-
-/* финальный CTA */
-.cta-panel{margin-top:40px;background:var(--canvas);border-radius:18px;box-shadow:inset 0 0 0 1px var(--line);padding:48px 40px;text-align:center}
-.cta-panel h2{margin:0 auto 14px;max-width:640px}
-.cta-panel .section-lead{margin:0 auto}
-.cta-panel .btnrow{margin-top:26px}
-.cta-panel .codebox{max-width:640px;margin:30px auto 0;text-align:left;background:var(--paper)}
-.cta-trust{margin:18px 0 0;font:400 13px/1.5 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-
-/* запуск: терминал */
-.codebox{background:var(--canvas);border-radius:12px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
-.codehead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 0 24px}
-.codehead span{font:500 12px/1 var(--sans);letter-spacing:.6px;text-transform:uppercase;color:var(--pebble)}
-pre{margin:6px 0 0;padding:0 24px 20px;font:400 13px/1.8 var(--mono);color:var(--ink);overflow-x:auto}
-
-/* футер: выцветающий */
-.foot{margin-top:104px;border-top:1px solid var(--line);padding:56px 20px 64px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
-.foot .fb b{display:block;font:500 16px/1.3 var(--sans);letter-spacing:-.13px}
-.foot .fb span{display:block;margin-top:5px;font:400 13px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-.foot nav{display:flex;gap:22px;flex-wrap:wrap}
-.foot nav a{font:500 14px/1.4 var(--sans);letter-spacing:-.09px;color:var(--pebble)}
-.foot nav a:hover{color:var(--ink)}
-
-@media(min-width:1240px){
-  /* на широких экранах мокап чуть крупнее за счёт хиро-колонки */
-  .mockwrap{max-width:1020px}
+body{background:var(--paper);color:var(--ink);font:15px/1.7 var(--text);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* ── шапка: лого справа сверху ───────────────── */
+header{
+  max-width:1200px;margin:0 auto;padding:26px 30px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
 }
-@media(max-width:1024px){
-  .grid9{grid-template-columns:repeat(2,1fr)}
-  .steps{grid-template-columns:repeat(2,1fr);gap:28px}
-  .step:not(:last-child)::after{display:none}
-  .mgrid4{grid-template-columns:repeat(2,1fr)}
+.menu{display:flex;gap:26px;font-size:14px}
+.menu a{color:var(--soft);text-decoration:none}
+.menu a:hover{color:var(--ink)}
+.logo{font:800 20px var(--text);letter-spacing:.14em;color:var(--ink);text-decoration:none}
+.logo b{color:var(--amber)}
+/* ── хиро: ворон слева, текст справа ─────────── */
+.hero{
+  max-width:1200px;margin:0 auto;padding:60px 30px 90px;
+  display:grid;grid-template-columns:minmax(300px,460px) 1fr;
+  gap:40px;align-items:center;
 }
-@media(max-width:920px){
-  .mside{display:none}
-  .demo-split{grid-template-columns:1fr;gap:36px}
+.crow{width:100%;max-width:440px;display:block;margin:0 auto}
+.crow .eye{transform-origin:150px 104px;animation:blink 4.4s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.06)}}
+.crow .ring{fill:none;stroke:var(--amber);stroke-width:2.4;opacity:.85}
+.crow .dot{fill:var(--amber)}
+.hero h1{
+  font:800 clamp(44px,6.4vw,84px)/1.04 var(--text);
+  letter-spacing:-.02em;margin:0 0 20px;
 }
-@media(max-width:880px){
-  .topnav{display:none}
-  .bar{height:68px}
-  h2{font-size:34px}
-  .section{margin-top:72px}
-  .hero{padding-top:56px}
-  .mockwrap{margin-top:40px}
-  .cta-panel{padding:34px 24px}
-  .foot{margin-top:72px}
+.hero h1 span{color:var(--soft)}
+.hero p.lead{font-size:17px;color:var(--soft);max-width:52ch;margin-bottom:34px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:15px 30px;border-radius:999px;text-decoration:none;font:600 14.5px var(--text);
+  border:1.6px solid var(--ink);color:var(--ink)}
+.btn.solid{background:var(--ink);color:var(--paper)}
+.btn:hover{background:var(--amber);border-color:var(--amber);color:var(--ink);transition:.2s}
+/* ── секции ──────────────────────────────────── */
+section{max-width:1200px;margin:0 auto;padding:80px 30px;border-top:1px solid var(--line)}
+.k{font:600 12px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:14px}
+h2{font:800 clamp(30px,4vw,50px)/1.15 var(--text);letter-spacing:-.02em;margin-bottom:18px}
+section p.intro{color:var(--soft);max-width:64ch;margin-bottom:40px}
+/* модули — строки */
+.mods{border-top:1px solid var(--line)}
+.mod{
+  display:grid;grid-template-columns:70px 1fr auto;gap:20px;align-items:baseline;
+  padding:26px 4px;border-bottom:1px solid var(--line);
 }
-@media(max-width:640px){
-  .grid9{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr;gap:24px}
-  .mgrid{grid-template-columns:1fr}
-  .mchart{height:96px}
-  .mgrid4{grid-template-columns:repeat(2,1fr);gap:12px}
-  .metric{padding:20px 16px}
-  .metric b{font-size:28px}
+.mod .i{font:600 13px var(--mono);color:var(--amber)}
+.mod b{font:600 20px var(--text)}
+.mod span{font-size:13.5px;color:var(--soft);text-align:right;max-width:38ch}
+/* четыре шага */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.step{border-top:2px solid var(--ink);padding-top:16px}
+.step b{font:800 15px var(--mono);color:var(--amber);display:block;margin-bottom:8px}
+.step h3{font:600 17px var(--text);margin-bottom:6px}
+.step p{font-size:13px;color:var(--soft)}
+/* проверено */
+.proof{display:flex;gap:16px;flex-wrap:wrap}
+.proof .box{
+  padding:24px 30px;border:1px solid var(--line);border-radius:12px;min-width:200px;
 }
-@media(max-width:560px){
-  .board{grid-template-columns:1fr}
-  .kcol{min-height:0;flex-direction:row;align-items:flex-start;gap:12px}
-  .khead{flex:none;width:118px;padding:2px 0 0}
-  .kstack{flex:1}
+.proof b{display:block;font:800 30px var(--text);letter-spacing:-.01em}
+.proof span{font-size:12.5px;color:var(--soft)}
+/* запуск */
+.run{background:var(--ink);color:var(--paper);border-radius:14px;padding:26px 30px;
+  font:14px/1.9 var(--mono);max-width:640px;overflow-wrap:anywhere}
+.run .c{color:#8f8f8f}
+.run .a{color:var(--amber)}
+/* ── лента-марки ─────────────────────────────── */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;padding:16px 0;white-space:nowrap}
+.marquee span{
+  display:inline-block;font:600 13px var(--mono);letter-spacing:.28em;
+  text-transform:uppercase;color:var(--soft);
+  animation:mq 30s linear infinite;
 }
-@media(max-width:480px){
-  pre{font-size:11.5px}
-  .pill.lg{height:44px;padding:0 20px;font-size:15px}
-  .mkpi{padding:10px}
-  .mkpi b{font-size:16px}
-  .mkpi i{display:none}
-  .mfcard i{display:none}
-  .mkbd{display:none}
-}
-@media(max-width:400px){
-  .mgrid4{grid-template-columns:1fr}
-  .maddr{display:none}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* ── подвал ──────────────────────────────────── */
+footer{max-width:1200px;margin:0 auto;padding:34px 30px 60px;
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:13.5px;color:var(--soft)}
+footer a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--amber)}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:30px}
+  .menu{display:none}
+  .crow{max-width:300px}
+  .steps{grid-template-columns:1fr 1fr}
+  .mod{grid-template-columns:50px 1fr}
+  .mod span{grid-column:2;text-align:left}
 }
 @media(prefers-reduced-motion:reduce){
-  *{transition:none!important;animation:none!important}
+  *{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
 }
 </style>
 </head>
 <body>
-<a class="skip" href="#main">К содержанию</a>
 
-<header class="topbar">
-  <div class="wrap bar">
-    <a class="brand" href="./"><span class="mark" aria-hidden="true">c</span>Corvid CRM</a>
-    <nav class="topnav" aria-label="Разделы">
-      <a href="#metrics">Метрики</a><a href="#modules">Модули</a><a href="#process">Процесс</a><a href="#demo">Демо</a><a href="#start">Запуск</a>
-    </nav>
-    <div class="actions">
-      <a class="pill oat sm" href="https://github.com/ssrjkk/corvid_crm">GitHub ↗</a>
-      <a class="pill black sm" href="#start">Начать</a>
-    </div>
-  </div>
+<header>
+  <nav class="menu">
+    <a href="#modules">модули</a>
+    <a href="#steps">четыре шага</a>
+    <a href="#proof">проверено</a>
+    <a href="#run">запуск</a>
+  </nav>
+  <a class="logo" href="#">COR<b>VID</b>.</a>
 </header>
 
-<main id="main">
+<div class="hero">
+  <!-- ворон-маскот: слева -->
+  <svg class="crow" viewBox="0 0 420 420" role="img" aria-label="Ворон-маскот Corvid">
+    <g fill="#141414">
+      <path d="M188 62 C 150 52, 118 66, 104 96 L 38 122 L 106 140 C 102 172, 116 214, 146 244 L 176 262 C 160 292, 170 318, 196 330 L 356 356 C 348 316, 330 292, 298 268 C 322 232, 326 178, 300 132 C 278 92, 236 60, 188 62 Z"/>
+      <path d="M300 300 L 398 322 L 386 372 L 296 348 Z"/>
+    </g>
+    <g class="eye">
+      <circle class="ring" cx="150" cy="104" r="13"/>
+      <circle class="dot" cx="150" cy="104" r="6.5"/>
+    </g>
+    <g stroke="#141414" stroke-width="5" stroke-linecap="round">
+      <line x1="196" y1="336" x2="192" y2="384"/>
+      <line x1="236" y1="340" x2="238" y2="384"/>
+    </g>
+  </svg>
 
-<section class="hero wrap">
-  <h1>Фриланс под контролем.</h1>
-  <p class="lead">Сделки, счета, клиенты, задачи и аналитика — один workspace вместо россыпи таблиц и чатов. Сделка превращается в счёт, счёт — в оплату, оплата — в цифры на дашборде.</p>
-  <div class="btnrow">
-    <a class="pill black lg" href="https://github.com/ssrjkk/corvid_crm#readme">Открыть репозиторий →</a>
-    <a class="pill oat lg" href="#start">Запуск за минуту</a>
-  </div>
-  <p class="stackline">Next.js 16 · tRPC · Prisma · Tailwind v4</p>
-  <div class="mockwrap">
-    <div class="mockup" role="img" aria-label="Иллюстрация: дашборд Corvid CRM — воронка сделок по этапам и график выручки по месяцам">
-      <div class="mch" aria-hidden="true">
-        <span class="mdot"></span><span class="mdot"></span><span class="mdot"></span>
-        <span class="maddr">corvid · дашборд</span>
-        <span class="mkbd">⌘K</span>
-      </div>
-      <div class="mbody" aria-hidden="true">
-        <div class="mside">
-          <span class="msbrand"><i>c</i>Corvid</span>
-          <span class="msit on">Дашборд</span>
-          <span class="msit">Воронка</span>
-          <span class="msit">Сделки</span>
-          <span class="msit">Счета</span>
-          <span class="msit">Клиенты</span>
-          <span class="msit">Задачи</span>
-        </div>
-        <div class="mmain">
-          <div class="mhead"><b>Обзор</b><span class="mperiod">Ноябрь</span></div>
-          <div class="mkpis">
-            <div class="mkpi"><span>Выручка за месяц</span><b>284 000 ₽</b><i class="up">+12% к октябрю</i></div>
-            <div class="mkpi"><span>Активные сделки</span><b>6</b><i>2 в согласовании</i></div>
-            <div class="mkpi"><span>Счета к оплате</span><b>2</b><i>на 96 000 ₽</i></div>
-          </div>
-          <div class="mgrid">
-            <div class="mcard">
-              <div class="mchead"><span>Воронка</span><b>21 сделка</b></div>
-              <div class="mfunnel">
-                <div class="mfcol"><span class="mfl">Новые · 2</span>
-                  <div class="mfcard"><b>Лендинг для студии</b><i>90 000 ₽</i></div>
-                  <div class="mfcard"><b>Баннерная сетка</b><i>35 000 ₽</i></div>
-                </div>
-                <div class="mfcol"><span class="mfl">В работе · 3</span>
-                  <div class="mfcard"><b>Айдентика кофейни</b><i>120 000 ₽</i></div>
-                  <div class="mfcard"><b>Сайт-визитка</b><i>60 000 ₽</i></div>
-                </div>
-                <div class="mfcol"><span class="mfl">Согласование · 1</span>
-                  <div class="mfcard"><b>Сетка соцсетей</b><i>48 000 ₽</i></div>
-                </div>
-                <div class="mfcol"><span class="mfl">Успех · 4</span>
-                  <div class="mfcard done"><b>Постер выставки</b><i>28 000 ₽</i></div>
-                </div>
-              </div>
-            </div>
-            <div class="mcard">
-              <div class="mchead"><span>Выручка по месяцам</span><b>284 000 ₽</b></div>
-              <div class="mchart">
-                <i style="--h:34%"></i><i style="--h:52%"></i><i style="--h:44%"></i>
-                <i style="--h:66%"></i><i style="--h:78%"></i><i class="hot" style="--h:96%"></i>
-              </div>
-              <div class="mmonth"><span>Июн</span><span>Июл</span><span>Авг</span><span>Сен</span><span>Окт</span><span>Ноя</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div>
+    <span class="k" style="margin-bottom:22px">CRM для фриланса · Next.js 16 · tRPC</span>
+    <h1>Фриланс<br><span>под контролем.</span></h1>
+    <p class="lead">Сделки, счета, клиенты, задачи и аналитика — один ворон ведёт весь
+    учёт. Вы ведёте дела; Corvid помнит остальное.</p>
+    <div class="cta">
+      <a class="btn solid" href="https://github.com/ssrjkk/corvid_crm">Открыть репозиторий →</a>
+      <a class="btn" href="https://github.com/ssrjkk/corvid_crm#readme">Склонировать и запустить</a>
     </div>
-    <p class="mockcap">Иллюстрация интерфейса · внутри учебные данные</p>
+  </div>
+</div>
+
+<div class="marquee" aria-hidden="true">
+  <span>сделки · счета · клиенты · задачи · аналитика · воронка · учебная сделка · сделки · счета · клиенты · задачи · аналитика · воронка · учебная сделка · </span>
+</div>
+
+<section id="modules">
+  <span class="k">модули</span>
+  <h2>Весь контур работы</h2>
+  <p class="intro">Пять модулей закрывают цикл фрилансера: от первого контакта до цифр, по которым видно, чем вы живёте.</p>
+  <div class="mods">
+    <div class="mod"><span class="i">01</span><b>Сделки</b><span>воронка от заявки до оплаты, статусы и суммы</span></div>
+    <div class="mod"><span class="i">02</span><b>Счета</b><span>выставление и учёт оплат по каждой сделке</span></div>
+    <div class="mod"><span class="i">03</span><b>Клиенты</b><span>карточки, история, контакты — ворон помнит всех</span></div>
+    <div class="mod"><span class="i">04</span><b>Задачи</b><span>что и когда по каждой сделке, без внешних таск-трекеров</span></div>
+    <div class="mod"><span class="i">05</span><b>Аналитика</b><span>цифры месяца: доход, конверсии, узкие места</span></div>
   </div>
 </section>
 
-<section class="section" id="metrics">
-  <div class="wrap">
-    <p class="eyebrow mint-t">Метрики доверия</p>
-    <h2>Проверено, а не обещано</h2>
-    <p class="section-lead">Цифры из репозитория, а не из презентации: покрытие тестами, темы из oklch-токенов и свободная лицензия.</p>
-    <div class="mgrid4">
-      <div class="metric"><b>59 + 7</b><span>unit- и e2e-тестов: логика сделок и счетов под автопроверкой</span></div>
-      <div class="metric"><b>oklch</b><span>светлая и тёмная темы собираются из одного набора токенов</span></div>
-      <div class="metric"><b>3 роли</b><span>ADMIN · MANAGER · VIEWER — доступ к деньгам разграничен</span></div>
-      <div class="metric"><b>MIT</b><span>открытая лицензия: код можно читать, править и забирать себе</span></div>
-    </div>
+<section id="steps">
+  <span class="k">маршрут</span>
+  <h2>От заявки до аналитики — четыре шага</h2>
+  <p class="intro">Учебная сделка в воронке показывает весь путь до первого запуска.</p>
+  <div class="steps">
+    <div class="step"><b>01</b><h3>Заявка</h3><p>контакт и потребность падают в воронку</p></div>
+    <div class="step"><b>02</b><h3>Сделка</h3><p>этапы, сумма, дедлайн — видно всё</p></div>
+    <div class="step"><b>03</b><h3>Работа</h3><p>задачи и счета по сделке</p></div>
+    <div class="step"><b>04</b><h3>Аналитика</h3><p>итоги складываются в цифры</p></div>
   </div>
 </section>
 
-<section class="section" id="modules">
-  <div class="wrap">
-    <p class="eyebrow blue-t">Возможности</p>
-    <h2>Модули — весь контур работы</h2>
-    <p class="section-lead">От первой заявки до закрытия месяца: модули собраны вокруг реального цикла фриланса, а не вокруг таблицы в базе. Всё связано — данные передаются сами.</p>
-    <div class="grid9">
-      <article class="mod">
-        <span class="tile peri" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-9M11 20V5M17 20v-6M3 20h18"/></svg></span>
-        <h3>Дашборд</h3>
-        <p>Воронка и выручка по месяцам на первом экране: видно, что закрыто, а что зависло.</p>
-      </article>
-      <article class="mod">
-        <span class="tile mintwash" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="4.6" height="14" rx="1.4"/><rect x="9.7" y="4" width="4.6" height="9" rx="1.4"/><rect x="15.9" y="4" width="4.6" height="6" rx="1.4"/></svg></span>
-        <h3>Воронка Kanban</h3>
-        <p>Drag-and-drop между этапами: перетащили карточку — воронка и суммы пересчитались сами.</p>
-      </article>
-      <article class="mod">
-        <span class="tile peri" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.7c0-.94.76-1.7 1.7-1.7h5.1c.45 0 .88.18 1.2.5l7.3 7.3c.66.66.66 1.74 0 2.4l-5.1 5.1c-.66.66-1.74.66-2.4 0l-7.3-7.3A1.7 1.7 0 0 1 4 10.8z"/><circle cx="8.3" cy="8.3" r="1.2"/></svg></span>
-        <h3>Сделки</h3>
-        <p>Карточки с тегами и суммами; вся история в одном списке, выгрузка — в CSV.</p>
-      </article>
-      <article class="mod">
-        <span class="tile mintwash" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 3.5h7.4L18.5 8v11a1.5 1.5 0 0 1-1.5 1.5H6.8A1.5 1.5 0 0 1 5.3 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14 3.8V8h4.3"/><path d="M8.6 12h6.8M8.6 15.5h4.5"/></svg></span>
-        <h3>Счета INV-0001</h3>
-        <p>Автонумерация и подстановка реквизитов один раз — дальше печать и экспорт в PDF.</p>
-      </article>
-      <article class="mod">
-        <span class="tile peri" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.2" cy="8.2" r="3.1"/><path d="M3.8 19.2c.6-3.1 2.8-4.8 5.4-4.8s4.8 1.7 5.4 4.8"/><path d="M15.4 5.6a3.1 3.1 0 0 1 0 5.4M16.9 14.6c1.9.7 3 2.2 3.4 4.3"/></svg></span>
-        <h3>Клиенты</h3>
-        <p>База контрагентов с историей сделок и счетов; импорт и экспорт — через CSV.</p>
-      </article>
-      <article class="mod">
-        <span class="tile mintwash" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.8l1.7 1.7 3-3.2"/><path d="M4.5 16.8l1.7 1.7 3-3.2"/><path d="M12.5 6.5h7M12.5 16.5h7"/></svg></span>
-        <h3>Задачи</h3>
-        <p>Список и Kanban, приоритеты и дедлайны — план на день собирается сам.</p>
-      </article>
-      <article class="mod">
-        <span class="tile peri" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10.2h16"/><path d="M8.7 3.5v3.6M15.3 3.5v3.6"/><path d="M8 14.2h3"/></svg></span>
-        <h3>Календарь</h3>
-        <p>Дедлайны сделок и задач на одной сетке месяца — без переключения вкладок.</p>
-      </article>
-      <article class="mod">
-        <span class="tile mintwash" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></span>
-        <h3>⌘K-палитра</h3>
-        <p>Навигация и глобальный поиск по сделкам, счетам и клиентам — с клавиатуры.</p>
-      </article>
-      <article class="mod">
-        <span class="tile peri" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.3l6.8 2.5v5.3c0 4.3-2.7 7.4-6.8 8.8-4.1-1.4-6.8-4.5-6.8-8.8V5.8z"/><path d="M9.3 11.7l2 2 3.5-3.7"/></svg></span>
-        <h3>Роли</h3>
-        <p>ADMIN, MANAGER и VIEWER: у каждой роли — свой доступ к деньгам и настройкам.</p>
-      </article>
-    </div>
+<section id="proof">
+  <span class="k">проверено, а не обещано</span>
+  <h2>Ворон проверяет сам</h2>
+  <p class="intro">Стек: Next.js 16, tRPC, Prisma. CI гоняет тесты и аудит на каждый push.</p>
+  <div class="proof">
+    <div class="box"><b>tRPC</b><span>типизированные контракты API</span></div>
+    <div class="box"><b>Prisma</b><span>схема и миграции под контролем</span></div>
+    <div class="box"><b>CI</b><span>тесты и аудит на каждый push</span></div>
+    <div class="box"><b>k8s</b><span>готово к размещению</span></div>
   </div>
 </section>
 
-<section class="section" id="process">
-  <div class="wrap">
-    <p class="eyebrow mint-t">Процесс</p>
-    <h2>От заявки до аналитики — четыре шага</h2>
-    <p class="section-lead">Данные передаются по цепочке сами: сделка порождает счёт, счёт привязывается к клиенту, клиент — к аналитике.</p>
-    <div class="steps">
-      <div class="step">
-        <span class="num">01</span>
-        <h3>Сделка</h3>
-        <p>Заказ фиксируется карточкой в воронке: сумма, теги, этап, дедлайн.</p>
-      </div>
-      <div class="step">
-        <span class="num">02</span>
-        <h3>Счёт</h3>
-        <p>INV-0001 формируется автоматически — осталось распечатать или отправить PDF.</p>
-      </div>
-      <div class="step">
-        <span class="num">03</span>
-        <h3>Клиент</h3>
-        <p>Контрагент и платежи оседают в базе; импорт и экспорт — через CSV.</p>
-      </div>
-      <div class="step">
-        <span class="num">04</span>
-        <h3>Аналитика</h3>
-        <p>Дашборд показывает, сколько из этого превратилось в выручку по месяцам.</p>
-      </div>
-    </div>
+<section id="run">
+  <span class="k">запуск</span>
+  <h2>Склонировать и запустить</h2>
+  <p class="intro">Учебная сделка уже в воронке — открывается сразу после первого старта.</p>
+  <div class="run">
+    <span class="c"># клон и зависимости</span><br>
+    git clone https://github.com/ssrjkk/corvid_crm.git<br>
+    cd corvid_crm && npm install<br>
+    <span class="c"># первая учебная сделка уже ждёт в воронке</span><br>
+    npm run dev
   </div>
 </section>
 
-<section class="section" id="demo">
-  <div class="wrap demo-split">
-    <div class="demo-copy">
-      <p class="eyebrow gold-t">Демо</p>
-      <h2>Учебная сделка в воронке</h2>
-      <p class="desc">Переведите карточку по этапам и закройте сделку — ровно так в Corvid CRM двигаются заказы: колонки воронки пересчитываются, счёт и аналитика подхватывают данные сами.</p>
-    </div>
-    <div class="demo-panel">
-      <div class="board" id="dealBoard" role="group" aria-label="Учебная воронка сделок">
-        <div class="kcol"><span class="khead">Новые <b class="kcount">1</b></span><div class="kstack">
-          <div class="kcard" id="dealCard"><b>Айдентика для кофейни</b><span class="sub">120 000 ₽ · дизайн</span><span class="chip">учебная сделка</span></div>
-        </div></div>
-        <div class="kcol"><span class="khead">В работе <b class="kcount">0</b></span><div class="kstack"></div></div>
-        <div class="kcol"><span class="khead">Согласование <b class="kcount">0</b></span><div class="kstack"></div></div>
-        <div class="kcol"><span class="khead">Закрыто <b class="kcount">0</b></span><div class="kstack"></div></div>
-      </div>
-      <div class="demo-controls">
-        <button class="pill black sm2" id="dealNext" type="button">Перевести дальше →</button>
-        <button class="pill oat sm2" id="dealReset" type="button">Сбросить</button>
-      </div>
-      <p class="status" id="dealStatus" role="status" aria-live="polite">Учебная сделка: этап «Новые» — 1 из 3.</p>
-      <p class="fineprint">Локальная иллюстрация, не подключается к сервисам: данные никуда не передаются.</p>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="start">
-  <div class="wrap">
-    <p class="eyebrow orange-t">Запуск</p>
-    <h2>Склонировать и запустить</h2>
-    <p class="section-lead">Corvid CRM — обычное Next.js-приложение: клон, установка зависимостей, запуск.</p>
-    <div class="cta-panel">
-      <div class="btnrow">
-        <a class="pill black lg" href="https://github.com/ssrjkk/corvid_crm#readme">Открыть репозиторий →</a>
-        <a class="pill oat lg" href="https://github.com/ssrjkk/corvid_crm#readme">Документация</a>
-      </div>
-      <div class="codebox">
-        <div class="codehead"><span>терминал</span><button class="pill black sm2" type="button" data-copy>Скопировать</button></div>
-        <pre><code>git clone https://github.com/ssrjkk/corvid_crm.git
-cd corvid_crm &amp;&amp; npm install &amp;&amp; npm run dev</code></pre>
-      </div>
-      <p class="cta-trust">MIT · 59 unit- и 7 e2e-тестов · светлый и тёмный режим из oklch-токенов</p>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<footer class="wrap foot">
-  <div class="fb">
-    <b>Проект SSRJKK</b>
-    <span>Corvid CRM — CRM для фриланса · MIT</span>
-  </div>
-  <nav aria-label="Футер">
-    <a href="https://github.com/ssrjkk/corvid_crm">Исходники ↗</a>
-    <a href="https://ssrjkk.github.io/">Все проекты ↗</a>
-  </nav>
+<footer>
+  <span>Corvid CRM · фриланс под контролем</span>
+  <span><a href="https://github.com/ssrjkk/corvid_crm">GitHub ↗</a> · <a href="https://ssrjkk.github.io/">все проекты ↗</a></span>
 </footer>
-
-<script>
-(function(){
-'use strict';
-/* копирование команды запуска */
-document.querySelectorAll('[data-copy]').forEach(function(btn){
-  btn.addEventListener('click',function(){
-    var box=btn.closest('.codebox');
-    var text=box?box.querySelector('pre').innerText:'';
-    function done(){
-      var old=btn.textContent;
-      btn.textContent='Скопировано';
-      btn.disabled=true;
-      setTimeout(function(){btn.textContent=old;btn.disabled=false;},1600);
-    }
-    function fallback(){
-      var ta=document.createElement('textarea');
-      ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
-      document.body.appendChild(ta);ta.select();
-      try{document.execCommand('copy');}catch(e){}
-      document.body.removeChild(ta);done();
-    }
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback);}
-    else{fallback();}
-  });
-});
-/* учебная воронка: карточка двигается по этапам и закрывается */
-var labels=['Новые','В работе','Согласование','Закрыто'];
-var stacks=[].slice.call(document.querySelectorAll('#dealBoard .kstack'));
-var counts=[].slice.call(document.querySelectorAll('#dealBoard .kcount'));
-var card=document.getElementById('dealCard');
-var chip=card.querySelector('.chip');
-var status=document.getElementById('dealStatus');
-var next=document.getElementById('dealNext');
-var reset=document.getElementById('dealReset');
-var idx=0;
-function slide(el){
-  try{
-    if(window.gsap&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      gsap.fromTo(el,{autoAlpha:0,y:8},{autoAlpha:1,y:0,duration:.35,ease:'power1.out',clearProps:'transform'});
-    }
-  }catch(e){}
-}
-function render(animate){
-  var pos=[0,0,0,0];
-  pos[idx]=1;
-  counts.forEach(function(el,i){el.textContent=pos[i];});
-  stacks[idx].appendChild(card);
-  card.hidden=false;
-  var closed=idx===3;
-  card.classList.toggle('closed',closed);
-  chip.textContent=closed?'закрыта · оплачена':'учебная сделка';
-  if(closed){
-    status.textContent='Сделка закрыта — в Corvid CRM она уехала бы в аналитику дашборда: выручка по месяцам обновилась бы сама.';
-    next.hidden=true;
-  }else{
-    status.textContent='Учебная сделка: этап «'+labels[idx]+'» — '+(idx+1)+' из 3.';
-    next.hidden=false;
-    next.textContent=idx<2?'Перевести дальше →':'Закрыть сделку →';
-  }
-  if(animate){slide(card);}
-}
-next.addEventListener('click',function(){if(idx<3){idx++;render(true);}});
-reset.addEventListener('click',function(){idx=0;render(false);});
-render(false);
-})();
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script>
-/* Моушен-слой витрин: вход хиро каскадом (текст + мокап), столбики выручки, scroll-ревилы. GSAP по CDN. */
-(function () {
+(function(){
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
 
-  /* хиро: каскадный вход */
-  var hero = document.querySelector(".hero");
-  if (hero) {
-    var kids = hero.querySelectorAll(":scope > *");
-    if (kids.length) {
-      gsap.set(kids, { autoAlpha: 0, y: 18 });
-      gsap.to(kids, {
-        autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.09,
-        ease: "power2.out", delay: 0.15, clearProps: "transform"
-      });
-    }
-  }
-
-  /* столбики выручки «вырастают», когда мокап появляется */
-  var bars = document.querySelectorAll(".mchart i");
-  if (bars.length) {
-    gsap.set(bars, { scaleY: 0.15, transformOrigin: "50% 100%" });
-    ScrollTrigger.create({
-      trigger: ".mockup", start: "top 88%", once: true,
-      onEnter: function () {
-        gsap.to(bars, { scaleY: 1, duration: 0.7, stagger: 0.055, ease: "power2.out" });
-      }
-    });
-  }
-
-  /* scroll-ревилы секций: блок за блоком */
-  var skip = ["grid9", "steps", "mgrid4"];
-  Array.prototype.forEach.call(document.querySelectorAll("main > section"), function (sec) {
-    if (sec.classList.contains("hero")) return;
-    var inner = sec.querySelector(".wrap") || sec;
-    Array.prototype.forEach.call(inner.children, function (kid) {
-      var cl = kid.classList;
-      if (cl && skip.some(function (s) { return cl.contains(s); })) return;
-      gsap.set(kid, { autoAlpha: 0, y: 26 });
-      ScrollTrigger.batch([kid], {
-        start: "top 92%", once: true,
-        onEnter: function (batch) {
-          gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power2.out", overwrite: true, clearProps: "transform" });
-        }
-      });
-    });
+  /* ворон прилетает слева */
+  gsap.from(".crow", {duration:1.1, x:-70, opacity:0, ease:"power3.out"});
+  gsap.from(".hero h1, .hero .k, .hero p.lead, .cta", {
+    duration:.85, y:24, opacity:0, stagger:.1, ease:"power2.out", delay:.15
   });
 
-  /* стаггер карточек внутри сеток */
-  [".grid9", ".steps", ".mgrid4"].forEach(function (sel) {
-    document.querySelectorAll(sel).forEach(function (g) {
-      if (!g.children.length) return;
-      gsap.set(g.children, { autoAlpha: 0, y: 22 });
-      ScrollTrigger.batch(g.children, {
-        start: "top 92%", once: true,
-        onEnter: function (batch) {
-          gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.07, ease: "power2.out", overwrite: true, clearProps: "transform" });
-        }
-      });
+  /* ворон кланяется головой на скролл мимо него */
+  gsap.to(".crow", {rotation:4, transformOrigin:"55% 30%", ease:"none",
+    scrollTrigger:{trigger:".hero", start:"top top", end:"bottom top", scrub:1}});
+
+  /* секции — чёткие входы */
+  gsap.utils.toArray("section").forEach(function(sec){
+    gsap.from(sec.querySelectorAll(".k, h2, p.intro"), {
+      duration:.8, y:22, opacity:0, stagger:.08, ease:"power2.out",
+      scrollTrigger:{trigger:sec, start:"top 74%", once:true}
+    });
+    var rows = sec.querySelectorAll(".mod, .step, .box, .run");
+    if (rows.length) gsap.from(rows, {
+      duration:.7, y:20, opacity:0, stagger:.09, ease:"power2.out",
+      scrollTrigger:{trigger:sec, start:"top 66%", once:true}
     });
   });
 })();
