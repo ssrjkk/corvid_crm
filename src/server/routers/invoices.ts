@@ -3,12 +3,12 @@ import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { createInvoiceWithNumber, formatInvoiceNumber } from "../invoice-number"
 import { defaultCurrencySchema } from "../currency"
-
-const itemSchema = z.object({
-  name: z.string().min(1),
-  qty: z.number().positive().default(1),
-  price: z.number().nonnegative().default(0),
-})
+import {
+  invoiceItemsSchema,
+  optionalDateStringSchema,
+  optionalText,
+  LIMITS,
+} from "../validation"
 
 export const invoicesRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -43,10 +43,10 @@ export const invoicesRouter = router({
         companyId: z.string().optional(),
         contactId: z.string().optional(),
         dealId: z.string().optional(),
-        dueDate: z.string().optional(),
+        dueDate: optionalDateStringSchema,
         currency: defaultCurrencySchema,
-        note: z.string().optional(),
-        items: z.array(itemSchema).min(1),
+        note: optionalText(LIMITS.note),
+        items: invoiceItemsSchema,
       })
     )
     .mutation(async ({ input }) => {

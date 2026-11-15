@@ -2,6 +2,13 @@ import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { currencySchema, defaultCurrencySchema } from "../currency"
+import {
+  moneySchema,
+  optionalText,
+  optionalNullableTagsSchema,
+  tagsSchema,
+  titleSchema,
+} from "../validation"
 
 export const dealsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -45,14 +52,14 @@ export const dealsRouter = router({
   create: authedProcedure
     .input(
       z.object({
-        title: z.string().min(1),
-        description: z.string().optional(),
-        value: z.number().optional(),
+        title: titleSchema,
+        description: optionalText(),
+        value: moneySchema.optional(),
         currency: defaultCurrencySchema,
         companyId: z.string().optional(),
         contactId: z.string().optional(),
         stageId: z.string().optional(),
-        tags: z.string().optional(),
+        tags: tagsSchema,
       })
     )
     .mutation(async ({ input }) => {
@@ -76,14 +83,14 @@ export const dealsRouter = router({
     .input(
       z.object({
         id: z.string(),
-        title: z.string().min(1).optional(),
-        description: z.string().optional(),
-        value: z.number().optional(),
+        title: titleSchema.optional(),
+        description: optionalText(),
+        value: moneySchema.optional(),
         currency: currencySchema.optional(),
         companyId: z.string().optional().nullable(),
         contactId: z.string().optional().nullable(),
         stageId: z.string().optional().nullable(),
-        tags: z.string().optional().nullable(),
+        tags: optionalNullableTagsSchema,
       })
     )
     .mutation(async ({ input }) => {

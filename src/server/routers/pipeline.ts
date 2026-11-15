@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
+import { hexColorSchema, requiredText } from "../validation"
 
 export const pipelineRouter = router({
   getStages: authedProcedure.query(async () => {
@@ -18,7 +19,13 @@ export const pipelineRouter = router({
   }),
 
   createStage: adminProcedure
-    .input(z.object({ name: z.string().min(1), order: z.number().default(0), color: z.string().optional() }))
+    .input(
+      z.object({
+        name: requiredText("название этапа"),
+        order: z.number().int().min(0, "Порядок — неотрицательное число").max(1000).default(0),
+        color: hexColorSchema,
+      })
+    )
     .mutation(async ({ input }) => {
       return prisma.pipelineStage.create({ data: input })
     }),
@@ -27,8 +34,8 @@ export const pipelineRouter = router({
     .input(
       z.object({
         id: z.string(),
-        name: z.string().min(1).optional(),
-        color: z.string().optional(),
+        name: requiredText("название этапа").optional(),
+        color: hexColorSchema,
       })
     )
     .mutation(async ({ input }) => {

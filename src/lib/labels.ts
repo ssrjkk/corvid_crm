@@ -61,6 +61,22 @@ export function formatMoney(value: unknown, currency = "RUB") {
   return `${amount.toLocaleString("ru-RU")} ${currency}`
 }
 
+/**
+ * Компактный формат денег для осей графиков (V31): «80 т.» вместо «80 000»,
+ * «1,2 млн» вместо «1 200 000». Полный формат — в Tooltip (formatMoney).
+ */
+export function formatCompactMoney(value: number) {
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toLocaleString("ru-RU", {
+      maximumFractionDigits: 1,
+    })} млн`
+  }
+  if (value >= 1_000) {
+    return `${Math.round(value / 1_000)} т.`
+  }
+  return String(value)
+}
+
 export const invoiceStatusLabels: Record<string, string> = {
   DRAFT: "Черновик",
   SENT: "Выставлен",

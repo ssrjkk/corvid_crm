@@ -2,7 +2,7 @@
 
 import { trpc } from "@/lib/trpc/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatMoney } from "@/lib/labels"
+import { formatMoney, formatCompactMoney } from "@/lib/labels"
 import { Handshake, CheckSquare, Users, FolderKanban } from "lucide-react"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
@@ -67,7 +67,7 @@ export default function DashboardPage() {
                 <LineChart data={revenue}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="month" fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} />
-                  <YAxis fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={48} />
+                  <YAxis fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={64} tickFormatter={(v) => formatCompactMoney(Number(v))} />
                   <Tooltip formatter={(v) => formatMoney(Number(v))} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: "8px" }} />
                   <Line type="monotone" dataKey="total" stroke="var(--chart-3)" strokeWidth={2} name="Выручка" isAnimationActive={false} />
                 </LineChart>

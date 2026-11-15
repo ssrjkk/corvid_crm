@@ -2,6 +2,7 @@ import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { ActivityType } from "@/generated/prisma/client"
+import { LIMITS, optionalText, requiredText } from "../validation"
 
 export const activitiesRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -19,8 +20,8 @@ export const activitiesRouter = router({
     .input(
       z.object({
         type: z.nativeEnum(ActivityType).default(ActivityType.NOTE),
-        title: z.string().optional(),
-        content: z.string().min(1),
+        title: optionalText(LIMITS.title),
+        content: requiredText("содержание"),
         dealId: z.string().optional(),
         contactId: z.string().optional(),
       })

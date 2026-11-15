@@ -3,6 +3,12 @@ import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { TaskStatus, Priority } from "@/generated/prisma/client"
 import type { Prisma } from "@/generated/prisma/client"
+import {
+  optionalNullableDateStringSchema,
+  optionalDateStringSchema,
+  optionalText,
+  titleSchema,
+} from "../validation"
 
 export const tasksRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -32,9 +38,9 @@ export const tasksRouter = router({
   create: authedProcedure
     .input(
       z.object({
-        title: z.string().min(1),
-        description: z.string().optional(),
-        dueDate: z.string().optional(),
+        title: titleSchema,
+        description: optionalText(),
+        dueDate: optionalDateStringSchema,
         priority: z.nativeEnum(Priority).default(Priority.MEDIUM),
         dealId: z.string().optional(),
         projectId: z.string().optional(),
@@ -54,11 +60,11 @@ export const tasksRouter = router({
     .input(
       z.object({
         id: z.string(),
-        title: z.string().min(1).optional(),
-        description: z.string().optional(),
+        title: titleSchema.optional(),
+        description: optionalText(),
         status: z.nativeEnum(TaskStatus).optional(),
         priority: z.nativeEnum(Priority).optional(),
-        dueDate: z.string().optional().nullable(),
+        dueDate: optionalNullableDateStringSchema,
         assigneeId: z.string().optional().nullable(),
       })
     )

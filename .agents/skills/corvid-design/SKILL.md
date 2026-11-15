@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (129 тестов, 23 файла: labels/formatMoney/formatDate/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (155 тестов, 24 файла: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller)) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -239,7 +239,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
   сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
   width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
-  при поднятой `npm run start`); далее strip цифр (129 Vitest · 20
+  при поднятой `npm run start`); далее strip цифр (155 Vitest · 20
   Playwright · 0 serious a11y · 0 prod-уязвимостей — синхронизировать
   с README) и 2 чередующихся строки «скриншот + фактический текст»,
   блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
@@ -266,6 +266,20 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   анимационных зависимостей НЕ добавлять (аудит остаётся 3 low/prod 0).
   (6) E2E-замки визитки: h1 содержит «Corvid» и строка
   «© 2026 ssrjkk · Corvid CRM» в подвале — не переименовать.
+- Ввод tRPC (V31): ЕДИНСТВЕННЫЙ источник схем ввода — `src/server/validation.ts`
+  (`LIMITS`, `moneySchema`, `titleSchema` = `requiredText("название")`,
+  `requiredText(label, max?)`, `optionalText/optionalNullableText`,
+  `emailSchema/phoneSchema/shortTextSchema/websiteSchema/addressSchema`,
+  `tagsSchema/optionalNullableTagsSchema`, `dateStringSchema` и optional(Nullable)-
+  варианты, `hexColorSchema`, `invoiceItem(s)Schema`). Все 8 роутеров
+  (deals/companies/contacts/tasks/projects/activities/invoices/pipeline) обязаны
+  брать схемы оттуда, не сочинять локальные `z.string().min(1)`. Сообщения —
+  по-русски (их показывает errorFormatter). Правки лимитов — только в LIMITS.
+  Нюанс zod v4: `.trim()` превращает схему в ZodPipe — тип выходного значения
+  уже пост-тримовый. Забытый экспорт из validation.ts проявляется как
+  `TypeError: ... reading 'optional'` при ЗАГРУЗКЕ роутера + ложные TS-ошибки
+  Prisma-типов ниже по течению — сначала чинить экспорт. users.ts read-only —
+  схемы ввода не нужны.
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —
   раньше сьют молча полагался на данные локального dev.db (INV-0001, этапы):
   «печать счёта» падала кликом по несуществующему INV-0001, CSP-тест — отсутствием

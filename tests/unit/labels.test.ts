@@ -5,6 +5,7 @@ import {
   SOFT_WAIT_BADGE,
   SOFT_WORK_BADGE,
   dealBadge,
+  formatCompactMoney,
   formatDate,
   formatMoney,
   invoiceBadge,
@@ -104,5 +105,15 @@ describe("cn", () => {
 
   it("поздние классы побеждают по конфликтам (tailwind-merge)", () => {
     expect(cn("px-2", "px-4")).toBe("px-4")
+  })
+})
+
+describe("formatCompactMoney (компактные тики осей графиков)", () => {
+  it("тысячи — «т.», миллионы — «млн», мелкие — как есть", () => {
+    expect(formatCompactMoney(0)).toBe("0")
+    expect(formatCompactMoney(750)).toBe("750")
+    expect(formatCompactMoney(80_000)).toBe("80 т.")
+    expect(formatCompactMoney(300_000)).toBe("300 т.")
+    expect(formatCompactMoney(1_200_000)).toBe("1,2 млн")
   })
 })

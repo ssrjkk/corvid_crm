@@ -1,6 +1,12 @@
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
+import {
+  emailSchema,
+  phoneSchema,
+  requiredText,
+  shortTextSchema,
+} from "../validation"
 
 export const contactsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -35,12 +41,12 @@ export const contactsRouter = router({
   create: authedProcedure
     .input(
       z.object({
-        firstName: z.string().min(1),
-        lastName: z.string().optional(),
-        email: z.string().email().optional().or(z.literal("")),
-        phone: z.string().optional(),
+        firstName: requiredText("имя контакта"),
+        lastName: shortTextSchema,
+        email: emailSchema,
+        phone: phoneSchema,
         companyId: z.string().optional(),
-        position: z.string().optional(),
+        position: shortTextSchema,
       })
     )
     .mutation(async ({ input }) => {
@@ -51,12 +57,12 @@ export const contactsRouter = router({
     .input(
       z.object({
         id: z.string(),
-        firstName: z.string().min(1).optional(),
-        lastName: z.string().optional(),
-        email: z.string().email().optional().or(z.literal("")),
-        phone: z.string().optional(),
+        firstName: requiredText("имя контакта").optional(),
+        lastName: shortTextSchema,
+        email: emailSchema,
+        phone: phoneSchema,
         companyId: z.string().optional().nullable(),
-        position: z.string().optional(),
+        position: shortTextSchema,
       })
     )
     .mutation(async ({ input }) => {

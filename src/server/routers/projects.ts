@@ -2,6 +2,12 @@ import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { ProjectStatus } from "@/generated/prisma/client"
+import {
+  optionalNullableDateStringSchema,
+  optionalDateStringSchema,
+  optionalText,
+  requiredText,
+} from "../validation"
 
 export const projectsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -29,11 +35,11 @@ export const projectsRouter = router({
   create: authedProcedure
     .input(
       z.object({
-        name: z.string().min(1),
-        description: z.string().optional(),
+        name: requiredText("название проекта"),
+        description: optionalText(),
         dealId: z.string().min(1),
-        startDate: z.string().optional(),
-        deadline: z.string().optional(),
+        startDate: optionalDateStringSchema,
+        deadline: optionalDateStringSchema,
       })
     )
     .mutation(async ({ input }) => {
@@ -50,11 +56,11 @@ export const projectsRouter = router({
     .input(
       z.object({
         id: z.string(),
-        name: z.string().min(1).optional(),
-        description: z.string().optional(),
+        name: requiredText("название проекта").optional(),
+        description: optionalText(),
         status: z.nativeEnum(ProjectStatus).optional(),
-        startDate: z.string().optional().nullable(),
-        deadline: z.string().optional().nullable(),
+        startDate: optionalNullableDateStringSchema,
+        deadline: optionalNullableDateStringSchema,
       })
     )
     .mutation(async ({ input }) => {
