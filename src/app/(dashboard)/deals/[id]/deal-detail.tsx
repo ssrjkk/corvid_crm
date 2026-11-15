@@ -50,7 +50,9 @@ import {
 } from "@/components/ui/sheet"
 import { ActivityTimeline } from "@/components/detail/activity-timeline"
 import { formatDate, formatMoney, priorityLabels, taskStatusLabels, activityTypeLabels } from "@/lib/labels"
+import { formatCustomValue } from "@/lib/custom-fields"
 import { usePermissions } from "@/lib/use-permissions"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 type Deal = NonNullable<RouterOutputs["deals"]["getById"]>
 type Stage = RouterOutputs["pipeline"]["getStages"][number]
@@ -225,6 +227,17 @@ export default function DealDetail({ dealId }: { dealId: string }) {
             <CardContent className="space-y-3 text-sm">
               {deal.description && (
                 <p className="whitespace-pre-wrap text-muted-foreground">{deal.description}</p>
+              )}
+              {/* V32: кастомные поля — свойства, которые админ завёл под свой бизнес. */}
+              {deal.customFields.length > 0 && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {deal.customFields.map(({ field, value }) => (
+                    <div key={field.id} className="min-w-0">
+                      <div className="text-xs text-muted-foreground">{field.label}</div>
+                      <div className="text-sm font-medium">{formatCustomValue(field.type, value)}</div>
+                    </div>
+                  ))}
+                </div>
               )}
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-muted-foreground" />
@@ -539,6 +552,10 @@ function DealEditForm({
   const [stageId, setStageId] = useState(deal.stageId ?? "none")
   const [companyId, setCompanyId] = useState(deal.companyId ?? "none")
   const [contactId, setContactId] = useState(deal.contactId ?? "none")
+  // V32: полная замена значений — форма присылает весь набор (семантика роутера).
+  const [customValues, setCustomValues] = useState<CustomFieldValues>(() =>
+    Object.fromEntries(deal.customFields.map((v) => [v.fieldId, v.value]))
+  )
 
   const update = trpc.deals.update.useMutation({
     onSuccess: () => {
@@ -565,6 +582,7 @@ function DealEditForm({
           stageId: stageId === "none" ? null : stageId,
           companyId: companyId === "none" ? null : companyId,
           contactId: contactId === "none" ? null : contactId,
+          fields: collectCustomFields(customValues),
         })
       }}
     >
@@ -621,6 +639,7 @@ function DealEditForm({
             </Select>
           </div>
         </div>
+        <CustomFieldsEditor entityType="DEAL" values={customValues} onChange={setCustomValues} />
         <div className="grid gap-2">
           <Label>Этап</Label>
           <Select

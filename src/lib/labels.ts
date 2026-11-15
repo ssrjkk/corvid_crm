@@ -39,11 +39,14 @@ export const activityTypeLabels: Record<string, string> = {
 
 export function formatDate(value?: Date | string | null) {
   if (!value) return "—"
+  const date = new Date(value)
+  // Битая строка — прочерк, а не RangeError «Invalid time value» посреди карточки.
+  if (Number.isNaN(date.getTime())) return "—"
   return new Intl.DateTimeFormat("ru-RU", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-  }).format(new Date(value))
+  }).format(date)
 }
 
 export function formatMoney(value: unknown, currency = "RUB") {

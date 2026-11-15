@@ -36,6 +36,12 @@ export const LIMITS = {
   invoiceItems: 100,
   /** Верхняя граница суммы: 1 триллион. */
   money: 1_000_000_000_000,
+  /** Значение одного кастомного поля (V32). */
+  customFieldValue: 1000,
+  /** Название кастомного поля. */
+  customFieldLabel: 100,
+  /** Кастомных полей на одну сущность в одном запросе. */
+  customFieldValues: 100,
 } as const
 
 /** Стандартный заголовок (сделки, задачи): обрезка пробелов + 1..200. */
@@ -157,3 +163,19 @@ export const invoiceItemsSchema = z
   .array(invoiceItemSchema)
   .min(1, "Добавьте хотя бы одну позицию")
   .max(LIMITS.invoiceItems, `Не больше ${LIMITS.invoiceItems} позиций в счёте`)
+
+/**
+ * Значения кастомных полей (V32 «Универсальность»): приходит с формы сырыми
+ * строками — тип/варианты SELECT проверяются на сервере против определений
+ * полей (см. src/server/custom-fields.ts), здесь — только общие границы.
+ */
+export const customFieldValuesSchema = z
+  .array(
+    z.object({
+      fieldId: z.string().min(1),
+      value: z
+        .string()
+        .max(LIMITS.customFieldValue, `Значение поля — до ${LIMITS.customFieldValue} символов`),
+    })
+  )
+  .max(LIMITS.customFieldValues, `Не больше ${LIMITS.customFieldValues} полей`)

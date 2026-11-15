@@ -10,6 +10,7 @@ import { pipelineRouter } from "./pipeline"
 import { analyticsRouter } from "./analytics"
 import { usersRouter } from "./users"
 import { invoicesRouter } from "./invoices"
+import { customFieldsRouter } from "./custom-fields"
 
 export const appRouter = router({
   deals: dealsRouter,
@@ -22,6 +23,7 @@ export const appRouter = router({
   analytics: analyticsRouter,
   users: usersRouter,
   invoices: invoicesRouter,
+  customFields: customFieldsRouter,
 })
 
 export type AppRouter = typeof appRouter

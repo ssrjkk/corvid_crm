@@ -144,6 +144,7 @@ model Deal {
   tasks       Task[]
   activities  Activity[]
   invoices    Invoice[]
+  customFields DealFieldValue[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   closedAt    DateTime?
@@ -288,4 +289,51 @@ enum ActivityType {
   MEETING
   MESSAGE
   OTHER
+}
+
+// ===== Кастомные поля (V32 «Универсальность»): CRM под любой бизнес =====
+// Админ определяет свои свойства сделки (площадь, пробег, кол-во ревизий…),
+// значения хранятся типизированно и гибнут вместе со сделкой/полем (FK-каскад).
+
+enum CustomEntityType {
+  DEAL
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  SELECT
+}
+
+model CustomField {
+  id         String           @id @default(cuid())
+  entityType CustomEntityType
+  label      String
+  type       CustomFieldType
+  // Для SELECT — массив строк-вариантов (Prisma Json); для остальных типов null.
+  options    Json?
+  order      Int              @default(0)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  dealValues DealFieldValue[]
+
+  @@unique([entityType, label])
+  @@index([entityType, order])
+}
+
+model DealFieldValue {
+  id        String      @id @default(cuid())
+  dealId    String
+  deal      Deal        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fieldId   String
+  field     CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  // Нормализованное значение: TEXT — как есть, NUMBER — каноническая строка
+  // числа (точка), DATE — ISO, SELECT — точный вариант из options.
+  value     String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([fieldId, dealId])
+  @@index([dealId])
 }

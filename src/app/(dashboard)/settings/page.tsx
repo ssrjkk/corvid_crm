@@ -8,6 +8,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { customFieldTypeLabels, fieldOptions } from "@/lib/custom-fields"
+import type { CustomFieldType } from "@/generated/prisma/client"
 import { usePermissions } from "@/lib/use-permissions"
 
 export default function SettingsPage() {
@@ -70,11 +81,91 @@ export default function SettingsPage() {
     setEditColor(stage.color ?? "#94a3b8")
   }
 
+  // ===== Кастомные поля сделок (V32 «Универсальность») =====
+  const { data: fields = [], isLoading: fieldsLoading } = trpc.customFields.getAll.useQuery({
+    entityType: "DEAL",
+  })
+
+  const [newFieldName, setNewFieldName] = useState("")
+  const [newFieldType, setNewFieldType] = useState<CustomFieldType>("TEXT")
+  const [newFieldOptions, setNewFieldOptions] = useState("")
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
+  const [editFieldLabel, setEditFieldLabel] = useState("")
+  const [editFieldOptions, setEditFieldOptions] = useState("")
+
+  const invalidateFields = () => {
+    utils.customFields.getAll.invalidate()
+    utils.deals.getById.invalidate()
+  }
+
+  const parseOptions = (raw: string) =>
+    raw
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+
+  const createField = trpc.customFields.create.useMutation({
+    onSuccess: () => {
+      invalidateFields()
+      setNewFieldName("")
+      setNewFieldOptions("")
+      toast.success("Поле добавлено")
+    },
+    onError: (error) => toast.error(error.message),
+  })
+  const updateField = trpc.customFields.update.useMutation({
+    onSuccess: () => {
+      invalidateFields()
+      setEditingFieldId(null)
+      toast.success("Поле обновлено")
+    },
+    onError: (error) => toast.error(error.message),
+  })
+  const reorderFields = trpc.customFields.reorder.useMutation({
+    onSuccess: () => invalidateFields(),
+    onError: (error) => toast.error(error.message),
+  })
+  const removeField = trpc.customFields.delete.useMutation({
+    onSuccess: () => {
+      invalidateFields()
+      toast.success("Поле удалено (значения удалены вместе с ним)")
+    },
+    onError: (error) => toast.error(error.message),
+  })
+
+  const moveField = (index: number, direction: -1 | 1) => {
+    const next = index + direction
+    if (next < 0 || next >= fields.length) return
+    const ids = fields.map((f) => f.id)
+    ;[ids[index], ids[next]] = [ids[next], ids[index]]
+    reorderFields.mutate({ ids })
+  }
+
+  const startFieldEdit = (field: { id: string; label: string; type: string; options: unknown }) => {
+    setEditingFieldId(field.id)
+    setEditFieldLabel(field.label)
+    setEditFieldOptions(
+      field.type === "SELECT" ? fieldOptions(field.options).join("\n") : ""
+    )
+  }
+
+  const submitCreateField = (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!newFieldName.trim()) return
+    createField.mutate({
+      entityType: "DEAL",
+      label: newFieldName.trim(),
+      type: newFieldType,
+      options: newFieldType === "SELECT" ? parseOptions(newFieldOptions) : undefined,
+      order: fields.length,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Настройки</h1>
-        <p className="text-muted-foreground">Этапы воронки продаж</p>
+        <p className="text-muted-foreground">Этапы воронки продаж и поля сделок</p>
       </div>
 
       {canDelete && (
@@ -208,6 +299,185 @@ export default function SettingsPage() {
           )}
           <p className="pt-2 text-xs text-muted-foreground">
             Этап нельзя удалить, пока на нём есть сделки. Порядок определяет колонки на воронке.
+          </p>
+        </CardContent>
+      </Card>
+
+      {canDelete && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Новое поле сделки</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="grid gap-3" onSubmit={submitCreateField}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="field-name">Название</Label>
+                  <Input
+                    id="field-name"
+                    value={newFieldName}
+                    onChange={(event) => setNewFieldName(event.target.value)}
+                    placeholder="Например: Площадь, м²"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Тип</Label>
+                  <Select
+                    value={newFieldType}
+                    onValueChange={(next: string) => setNewFieldType(next as CustomFieldType)}
+                    items={{ TEXT: "Текст", NUMBER: "Число", DATE: "Дата", SELECT: "Список" }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TEXT">Текст</SelectItem>
+                      <SelectItem value="NUMBER">Число</SelectItem>
+                      <SelectItem value="DATE">Дата</SelectItem>
+                      <SelectItem value="SELECT">Список</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {newFieldType === "SELECT" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="field-options">Варианты (каждый с новой строки)</Label>
+                  <Textarea
+                    id="field-options"
+                    value={newFieldOptions}
+                    onChange={(event) => setNewFieldOptions(event.target.value)}
+                    placeholder={"Квартира\nДом"}
+                    rows={3}
+                  />
+                </div>
+              )}
+              <div>
+                <Button type="submit" disabled={createField.isPending}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Добавить поле
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Поля сделки ({fields.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {fieldsLoading ? (
+            <p className="text-sm text-muted-foreground">Загрузка…</p>
+          ) : fields.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Полей пока нет — сделка собирается из базовых свойств
+            </p>
+          ) : (
+            fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
+              >
+                {editingFieldId === field.id ? (
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <Input
+                      value={editFieldLabel}
+                      onChange={(event) => setEditFieldLabel(event.target.value)}
+                      className="max-w-64"
+                    />
+                    {field.type === "SELECT" && (
+                      <Textarea
+                        value={editFieldOptions}
+                        onChange={(event) => setEditFieldOptions(event.target.value)}
+                        placeholder={"Квартира\nДом"}
+                        rows={3}
+                      />
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        disabled={updateField.isPending}
+                        onClick={() =>
+                          updateField.mutate({
+                            id: field.id,
+                            label: editFieldLabel.trim(),
+                            ...(field.type === "SELECT" && {
+                              options: parseOptions(editFieldOptions),
+                            }),
+                          })
+                        }
+                      >
+                        <Save className="mr-1 h-4 w-4" />
+                        Сохранить
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingFieldId(null)}>
+                        <X className="mr-1 h-4 w-4" />
+                        Отмена
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{field.label}</span>
+                      <Badge variant="secondary">{customFieldTypeLabels[field.type]}</Badge>
+                    </div>
+                    {field.type === "SELECT" && (
+                      <div className="text-xs text-muted-foreground">
+                        Варианты: {fieldOptions(field.options).join(", ") || "—"}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {editingFieldId !== field.id && (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Выше"
+                      disabled={index === 0 || reorderFields.isPending}
+                      onClick={() => moveField(index, -1)}
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Ниже"
+                      disabled={index === fields.length - 1 || reorderFields.isPending}
+                      onClick={() => moveField(index, 1)}
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label={`Изменить ${field.label}`}
+                      onClick={() => startFieldEdit(field)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label={`Удалить ${field.label}`}
+                      disabled={removeField.isPending}
+                      onClick={() => removeField.mutate({ id: field.id })}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+          <p className="pt-2 text-xs text-muted-foreground">
+            Поля появляются в форме и карточке сделки. Тип после создания не меняется (нужен
+            другой — удалите поле и создайте заново); значения хранятся до удаления поля или
+            сделки. Порядок задаёт следование в формах.
           </p>
         </CardContent>
       </Card>

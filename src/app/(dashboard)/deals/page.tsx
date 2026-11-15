@@ -18,12 +18,14 @@ import { downloadCsv } from "@/lib/csv"
 import { dealStatusLabels, formatMoney } from "@/lib/labels"
 import { roundMoney } from "@/lib/money"
 import { usePermissions } from "@/lib/use-permissions"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 export default function DealsPage() {
   const { canWrite, canDelete } = usePermissions()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [value, setValue] = useState("")
+  const [customValues, setCustomValues] = useState<CustomFieldValues>({})
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
@@ -38,6 +40,7 @@ export default function DealsPage() {
       setOpen(false)
       setTitle("")
       setValue("")
+      setCustomValues({})
       toast.success("Сделка создана")
     },
     onError: (err) => {
@@ -62,6 +65,7 @@ export default function DealsPage() {
     createDeal.mutate({
       title,
       value: value ? Number(value) : undefined,
+      fields: collectCustomFields(customValues),
     })
   }
 
@@ -218,6 +222,7 @@ export default function DealsPage() {
                   <Label htmlFor="value">Сумма (₽)</Label>
                   <Input id="value" type="number" value={value} onChange={(e) => setValue(e.target.value)} />
                 </div>
+                <CustomFieldsEditor entityType="DEAL" values={customValues} onChange={setCustomValues} />
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createDeal.isPending}>
