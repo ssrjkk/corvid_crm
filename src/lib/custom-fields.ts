@@ -1,4 +1,5 @@
 import { CustomFieldType } from "@/generated/prisma/client"
+import type { CustomEntityType } from "@/generated/prisma/client"
 import { formatDate } from "@/lib/labels"
 
 /**
@@ -11,6 +12,12 @@ export const customFieldTypeLabels: Record<CustomFieldType, string> = {
   NUMBER: "Число",
   DATE: "Дата",
   SELECT: "Список",
+}
+
+export const customEntityTypeLabels: Record<CustomEntityType, string> = {
+  DEAL: "Сделки",
+  COMPANY: "Компании",
+  CONTACT: "Контакты",
 }
 
 /** Безопасное чтение вариантов SELECT из Json-колонки (могут быть не массивом). */

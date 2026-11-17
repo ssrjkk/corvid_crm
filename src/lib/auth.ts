@@ -19,6 +19,20 @@ export const auth = betterAuth({
   },
   secret: process.env.BETTER_AUTH_SECRET || "corvid-crm-secret-key-change-in-production",
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  /**
+   * V33 «Универсальность»: доверяем запросу его СВОЕГО origin (Host) — вход
+   * работает с любого адреса, на котором открыто приложение. Чужие origins
+   * по-прежнему отклоняются: список строится из Host самого запроса, поэтому
+   * атакующий не может протащить свой origin (CSRF-защита не ослаблена).
+   * Явно заданный BETTER_AUTH_URL продолжает работать как раньше.
+   */
+  trustedOrigins: (request) => {
+    const host = request?.headers.get("host")
+    if (!host) return []
+    const proto =
+      request?.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || "http"
+    return [`${proto}://${host}`]
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
   },

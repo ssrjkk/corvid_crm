@@ -6,7 +6,10 @@ import {
   phoneSchema,
   requiredText,
   shortTextSchema,
+  customFieldValuesSchema,
 } from "../validation"
+import { resolveFieldValues } from "../custom-fields"
+import { CustomEntityType } from "@/generated/prisma/client"
 
 export const contactsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -34,6 +37,11 @@ export const contactsRouter = router({
             include: { user: true, deal: true },
             orderBy: { createdAt: "desc" },
           },
+          // V33: кастомные поля контакта — в порядке, заданном админом.
+          customFields: {
+            orderBy: { field: { order: "asc" } },
+            include: { field: true },
+          },
         },
       })
     }),
@@ -47,10 +55,23 @@ export const contactsRouter = router({
         phone: phoneSchema,
         companyId: z.string().optional(),
         position: shortTextSchema,
+        fields: customFieldValuesSchema.optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return prisma.contact.create({ data: input })
+      const { fields, ...data } = input
+      const rows = fields
+        ? await resolveFieldValues(CustomEntityType.CONTACT, fields)
+        : []
+      return prisma.$transaction(async (tx) => {
+        const contact = await tx.contact.create({ data })
+        if (rows.length > 0) {
+          await tx.contactFieldValue.createMany({
+            data: rows.map((row) => ({ ...row, contactId: contact.id })),
+          })
+        }
+        return contact
+      })
     }),
 
   update: authedProcedure
@@ -63,11 +84,27 @@ export const contactsRouter = router({
         phone: phoneSchema,
         companyId: z.string().optional().nullable(),
         position: shortTextSchema,
+        // Семантика «полной замены» — как у сделок и компаний (V32/V33).
+        fields: customFieldValuesSchema.optional(),
       })
     )
     .mutation(async ({ input }) => {
-      const { id, ...data } = input
-      return prisma.contact.update({ where: { id }, data })
+      const { id, fields, ...data } = input
+      const rows = fields
+        ? await resolveFieldValues(CustomEntityType.CONTACT, fields)
+        : null
+      return prisma.$transaction(async (tx) => {
+        const contact = await tx.contact.update({ where: { id }, data })
+        if (rows) {
+          await tx.contactFieldValue.deleteMany({ where: { contactId: id } })
+          if (rows.length > 0) {
+            await tx.contactFieldValue.createMany({
+              data: rows.map((row) => ({ ...row, contactId: id })),
+            })
+          }
+        }
+        return contact
+      })
     }),
 
   delete: adminProcedure

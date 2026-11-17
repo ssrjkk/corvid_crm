@@ -135,7 +135,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (180 тестов, 26 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue + роутер и сделки через makeCaller)) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (188 тестов, 26 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue/customEntityTypeLabels + общий resolveFieldValues для DEAL/COMPANY/CONTACT через makeCaller)) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -239,7 +239,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
   сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
   width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
-  при поднятой `npm run start`); далее strip цифр (180 Vitest · 20
+  при поднятой `npm run start`); далее strip цифр (188 Vitest · 20
   Playwright · 0 serious a11y · 0 prod-уязвимостей — синхронизировать
   с README) и 2 чередующихся строки «скриншот + фактический текст»,
   блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
@@ -298,7 +298,12 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   валидация через `resolveFieldValues` ДО записи, транзакция откатывает сделку
   целиком («полусделки» нет); (6) getAll (definitions) читают все — формы
   обязаны уметь показать поля; правки — adminProcedure, гейт UI `canDelete`.
-  Расширение на COMPANY/CONTACT = новая value-таблица + FK (паттерн готов).
+  Расширение на COMPANY/CONTACT (V33): таблицы `CompanyFieldValue`/
+  `ContactFieldValue` — тот же FK-каскад с обеих сторон; `resolveFieldValues(
+  entityType, raw)` переехал в `src/server/custom-fields.ts` и общий для трёх
+  сущностей; роутеры companies/contacts принимают `fields` с той же семантикой
+  полной замены; в Настройках — переключатель сущностей (Сделки/Компании/
+  Контакты), метки — `customEntityTypeLabels` в либе.
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —
   раньше сьют молча полагался на данные локального dev.db (INV-0001, этапы):
   «печать счёта» падала кликом по несуществующему INV-0001, CSP-тест — отсутствием

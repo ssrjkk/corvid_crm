@@ -32,7 +32,9 @@ import {
 } from "@/components/ui/sheet"
 import { ActivityTimeline } from "@/components/detail/activity-timeline"
 import { formatDate, formatMoney } from "@/lib/labels"
+import { formatCustomValue } from "@/lib/custom-fields"
 import { usePermissions } from "@/lib/use-permissions"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 type Company = NonNullable<RouterOutputs["companies"]["getById"]>
 
@@ -195,6 +197,17 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
               {!company.email && !company.phone && !company.website && !company.address && (
                 <div className="text-muted-foreground">Реквизиты не заполнены</div>
               )}
+              {/* V33: кастомные поля компании — свойства, заведённые под бизнес. */}
+              {company.customFields.length > 0 && (
+                <div className="grid gap-2 border-t pt-3">
+                  {company.customFields.map(({ field, value }) => (
+                    <div key={field.id} className="flex items-center justify-between gap-2">
+                      <span className="text-muted-foreground">{field.label}</span>
+                      <span className="font-medium tabular-nums">{formatCustomValue(field.type, value)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -235,6 +248,10 @@ function CompanyEditForm({ company, onDone }: { company: Company; onDone: () => 
   const [website, setWebsite] = useState(company.website ?? "")
   const [address, setAddress] = useState(company.address ?? "")
   const [description, setDescription] = useState(company.description ?? "")
+  // V33: полная замена значений — форма присылает весь набор.
+  const [customValues, setCustomValues] = useState<CustomFieldValues>(() =>
+    Object.fromEntries(company.customFields.map((v) => [v.fieldId, v.value]))
+  )
 
   const update = trpc.companies.update.useMutation({
     onSuccess: () => {
@@ -259,6 +276,7 @@ function CompanyEditForm({ company, onDone }: { company: Company; onDone: () => 
           website,
           address,
           description,
+          fields: collectCustomFields(customValues),
         })
       }}
     >
@@ -313,6 +331,7 @@ function CompanyEditForm({ company, onDone }: { company: Company; onDone: () => 
             rows={4}
           />
         </div>
+        <CustomFieldsEditor entityType="COMPANY" values={customValues} onChange={setCustomValues} />
       </div>
       <SheetFooter>
         <Button type="submit" disabled={update.isPending}>

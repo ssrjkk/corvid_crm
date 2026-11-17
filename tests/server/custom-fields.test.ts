@@ -181,3 +181,130 @@ describe("deals.delete каскадом убирает значения", () => 
     expect(await prisma.dealFieldValue.count()).toBe(before - 1)
   })
 })
+
+/**
+ * V33: тот же контракт для компаний и контактов. Определения полей создаются
+ * под свою сущность; values отдельными таблицами с FK-каскадом.
+ */
+describe("customFields: компании (V33)", () => {
+  let floorFieldId: string
+
+  beforeAll(async () => {
+    const admin = makeCaller("ADMIN")
+    floorFieldId = (
+      await admin.customFields.create({
+        entityType: "COMPANY",
+        label: "Этаж офиса",
+        type: "NUMBER",
+      })
+    ).id
+  })
+
+  it("create сохраняет значения, getById читает с определением", async () => {
+    const admin = makeCaller("ADMIN")
+    const company = await admin.companies.create({
+      name: "ООО Кастомные поля",
+      fields: [{ fieldId: floorFieldId, value: "7,5" }],
+    })
+    const loaded = await admin.companies.getById({ id: company.id })
+    const floor = loaded?.customFields.find((v) => v.fieldId === floorFieldId)
+    expect(floor?.value).toBe("7.5")
+    expect(floor?.field.label).toBe("Этаж офиса")
+  })
+
+  it("MANAGER может писать значения, но не определения", async () => {
+    const manager = makeCaller("MANAGER")
+    await expect(
+      manager.customFields.create({ entityType: "COMPANY", label: "Чужое", type: "TEXT" })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    const company = await manager.companies.create({
+      name: "ООО Менеджерская",
+      fields: [{ fieldId: floorFieldId, value: "3" }],
+    })
+    const loaded = await manager.companies.getById({ id: company.id })
+    expect(loaded?.customFields).toHaveLength(1)
+  })
+
+  it("update заменяет значения полностью, без fields — не трогает", async () => {
+    const admin = makeCaller("ADMIN")
+    const company = await admin.companies.create({
+      name: "ООО Замена",
+      fields: [{ fieldId: floorFieldId, value: "1" }],
+    })
+    await admin.companies.update({ id: company.id, fields: [{ fieldId: floorFieldId, value: "9" }] })
+    let loaded = await admin.companies.getById({ id: company.id })
+    expect(loaded?.customFields.map((v) => v.value)).toEqual(["9"])
+    await admin.companies.update({ id: company.id, name: "ООО Замена-2" })
+    loaded = await admin.companies.getById({ id: company.id })
+    expect(loaded?.customFields.map((v) => v.value)).toEqual(["9"])
+  })
+
+  it("чужой fieldId (поле сделки) отклоняется, каскад работает", async () => {
+    const admin = makeCaller("ADMIN")
+    await expect(
+      admin.companies.create({
+        name: "ООО Чужие поля",
+        fields: [{ fieldId: areaFieldId, value: "1" }],
+      })
+    ).rejects.toThrow(/Неизвестное поле/)
+    const before = await prisma.companyFieldValue.count()
+    const company = await admin.companies.create({
+      name: "ООО Каскад",
+      fields: [{ fieldId: floorFieldId, value: "2" }],
+    })
+    expect(await prisma.companyFieldValue.count()).toBe(before + 1)
+    await admin.companies.delete({ id: company.id })
+    expect(await prisma.companyFieldValue.count()).toBe(before)
+  })
+})
+
+describe("customFields: контакты (V33)", () => {
+  let birthdayFieldId: string
+
+  beforeAll(async () => {
+    const admin = makeCaller("ADMIN")
+    birthdayFieldId = (
+      await admin.customFields.create({
+        entityType: "CONTACT",
+        label: "День рождения",
+        type: "DATE",
+      })
+    ).id
+  })
+
+  it("create + getById: дата хранится как ввёл пользователь", async () => {
+    const admin = makeCaller("ADMIN")
+    const contact = await admin.contacts.create({
+      firstName: "Анна",
+      lastName: "Керн",
+      fields: [{ fieldId: birthdayFieldId, value: "1990-02-11" }],
+    })
+    const loaded = await admin.contacts.getById({ id: contact.id })
+    const birthday = loaded?.customFields.find((v) => v.fieldId === birthdayFieldId)
+    expect(birthday?.value).toBe("1990-02-11")
+    expect(birthday?.field.type).toBe("DATE")
+  })
+
+  it("битая дата откатывает контакт целиком", async () => {
+    const admin = makeCaller("ADMIN")
+    const before = await prisma.contact.count()
+    await expect(
+      admin.contacts.create({
+        firstName: "Битая дата",
+        fields: [{ fieldId: birthdayFieldId, value: "не дата" }],
+      })
+    ).rejects.toThrow(/Некорректная дата/)
+    expect(await prisma.contact.count()).toBe(before)
+  })
+
+  it("fields: [] очищает значения", async () => {
+    const admin = makeCaller("ADMIN")
+    const contact = await admin.contacts.create({
+      firstName: "С полями",
+      fields: [{ fieldId: birthdayFieldId, value: "1980-01-01" }],
+    })
+    await admin.contacts.update({ id: contact.id, fields: [] })
+    const loaded = await admin.contacts.getById({ id: contact.id })
+    expect(loaded?.customFields).toHaveLength(0)
+  })
+})

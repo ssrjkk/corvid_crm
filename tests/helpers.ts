@@ -10,9 +10,12 @@ export async function resetDb() {
   await prisma.activity.deleteMany()
   await prisma.task.deleteMany()
   await prisma.project.deleteMany()
-  // V32: значения кастомных полей гибнут вместе со сделками (FK-каскад),
-  // но сбрасываем явно — порядок определения полей не должен течь между тестами.
+  // V32/V33: значения кастомных полей гибнут вместе со сделками/компаниями/
+  // контактами (FK-каскад), но сбрасываем явно — определения полей не должны
+  // течь между тестами.
   await prisma.dealFieldValue.deleteMany()
+  await prisma.companyFieldValue.deleteMany()
+  await prisma.contactFieldValue.deleteMany()
   await prisma.customField.deleteMany()
   await prisma.deal.deleteMany()
   await prisma.pipelineStage.deleteMany()

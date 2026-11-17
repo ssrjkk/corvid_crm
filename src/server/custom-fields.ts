@@ -1,4 +1,6 @@
-import { CustomFieldType } from "@/generated/prisma/client"
+import { CustomEntityType, CustomFieldType } from "@/generated/prisma/client"
+import { prisma } from "@/lib/prisma"
+import { fieldOptions } from "@/lib/custom-fields"
 
 /**
  * V32 «Универсальность»: нормализация значений кастомных полей.
@@ -59,4 +61,35 @@ export function normalizeFieldValue(field: CustomFieldDef, raw: string): string 
       return value
     }
   }
+}
+
+/**
+ * V33: значения полей для любой сущности (DEAL/COMPANY/CONTACT).
+ * Неизвестный/чужой fieldId, неверный тип или вариант вне списка отклоняются
+ * с русским сообщением — ДО записи в БД. Пустые значения пропускаются.
+ */
+export async function resolveFieldValues(
+  entityType: CustomEntityType,
+  rawFields: { fieldId: string; value: string }[]
+) {
+  const filled = rawFields.filter((f) => f.value.trim() !== "")
+  if (filled.length === 0) return []
+  const ids = Array.from(new Set(filled.map((f) => f.fieldId)))
+  const defs = await prisma.customField.findMany({
+    where: { id: { in: ids }, entityType },
+  })
+  if (defs.length !== ids.length) {
+    throw new Error("Неизвестное поле — обновите страницу")
+  }
+  const rows: { fieldId: string; value: string }[] = []
+  for (const f of filled) {
+    const def = defs.find((d) => d.id === f.fieldId)
+    if (!def) continue
+    const value = normalizeFieldValue(
+      { type: def.type, options: fieldOptions(def.options) },
+      f.value
+    )
+    rows.push({ fieldId: f.fieldId, value })
+  }
+  return rows
 }

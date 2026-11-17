@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { downloadCsv } from "@/lib/csv"
 import { ImportCsvButton } from "@/components/import-csv-button"
 import { usePermissions } from "@/lib/use-permissions"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 export default function ContactsPage() {
   const { canWrite } = usePermissions()
@@ -23,6 +24,7 @@ export default function ContactsPage() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
+  const [customValues, setCustomValues] = useState<CustomFieldValues>({})
   const [companyFilter, setCompanyFilter] = useState("ALL")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
@@ -38,6 +40,7 @@ export default function ContactsPage() {
       setLastName("")
       setEmail("")
       setPhone("")
+      setCustomValues({})
       toast.success("Контакт создан")
     },
     onError: (err) => {
@@ -52,6 +55,7 @@ export default function ContactsPage() {
       lastName: lastName || undefined,
       email: email || undefined,
       phone: phone || undefined,
+      fields: collectCustomFields(customValues),
     })
   }
 
@@ -196,6 +200,7 @@ export default function ContactsPage() {
                   <Label htmlFor="phone">Телефон</Label>
                   <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
                 </div>
+                <CustomFieldsEditor entityType="CONTACT" values={customValues} onChange={setCustomValues} />
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createContact.isPending}>

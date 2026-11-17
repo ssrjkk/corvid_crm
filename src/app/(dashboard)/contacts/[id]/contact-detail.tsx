@@ -39,7 +39,9 @@ import {
 } from "@/components/ui/sheet"
 import { ActivityTimeline } from "@/components/detail/activity-timeline"
 import { activityTypeLabels, formatDate, formatMoney } from "@/lib/labels"
+import { formatCustomValue } from "@/lib/custom-fields"
 import { usePermissions } from "@/lib/use-permissions"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 type Contact = NonNullable<RouterOutputs["contacts"]["getById"]>
 type Company = RouterOutputs["companies"]["getAll"][number]
@@ -264,6 +266,17 @@ export default function ContactDetail({ contactId }: { contactId: string }) {
                   Нет контактных данных
                 </div>
               )}
+              {/* V33: кастомные поля контакта — свойства, заведённые под бизнес. */}
+              {contact.customFields.length > 0 && (
+                <div className="grid gap-2 border-t pt-3">
+                  {contact.customFields.map(({ field, value }) => (
+                    <div key={field.id} className="flex items-center justify-between gap-2">
+                      <span className="text-muted-foreground">{field.label}</span>
+                      <span className="font-medium tabular-nums">{formatCustomValue(field.type, value)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -298,6 +311,10 @@ function ContactEditForm({
   const [phone, setPhone] = useState(contact.phone ?? "")
   const [position, setPosition] = useState(contact.position ?? "")
   const [companyId, setCompanyId] = useState(contact.companyId ?? "none")
+  // V33: полная замена значений — форма присылает весь набор.
+  const [customValues, setCustomValues] = useState<CustomFieldValues>(() =>
+    Object.fromEntries(contact.customFields.map((v) => [v.fieldId, v.value]))
+  )
 
   const update = trpc.contacts.update.useMutation({
     onSuccess: () => {
@@ -322,6 +339,7 @@ function ContactEditForm({
           phone,
           position,
           companyId: companyId === "none" ? null : companyId,
+          fields: collectCustomFields(customValues),
         })
       }}
     >
@@ -394,6 +412,7 @@ function ContactEditForm({
             </SelectContent>
           </Select>
         </div>
+        <CustomFieldsEditor entityType="CONTACT" values={customValues} onChange={setCustomValues} />
       </div>
       <SheetFooter>
         <Button type="submit" disabled={update.isPending}>

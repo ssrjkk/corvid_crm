@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { customFieldTypeLabels, fieldOptions } from "@/lib/custom-fields"
-import type { CustomFieldType } from "@/generated/prisma/client"
+import { customEntityTypeLabels, customFieldTypeLabels, fieldOptions } from "@/lib/custom-fields"
+import type { CustomEntityType, CustomFieldType } from "@/generated/prisma/client"
 import { usePermissions } from "@/lib/use-permissions"
 
 export default function SettingsPage() {
@@ -81,9 +81,10 @@ export default function SettingsPage() {
     setEditColor(stage.color ?? "#94a3b8")
   }
 
-  // ===== Кастомные поля сделок (V32 «Универсальность») =====
+  // ===== Кастомные поля (V32/V33 «Универсальность») =====
+  const [fieldEntityType, setFieldEntityType] = useState<CustomEntityType>("DEAL")
   const { data: fields = [], isLoading: fieldsLoading } = trpc.customFields.getAll.useQuery({
-    entityType: "DEAL",
+    entityType: fieldEntityType,
   })
 
   const [newFieldName, setNewFieldName] = useState("")
@@ -93,9 +94,16 @@ export default function SettingsPage() {
   const [editFieldLabel, setEditFieldLabel] = useState("")
   const [editFieldOptions, setEditFieldOptions] = useState("")
 
+  const switchFieldEntityType = (entityType: CustomEntityType) => {
+    setFieldEntityType(entityType)
+    setEditingFieldId(null)
+  }
+
   const invalidateFields = () => {
     utils.customFields.getAll.invalidate()
     utils.deals.getById.invalidate()
+    utils.companies.getById.invalidate()
+    utils.contacts.getById.invalidate()
   }
 
   const parseOptions = (raw: string) =>
@@ -153,7 +161,7 @@ export default function SettingsPage() {
     event.preventDefault()
     if (!newFieldName.trim()) return
     createField.mutate({
-      entityType: "DEAL",
+      entityType: fieldEntityType,
       label: newFieldName.trim(),
       type: newFieldType,
       options: newFieldType === "SELECT" ? parseOptions(newFieldOptions) : undefined,
@@ -306,9 +314,22 @@ export default function SettingsPage() {
       {canDelete && (
         <Card>
           <CardHeader>
-            <CardTitle>Новое поле сделки</CardTitle>
+            <CardTitle>Поля: {customEntityTypeLabels[fieldEntityType].toLowerCase()}</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {(Object.keys(customEntityTypeLabels) as CustomEntityType[]).map((entityType) => (
+                <Button
+                  key={entityType}
+                  type="button"
+                  size="sm"
+                  variant={fieldEntityType === entityType ? "secondary" : "ghost"}
+                  onClick={() => switchFieldEntityType(entityType)}
+                >
+                  {customEntityTypeLabels[entityType]}
+                </Button>
+              ))}
+            </div>
             <form className="grid gap-3" onSubmit={submitCreateField}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
@@ -365,7 +386,9 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Поля сделки ({fields.length})</CardTitle>
+          <CardTitle>
+            Поля ({customEntityTypeLabels[fieldEntityType]}): {fields.length}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {fieldsLoading ? (
@@ -475,9 +498,9 @@ export default function SettingsPage() {
             ))
           )}
           <p className="pt-2 text-xs text-muted-foreground">
-            Поля появляются в форме и карточке сделки. Тип после создания не меняется (нужен
-            другой — удалите поле и создайте заново); значения хранятся до удаления поля или
-            сделки. Порядок задаёт следование в формах.
+            Поля появляются в формах и карточках выбранной сущности. Тип после создания не
+            меняется (нужен другой — удалите поле и создайте заново); значения хранятся до
+            удаления поля или записи. Порядок задаёт следование в формах.
           </p>
         </CardContent>
       </Card>

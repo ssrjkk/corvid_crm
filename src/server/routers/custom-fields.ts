@@ -2,9 +2,8 @@ import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
 import { requiredText } from "../validation"
-import { CustomEntityType } from "@/generated/prisma/client"
-import { isUniqueViolation } from "../invoice-number"
 import { LIMITS } from "../validation"
+import { isUniqueViolation } from "../invoice-number"
 
 /**
  * V32 «Универсальность»: управление кастомными полями (свойства сущностей).
@@ -15,7 +14,7 @@ import { LIMITS } from "../validation"
  * уже сохранённые значения. Нужен другой тип — удалить поле и создать заново.
  */
 
-const entityTypeSchema = z.enum(["DEAL"])
+const entityTypeSchema = z.enum(["DEAL", "COMPANY", "CONTACT"])
 const fieldTypeSchema = z.enum(["TEXT", "NUMBER", "DATE", "SELECT"])
 
 const optionsSchema = z
@@ -58,7 +57,7 @@ export const customFieldsRouter = router({
       try {
         return await prisma.customField.create({
           data: {
-            entityType: CustomEntityType.DEAL,
+            entityType: input.entityType,
             label: input.label,
             type: input.type,
             options,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { normalizeFieldValue } from "@/server/custom-fields"
-import { customFieldTypeLabels, fieldOptions, formatCustomValue } from "@/lib/custom-fields"
+import { customEntityTypeLabels, customFieldTypeLabels, fieldOptions, formatCustomValue } from "@/lib/custom-fields"
 import type { CustomFieldDef } from "@/server/custom-fields"
 
 /** V32 «Универсальность»: типизированные значения кастомных полей. */
@@ -64,6 +64,14 @@ describe("customFieldTypeLabels", () => {
     expect(customFieldTypeLabels.NUMBER).toBe("Число")
     expect(customFieldTypeLabels.DATE).toBe("Дата")
     expect(customFieldTypeLabels.SELECT).toBe("Список")
+  })
+})
+
+describe("customEntityTypeLabels (V33)", () => {
+  it("все три сущности подписаны по-русски", () => {
+    expect(customEntityTypeLabels.DEAL).toBe("Сделки")
+    expect(customEntityTypeLabels.COMPANY).toBe("Компании")
+    expect(customEntityTypeLabels.CONTACT).toBe("Контакты")
   })
 })
 

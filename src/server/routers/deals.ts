@@ -10,37 +10,8 @@ import {
   tagsSchema,
   titleSchema,
 } from "../validation"
-import { normalizeFieldValue } from "../custom-fields"
-import { fieldOptions } from "@/lib/custom-fields"
+import { resolveFieldValues } from "../custom-fields"
 import { CustomEntityType } from "@/generated/prisma/client"
-
-/**
- * V32: проверяет значения кастомных полей против их определений.
- * Неизвестный/чужой fieldId, неверный тип значения или вариант вне списка
- * отклоняются с русским сообщением — ДО записи в БД.
- */
-async function resolveFieldValues(rawFields: { fieldId: string; value: string }[]) {
-  const filled = rawFields.filter((f) => f.value.trim() !== "")
-  if (filled.length === 0) return []
-  const ids = Array.from(new Set(filled.map((f) => f.fieldId)))
-  const defs = await prisma.customField.findMany({
-    where: { id: { in: ids }, entityType: CustomEntityType.DEAL },
-  })
-  if (defs.length !== ids.length) {
-    throw new Error("Неизвестное поле — обновите страницу")
-  }
-  const rows: { fieldId: string; value: string }[] = []
-  for (const f of filled) {
-    const def = defs.find((d) => d.id === f.fieldId)
-    if (!def) continue
-    const value = normalizeFieldValue(
-      { type: def.type, options: fieldOptions(def.options) },
-      f.value
-    )
-    rows.push({ fieldId: f.fieldId, value })
-  }
-  return rows
-}
 
 export const dealsRouter = router({
   getAll: authedProcedure.query(async () => {
@@ -110,7 +81,9 @@ export const dealsRouter = router({
       }
       // Значения проверяются до записи; транзакция откатывает сделку целиком,
       // если хоть одно значение невалидно — «полусделка» невозможна.
-      const rows = fields ? await resolveFieldValues(fields) : []
+      const rows = fields
+        ? await resolveFieldValues(CustomEntityType.DEAL, fields)
+        : []
       return prisma.$transaction(async (tx) => {
         const deal = await tx.deal.create({
           data: { ...data, stageId },
@@ -150,7 +123,9 @@ export const dealsRouter = router({
       const { id, fields, ...data } = input
       // fields: undefined — не трогаем значения (CSV-импорт и точечные правки
       // полей не присылают его); массив — заменить целиком.
-      const rows = fields ? await resolveFieldValues(fields) : null
+      const rows = fields
+        ? await resolveFieldValues(CustomEntityType.DEAL, fields)
+        : null
       return prisma.$transaction(async (tx) => {
         const deal = await tx.deal.update({ where: { id }, data })
         if (rows) {

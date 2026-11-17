@@ -19,17 +19,17 @@ type FieldDef = RouterOutputs["customFields"]["getAll"][number]
 export type CustomFieldValues = Record<string, string>
 
 /**
- * V32 «Универсальность»: динамический блок кастомных полей в формах.
+ * V32/V33 «Универсальность»: динамический блок кастомных полей в формах.
  * Контролируемый компонент — родитель владеет значениями (сброс при
  * открытии формы и после успешного создания). Пустая строка = поле не
- * заполнено; тип и варианты SELECT проверяет сервер (см. resolveFieldValues).
+ * заполнено; тип и варианты SELECT проверяет сервер (resolveFieldValues).
  */
 export function CustomFieldsEditor({
   entityType,
   values,
   onChange,
 }: {
-  entityType: "DEAL"
+  entityType: "DEAL" | "COMPANY" | "CONTACT"
   values: CustomFieldValues
   onChange: (values: CustomFieldValues) => void
 }) {

@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-180%20vitest%20%2B%2020%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-188%20vitest%20%2B%2020%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -58,10 +58,10 @@ npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvi
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 180 vitest + 20 e2e, всё зелёное
+## Качество: 188 vitest + 20 e2e, всё зелёное
 
 ```bash
-npm test        # Vitest: 180 тестов — вся чистая логика + ВСЕ 12 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31: whitespace/лимиты/деньги/даты), кастомные поля (V32: типизация значений, транзакции, каскады)
+npm test        # Vitest: 188 тестов — вся чистая логика + ВСЕ 12 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31), кастомные поля сделок (V32) и компаний/контактов (V33: общий resolver, FK-каскад, полная замена)
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
 npm run e2e     # Playwright (20): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER

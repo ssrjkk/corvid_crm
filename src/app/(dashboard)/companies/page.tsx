@@ -14,6 +14,7 @@ import { toast } from "sonner"
 import { usePermissions } from "@/lib/use-permissions"
 import { downloadCsv } from "@/lib/csv"
 import { ImportCsvButton } from "@/components/import-csv-button"
+import { CustomFieldsEditor, collectCustomFields, type CustomFieldValues } from "@/components/custom-fields-editor"
 
 export default function CompaniesPage() {
   const { canWrite } = usePermissions()
@@ -22,6 +23,7 @@ export default function CompaniesPage() {
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [website, setWebsite] = useState("")
+  const [customValues, setCustomValues] = useState<CustomFieldValues>({})
   const [search, setSearch] = useState("")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
@@ -36,6 +38,7 @@ export default function CompaniesPage() {
       setEmail("")
       setPhone("")
       setWebsite("")
+      setCustomValues({})
       toast.success("Компания создана")
     },
     onError: (err) => {
@@ -50,6 +53,7 @@ export default function CompaniesPage() {
       email: email || undefined,
       phone: phone || undefined,
       website: website || undefined,
+      fields: collectCustomFields(customValues),
     })
   }
 
@@ -185,6 +189,7 @@ export default function CompaniesPage() {
                   <Label htmlFor="website">Сайт</Label>
                   <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" />
                 </div>
+                <CustomFieldsEditor entityType="COMPANY" values={customValues} onChange={setCustomValues} />
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={createCompany.isPending}>
