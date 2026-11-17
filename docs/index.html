@@ -3,253 +3,266 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Corvid CRM — фриланс под контролем</title>
-<meta name="description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
+<title>Corvid CRM — своя воронка, свои поля, свои счета</title>
+<meta name="description" content="Corvid CRM — CRM для фриланса на вашем сервере: сделки с полями под ваш бизнес, счета с печатной формой, задачи, аналитика. 188 автотестов и 20 e2e держат цифры честными.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="SSRJKK">
-<meta property="og:title" content="Corvid CRM — фриланс под контролем">
-<meta property="og:description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
+<meta property="og:site_name" content="Corvid CRM">
+<meta property="og:title" content="Corvid CRM — своя воронка, свои поля, свои счета">
+<meta property="og:description" content="CRM для фриланса на своём сервере: кастомные поля на сделках, компаниях и контактах, свои этапы воронки, счета с печатью, мультивалютная аналитика.">
 <meta property="og:url" content="https://ssrjkk.github.io/corvid_crm/">
 <meta property="og:locale" content="ru_RU">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Corvid CRM — фриланс под контролем">
-<meta name="twitter:description" content="Corvid CRM — CRM для фриланса: сделки, счета, клиенты, задачи и аналитика. Next.js 16, tRPC, Prisma. Ворон ведёт учёт — вы ведёте дела.">
-<meta name="twitter:image" content="https://ssrjkk.github.io/corvid_crm/og-card.png">
-<meta property="og:image" content="https://ssrjkk.github.io/corvid_crm/og-card.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='30' fill='%23EEF2FF'/%3E%3Cellipse cx='64' cy='82' rx='31' ry='29' fill='%23333D55'/%3E%3Ccircle cx='64' cy='45' r='26' fill='%23333D55'/%3E%3Cellipse cx='54' cy='44' rx='7.5' ry='8.5' fill='%23fff'/%3E%3Cellipse cx='74' cy='44' rx='7.5' ry='8.5' fill='%23fff'/%3E%3Cpath d='M57 52.5c4.5-2.7 9.5-2.7 14 0-1.6 4.2-4 7.4-7 9.5-3-2.1-5.4-5.3-7-9.5z' fill='%23F59E0B'/%3E%3C/svg%3E">
+<meta name="twitter:title" content="Corvid CRM — своя воронка, свои поля, свои счета">
+<meta name="twitter:description" content="CRM для фриланса на своём сервере: кастомные поля, своя воронка, счета с печатью, мультивалютная аналитика.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23F6F4EE'/%3E%3Cellipse cx='64' cy='82' rx='31' ry='29' fill='%2323252B'/%3E%3Ccircle cx='64' cy='45' r='26' fill='%2323252B'/%3E%3Cpath d='M56 24c-3-6 0-11 4-7 1-7 5-8 7-3 4-5 8-2 6 4l-2 8z' fill='%2323252B'/%3E%3Cpath d='M84 55c8-4 14-12 17-22 1-4 1-7 0-10 4 2 7 6 8 10 1-3 2-6 1-9 5 4 7 10 6 16-1 10-8 18-18 21-5 2-10 0-14-3z' fill='%233A3D45'/%3E%3Cpath d='M57 52.5c4.5-2.7 9.5-2.7 14 0-1.6 4.2-4 7.4-7 9.5-3-2.1-5.4-5.3-7-9.5z' fill='%23B45309'/%3E%3C/svg%3E">
 <link rel="canonical" href="https://ssrjkk.github.io/corvid_crm/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;800&family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
+/* ── Айдентика «ворон на бумаге» (V34): бумага, чернила, отлив оперения.
+      Без градиентов, маскотов и внешних CDN. Шрифты self-hosted (fonts.css):
+      Unbounded 600 — заголовки; IBM Plex Sans — текст; IBM Plex Mono — цифры и код. */
 :root{
-  --bg:#f7f8fc; --card:#ffffff; --ink:#23283b; --ink2:#333d55;
-  --soft:#6b7391; --indigo:#5b5fc7; --indigo-deep:#3f44a8;
-  --amber:#f59e0b; --blush:#fb7185; --line:#c7d2fe; --hairline:#e4e7f4;
-  --head:'Manrope',sans-serif; --body:'Inter',sans-serif; --mono:'Geist Mono',monospace;
+  --paper:#F6F4EE; --card:#FDFCF9;
+  --ink:#23252B; --ink2:#3A3D45; --soft:#6E7076;
+  --petrol:#2E6E7E; --petrol-ink:#245660;
+  --amber:#B45309;
+  --line:#D9D4C7; --hairline:#EAE7DE;
+  --head:'Unbounded',sans-serif; --body:'IBM Plex Sans',sans-serif; --mono:'IBM Plex Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font:15.5px/1.7 var(--body);
-  -webkit-font-smoothing:antialiased;overflow-x:hidden}
-/* ── шапка: лого справа сверху ───────────────── */
-header{
-  position:sticky;top:0;z-index:10;
-  background:rgba(247,248,252,.86);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--hairline);
-}
-header .in{max-width:1160px;margin:0 auto;padding:16px 28px;
-  display:flex;align-items:center;justify-content:space-between;gap:18px}
-.menu{display:flex;gap:28px;font-size:14px;color:var(--soft)}
+body{background:var(--paper);color:var(--ink);font:16px/1.7 var(--body);
+  -webkit-font-smoothing:antialiased}
+a:focus-visible,button:focus-visible{outline:2px solid var(--petrol);outline-offset:3px;border-radius:2px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--paper);
+  padding:10px 16px;z-index:99;font:500 14px var(--body)}
+.skip:focus{left:12px;top:12px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono)}
+
+/* ── шапка ── */
+header{position:sticky;top:0;z-index:10;background:rgba(246,244,238,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;height:64px}
+.menu{display:flex;gap:26px;font:400 13.5px var(--mono);color:var(--soft)}
 .menu a{color:var(--soft);text-decoration:none}
-.menu a:hover{color:var(--indigo)}
+.menu a:hover{color:var(--ink)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo img{width:44px;height:44px;border-radius:12px}
-.logo span{font:800 19px var(--head);letter-spacing:.01em;color:var(--ink)}
-.logo span b{color:var(--indigo)}
-/* ── хиро: ворона слева, текст справа ────────── */
-.hero{max-width:1160px;margin:0 auto;padding:64px 28px 96px;
-  display:grid;grid-template-columns:minmax(300px,430px) 1fr;
-  gap:44px;align-items:center}
-.crow-wrap{position:relative}
-.crow-wrap svg,.crow-wrap .crow-img{width:100%;max-width:420px;display:block;
-  filter:drop-shadow(0 24px 40px rgba(63,68,168,.18))}
-.kicker{
-  display:inline-flex;align-items:center;gap:10px;
-  font:500 13.5px var(--mono);color:var(--soft);margin-bottom:22px;
-}
+.logo img{width:34px;height:34px;display:block}
+.logo span{font:600 17px var(--head);letter-spacing:.06em;color:var(--ink)}
+
+/* ── герой: текст слева, реальный интерфейс справа ── */
+.hero{display:grid;grid-template-columns:minmax(340px,520px) 1fr;gap:48px;
+  align-items:center;padding:72px 0 88px}
+.kicker{font:400 13px var(--mono);letter-spacing:.08em;color:var(--soft);margin-bottom:24px}
 .kicker i{font-style:normal;color:var(--amber)}
-h1{font:800 clamp(42px,5.8vw,76px)/1.06 var(--head);letter-spacing:-.025em;
-  margin-bottom:20px}
-h1 span{color:var(--indigo)}
-.hero p.lead{font-size:17px;color:var(--soft);max-width:50ch;margin-bottom:36px}
-.cta{display:flex;gap:14px;flex-wrap:wrap}
-.btn{padding:15px 30px;border-radius:14px;text-decoration:none;
-  font:600 14.5px var(--body);border:1.5px solid transparent}
-.btn.solid{background:var(--indigo);color:#fff;box-shadow:0 14px 30px rgba(91,95,199,.3)}
-.btn.solid:hover{background:var(--indigo-deep)}
+h1{font:600 clamp(34px,4.6vw,58px)/1.12 var(--head);letter-spacing:-.01em;margin-bottom:20px}
+.lead{font-size:17px;color:var(--soft);max-width:52ch;margin-bottom:32px}
+.lead b{color:var(--ink2);font-weight:600}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{padding:14px 26px;border-radius:10px;text-decoration:none;
+  font:600 14.5px var(--body);border:1.5px solid transparent;transition:background .15s,border-color .15s}
+.btn.solid{background:var(--ink);color:var(--paper)}
+.btn.solid:hover{background:#000}
 .btn.ghost{border-color:var(--line);color:var(--ink);background:var(--card)}
-.btn.ghost:hover{border-color:var(--indigo)}
-/* ── секции ──────────────────────────────────── */
-section{max-width:1160px;margin:0 auto;padding:84px 28px;border-top:1px solid var(--hairline)}
-h2{font:800 clamp(30px,4vw,48px)/1.14 var(--head);letter-spacing:-.02em;margin-bottom:14px;max-width:24ch}
-section p.intro{color:var(--soft);max-width:60ch;margin-bottom:44px;font-size:16px}
-/* модули: две колонки, спокойно */
-.mods{display:grid;grid-template-columns:1fr 1fr;gap:14px 44px;max-width:900px}
-.mod{display:flex;gap:18px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--hairline)}
-.mod b{font:700 19px var(--head);min-width:130px;color:var(--ink2)}
-.mod p{font-size:14.5px;color:var(--soft)}
-/* четыре шага: стрелочный поток, не чипы */
-.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;max-width:1000px}
-.flow .st{flex:1;min-width:210px;padding:24px 26px;background:var(--card);
-  border:1.5px solid var(--hairline);border-radius:18px;position:relative}
-.flow .st + .st{margin-left:34px}
-.flow .st::after{
-  content:"";position:absolute;right:-25px;top:50%;width:16px;height:16px;margin-top:-8px;
-  border-top:2px solid var(--indigo);border-right:2px solid var(--indigo);
-  transform:rotate(45deg);
-}
-.flow .st:last-child::after{display:none}
-.flow h3{font:700 17px var(--head);margin-bottom:6px}
-.flow p{font-size:13.5px;color:var(--soft)}
-/* проверено: тихая строка фактов */
-.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:960px}
-.pf{background:var(--card);border:1.5px solid var(--hairline);border-radius:16px;padding:22px 24px}
-.pf b{display:block;font:800 26px var(--head);color:var(--ink2);margin-bottom:4px}
-.pf span{font-size:13px;color:var(--soft)}
-/* запуск */
-.run{background:var(--ink2);color:#dfe3f5;border-radius:20px;padding:30px 34px;
-  font:14px/1.95 var(--mono);max-width:660px;overflow-wrap:anywhere}
-.run .c{color:#8b94b8}
-/* ── подвал ──────────────────────────────────── */
+.btn.ghost:hover{border-color:var(--ink)}
+.shot{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.shot img{display:block;width:100%;height:auto}
+.shot figcaption{font:400 12.5px/1.6 var(--mono);color:var(--soft);
+  padding:10px 14px;border-top:1px solid var(--hairline)}
+
+/* ── секции ── */
+section{padding:76px 0;border-top:1px solid var(--hairline)}
+h2{font:600 clamp(24px,3vw,36px)/1.2 var(--head);letter-spacing:-.01em;margin-bottom:12px}
+.intro{color:var(--soft);max-width:58ch;margin-bottom:40px;font-size:15.5px}
+.num{font:500 13px var(--mono);color:var(--amber);letter-spacing:.06em}
+
+/* модули: редакторский указатель с номерами, без карточек */
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:0 56px;max-width:980px}
+.mod{display:grid;grid-template-columns:34px 148px 1fr;gap:14px;align-items:baseline;
+  padding:17px 0;border-bottom:1px solid var(--hairline)}
+.mod .num{padding-top:3px}
+.mod b{font:600 16px var(--body);color:var(--ink)}
+.mod p{font-size:14px;color:var(--soft);line-height:1.6}
+
+/* маршрут сделки: один поток, без коробок */
+.route{font-size:15px;color:var(--soft);max-width:70ch;line-height:2.1}
+.route .num{font-size:14px}
+
+/* проверено: типографский ряд цифр, без коробок */
+.proof{display:flex;gap:56px;flex-wrap:wrap;padding-top:8px}
+.pf b{display:block;font:500 40px/1 var(--mono);color:var(--ink);margin-bottom:8px}
+.pf span{font-size:13px;color:var(--soft);max-width:20ch;display:block}
+.ciline{margin-top:34px;font:400 13px/1.9 var(--mono);color:var(--soft);
+  border-top:1px solid var(--hairline);padding-top:16px;max-width:980px}
+.ciline i{font-style:normal;color:var(--petrol)}
+
+/* запуск: терминал */
+.run{background:var(--ink);color:#E9E7E0;border-radius:14px;padding:26px 30px;
+  font:400 13.5px/2 var(--mono);max-width:720px;overflow-wrap:anywhere}
+.run .c{color:#8A8C93}
+.run .u{color:#7FB4BD}
+
+/* ── подвал ── */
 footer{border-top:1px solid var(--hairline);background:var(--card)}
-footer .in{max-width:1160px;margin:0 auto;padding:30px 28px 44px;
-  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  font-size:13.5px;color:var(--soft)}
-footer a{color:var(--indigo);text-decoration:none}
+footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:28px 0 40px;font:400 13.5px var(--mono);color:var(--soft)}
+footer a{color:var(--petrol);text-decoration:none}
+footer a:hover{color:var(--petrol-ink);text-decoration:underline}
+
+/* появление при скролле: только transform, без opacity (контраст для
+   axe-core не мигает); браузеры без scroll-driven анимаций показывают сразу */
+@media (prefers-reduced-motion:no-preference){
+  @supports (animation-timeline:view()){
+    .rev{animation:rise both;animation-timeline:view();animation-range:entry 0% cover 26%}
+  }
+}
+@keyframes rise{from{transform:translateY(14px)}to{transform:translateY(0)}}
+
 @media(max-width:920px){
-  .hero{grid-template-columns:1fr;padding-top:36px}
-  .crow-wrap{max-width:280px;margin:0 auto}
+  .hero{grid-template-columns:1fr;padding:44px 0 64px}
   .menu{display:none}
   .mods{grid-template-columns:1fr}
-  .flow .st + .st{margin-left:0;margin-top:34px}
-  .flow .st::after{display:none}
-  .proof{grid-template-columns:1fr 1fr}
+  .mod{grid-template-columns:34px 1fr}
+  .mod p{grid-column:2}
+  .proof{gap:34px}
 }
-@media(prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  html{scroll-behavior:auto}
+@media print{
+  header,.cta,.skip{display:none}
+  body{background:#fff}
 }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">К содержанию</a>
 
 <header>
-  <div class="in">
-    <nav class="menu">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Corvid — к началу страницы">
+      <img src="corvid-logo.svg" width="34" height="34" alt="">
+      <span>CORVID</span>
+    </a>
+    <nav class="menu" aria-label="Разделы">
       <a href="#modules">модули</a>
-      <a href="#steps">маршрут сделки</a>
+      <a href="#screens">экраны</a>
       <a href="#proof">проверено</a>
       <a href="#run">запуск</a>
+      <a href="https://github.com/ssrjkk/corvid_crm">github</a>
     </nav>
-    <a class="logo" href="#">
-      <img src="corvid-logo.svg" width="44" height="44" alt="">
-      <span>COR<b>VID</b> CRM</span>
-    </a>
   </div>
 </header>
 
-<div class="hero">
-  <div class="crow-wrap">
-    <!-- фирменная ворона из public/corvid-logo.svg — крыло машет -->
-    <img class="crow-img" src="corvid-logo.svg" alt="Corvid — добрая ворона машет крылом">
-  </div>
-
-  <div>
-    <span class="kicker"><i>◆</i> CRM для фриланса · Next.js 16 · tRPC · Prisma</span>
-    <h1>Фриланс под <span>контролем.</span></h1>
-    <p class="lead">Сделки, счета, клиенты, задачи и аналитика в одном месте.
-    Corvid ведёт учёт так же надёжно, как ворона хранит то, что ей дорого, —
-    вы занимаетесь делом.</p>
-    <div class="cta">
-      <a class="btn solid" href="https://github.com/ssrjkk/corvid_crm">Склонировать и запустить</a>
-      <a class="btn ghost" href="https://github.com/ssrjkk/corvid_crm#readme">Как это устроено</a>
+<main id="main">
+  <!-- Герой: три конкретных утверждения о механике, справа — настоящая воронка -->
+  <div class="wrap" id="top">
+    <div class="hero">
+      <div>
+        <p class="kicker"><i>◆</i> CRM ДЛЯ ФРИЛАНСА · NEXT.JS 16 · TRPC · PRISMA · SQLITE</p>
+        <h1>Своя воронка. Свои поля. Свои счета.</h1>
+        <p class="lead">Corvid ставится на ваш сервер и ведёт дела фрилансера:
+        сделки с <b>кастомными полями под ваш бизнес</b> — недвижимость, автосервис,
+        студия или что угодно ещё, — счета с печатной формой, задачи и аналитика.
+        <b>188 автотестов и 20 e2e</b> проверяют каждую цифру на каждый push.</p>
+        <div class="cta">
+          <a class="btn solid" href="https://github.com/ssrjkk/corvid_crm">Склонировать и запустить</a>
+          <a class="btn ghost" href="https://github.com/ssrjkk/corvid_crm#readme">Как это устроено</a>
+        </div>
+      </div>
+      <figure class="shot">
+        <img src="screenshots/pipeline.png" width="2880" height="1928" loading="eager"
+          alt="Скриншот воронки Corvid: этапы Новая, Переговоры, Договор, Выиграна, Проиграна с карточками сделок и суммами">
+        <figcaption>воронка сделок — реальный интерфейс, демо-набор db:seed-demo</figcaption>
+      </figure>
     </div>
   </div>
-</div>
 
-<section id="modules">
-  <h2>Весь контур работы фрилансера</h2>
-  <p class="intro">Пять модулей закрывают цикл от первого контакта до цифр, по которым видно, чем вы живёте.</p>
-  <div class="mods">
-    <div class="mod"><b>Сделки</b><p>воронка от заявки до оплаты: этапы, суммы, дедлайны</p></div>
-    <div class="mod"><b>Счета</b><p>выставление и учёт оплат по каждой сделке</p></div>
-    <div class="mod"><b>Клиенты</b><p>карточки, история, контакты — ворон помнит всех</p></div>
-    <div class="mod"><b>Задачи</b><p>что и когда по каждой сделке, без внешних таск-трекеров</p></div>
-    <div class="mod"><b>Аналитика</b><p>доход, конверсии и узкие места — цифрами месяца</p></div>
-    <div class="mod"><b>Поля сделок</b><p>TEXT/NUMBER/DATE/SELECT — свои поля с валидацией</p></div>
-  </div>
-</section>
+  <div class="wrap">
+    <!-- Модули: редакторский указатель -->
+    <section id="modules" class="rev" aria-labelledby="h-modules">
+      <p class="num">01</p>
+      <h2 id="h-modules">Восемь модулей — весь цикл работы</h2>
+      <p class="intro">От первого контакта до итога месяца. Ничего лишнего между ними.</p>
+      <div class="mods">
+        <div class="mod"><span class="num">01</span><b>Сделки</b><p>воронка от заявки до оплаты; этапы задаёте сами, суммы считаются в копейках без флоат-мусора</p></div>
+        <div class="mod"><span class="num">02</span><b>Кастомные поля</b><p>TEXT, NUMBER, DATE, SELECT на сделках, компаниях и контактах; заводятся в Настройках, проверяются на сервере, удаляются вместе с записью</p></div>
+        <div class="mod"><span class="num">03</span><b>Счета</b><p>позиции, три валюты, автонумерация INV-0001, печатная форма A4 из карточки</p></div>
+        <div class="mod"><span class="num">04</span><b>Клиенты</b><p>компании и контакты, история активностей по каждой карточке</p></div>
+        <div class="mod"><span class="num">05</span><b>Задачи</b><p>список и доска; просроченные сами поднимаются в сводку дня</p></div>
+        <div class="mod"><span class="num">06</span><b>Аналитика</b><p>выручка по месяцам и валютам раздельно, сделки и задачи на одном экране</p></div>
+        <div class="mod"><span class="num">07</span><b>Роли</b><p>ADMIN, MANAGER, VIEWER; права проверяет API — наблюдатель не удалит ничего даже прямым запросом</p></div>
+        <div class="mod"><span class="num">08</span><b>Данные</b><p>SQLite на вашем диске, миграции Prisma, ротация бэкапов с проверкой целостности</p></div>
+      </div>
+    </section>
 
-<section id="steps">
-  <h2>От заявки до аналитики — четыре шага</h2>
-  <p class="intro">Учебная сделка уже лежит в воронке после первого запуска — путь виден сразу.</p>
-  <div class="flow">
-    <div class="st"><h3>Заявка</h3><p>контакт и потребность попадают в воронку</p></div>
-    <div class="st"><h3>Сделка</h3><p>этапы, сумма и дедлайн на одной карточке</p></div>
-    <div class="st"><h3>Работа</h3><p>задачи и счета ведутся по сделке</p></div>
-    <div class="st"><h3>Аналитика</h3><p>итоги месяца собираются сами</p></div>
-  </div>
-</section>
+    <!-- Экраны: настоящие скриншоты, не мокапы -->
+    <section id="screens" class="rev" aria-labelledby="h-screens">
+      <p class="num">02</p>
+      <h2 id="h-screens">Экраны продукта</h2>
+      <p class="intro">Скриншоты сняты с работающего приложения (демо-набор db:seed-demo), без мокапов и фотошопа.</p>
+      <figure class="shot" style="max-width:980px">
+        <img src="screenshots/invoice.png" width="2880" height="1800" loading="lazy"
+          alt="Скриншот счёта INV-0001 в Corvid: клиент ООО Аврора, позиция «Разработка CRM — этап 1», итого 45 000 ₽, статус Оплачен">
+        <figcaption>счёт INV-0001 · ООО Аврора · 45 000 ₽ · статус «Оплачен» · кнопка «Печать / PDF»</figcaption>
+      </figure>
+      <figure class="shot" style="max-width:980px;margin-top:28px">
+        <img src="screenshots/dashboard.png" width="2880" height="1800" loading="lazy"
+          alt="Скриншот дашборда Corvid: сводка сделок и задач, воронка продаж и график выручки по месяцам">
+        <figcaption>дашборд · сводка дня, выручка по месяцам, валюты не смешиваются</figcaption>
+      </figure>
+    </section>
 
-<section id="proof">
-  <h2>Проверено, а не обещано</h2>
-  <p class="intro">Тесты и аудит гоняются на каждый push — ворон не любит сюрпризов.</p>
-  <div class="proof">
-    <div class="pf"><b>180</b><span>тестов: контракты, валидация, транзакции</span></div>
-    <div class="pf"><b>tRPC</b><span>типизация API от клиента до сервера</span></div>
-    <div class="pf"><b>Prisma</b><span>схема и миграции под контролем</span></div>
-    <div class="pf"><b>CI</b><span>e2e и a11y-аудит на каждый push</span></div>
-  </div>
-</section>
+    <!-- Маршрут: один поток текста, без коробок -->
+    <section id="route" class="rev" aria-labelledby="h-route">
+      <p class="num">03</p>
+      <h2 id="h-route">Маршрут сделки</h2>
+      <p class="route">
+        <span class="num">01</span> <b>Заявка</b> — контакт и потребность ложатся в воронку;&nbsp;
+        <span class="num">02</span> <b>Сделка</b> — этап, сумма в валюте клиента, дедлайн;&nbsp;
+        <span class="num">03</span> <b>Работа</b> — задачи и счёт ведутся по сделке, каждая активность остаётся в истории;&nbsp;
+        <span class="num">04</span> <b>Аналитика</b> — итог месяца собирается сам, без ручных таблиц.
+      </p>
+      <p class="intro" style="margin-bottom:0;margin-top:18px">Учебные данные для демо заводятся одной командой — <span class="mono">npm run db:seed-demo</span>, пустая установка остаётся пустой.</p>
+    </section>
 
-<section id="run">
-  <h2>Склонировать и запустить</h2>
-  <p class="intro">Next.js 16, tRPC, Prisma. Один npm install — и ворон уже в воронке.</p>
-  <div class="run">
-    <span class="c"># клон и зависимости</span><br>
-    git clone https://github.com/ssrjkk/corvid_crm.git<br>
-    cd corvid_crm && npm install<br>
-    <span class="c"># учебная сделка ждёт в воронке</span><br>
-    npm run dev
+    <!-- Проверено: цифры вместо обещаний -->
+    <section id="proof" class="rev" aria-labelledby="h-proof">
+      <p class="num">04</p>
+      <h2 id="h-proof">Проверено, а не обещано</h2>
+      <p class="intro">Каждое число ниже проверяет CI на каждый push в main.</p>
+      <div class="proof">
+        <div class="pf"><b>188</b><span>тестов Vitest: контракты, транзакции, роли, деньги</span></div>
+        <div class="pf"><b>20</b><span>сценариев Playwright e2e в реальном браузере</span></div>
+        <div class="pf"><b>0</b><span>serious a11y-нарушений по axe-core</span></div>
+        <div class="pf"><b>0</b><span>уязвимостей в prod-зависимостях (npm audit)</span></div>
+      </div>
+      <p class="ciline">конвейер на каждый push: <i>lint → tsc → vitest → build → Playwright e2e → CodeQL</i></p>
+    </section>
+
+    <!-- Запуск: честные команды -->
+    <section id="run" class="rev" aria-labelledby="h-run">
+      <p class="num">05</p>
+      <h2 id="h-run">Запуск за четыре команды</h2>
+      <p class="intro">Node 20.9+, npm. SQLite создаётся миграциями, ничего ставить не нужно.</p>
+      <div class="run">
+        <span class="c"># зависимости (prisma generate входит в postinstall)</span><br>
+        git clone https://github.com/ssrjkk/corvid_crm.git<br>
+        cd corvid_crm &amp;&amp; npm install<br>
+        <span class="c"># учебные данные: воронка, счёт INV-0001, демо-юзеры</span><br>
+        npm run db:seed-demo<br>
+        <span class="c"># приложение на http://localhost:3000</span><br>
+        npm run dev<br>
+        <span class="c"># вход демо-админа (создаёт db:seed-demo)</span><br>
+        <span class="u">test@corvid.dev / Test12345!</span>
+      </div>
+    </section>
   </div>
-</section>
+</main>
 
 <footer>
-  <div class="in">
-    <span>Corvid CRM · фриланс под контролем</span>
-    <span><a href="https://github.com/ssrjkk/corvid_crm">GitHub ↗</a> · <a href="https://ssrjkk.github.io/">все проекты ↗</a></span>
+  <div class="wrap">
+    <span>© 2026 ssrjkk · Corvid CRM</span>
+    <span><a href="https://github.com/ssrjkk/corvid_crm">github.com/ssrjkk/corvid_crm</a> · <a href="https://ssrjkk.github.io/">все проекты</a></span>
   </div>
 </footer>
-
-<!-- символ для шапки -->
-
-
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-<script>
-(function(){
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduced || !window.gsap) return;
-  if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
-
-  /* один orchestrated moment: ворона машет крылом — файл лого анимируется наклоном */
-  var crowImg = document.querySelector(".crow-img");
-  if (crowImg){
-    gsap.from(crowImg, {rotation:-6, transformOrigin:"50% 85%", duration:1, ease:"back.out(1.6)", delay:.4});
-    gsap.to(crowImg, {rotation:2.5, duration:1.1, repeat:-1, yoyo:true, ease:"sine.inOut", delay:1.5});
-  }
-
-  gsap.from(".hero .kicker, .hero h1, .hero p.lead, .cta", {
-    duration:.85, y:20, opacity:0, stagger:.09, ease:"power2.out", delay:.25
-  });
-  gsap.from(".crow-wrap svg", {duration:1, x:-46, opacity:0, ease:"power3.out"});
-
-  if (!window.ScrollTrigger) return;
-  gsap.utils.toArray("section").forEach(function(sec){
-    gsap.from(sec.querySelectorAll("h2, p.intro"), {
-      duration:.7, y:18, opacity:0, ease:"power2.out",
-      scrollTrigger:{trigger:sec, start:"top 72%", once:true}
-    });
-    var rows = sec.querySelectorAll(".mod, .st, .pf, .run");
-    if (rows.length) gsap.from(rows, {
-      duration:.6, y:16, opacity:0, stagger:.07, ease:"power2.out",
-      scrollTrigger:{trigger:sec, start:"top 64%", once:true}
-    });
-  });
-})();
-</script>
 </body>
 </html>

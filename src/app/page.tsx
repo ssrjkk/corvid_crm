@@ -14,7 +14,7 @@ import { Brand, BrandMark } from "@/components/layout/brand"
  */
 
 const stats = [
-  { value: "129", label: "тестов Vitest" },
+  { value: "188", label: "тестов Vitest" },
   { value: "20", label: "сценариев Playwright" },
   { value: "0", label: "serious a11y-нарушений (axe-core)" },
   { value: "0", label: "уязвимостей в prod-зависимостях" },
