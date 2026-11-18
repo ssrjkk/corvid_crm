@@ -49,7 +49,7 @@ describe("status badge mapping (единый источник)", () => {
 
   it("priorityToneClass: URGENT destructive, HIGH янтарь, остальное muted", () => {
     expect(priorityToneClass("URGENT")).toBe("text-destructive")
-    expect(priorityToneClass("HIGH")).toBe("text-chart-4")
+    expect(priorityToneClass("HIGH")).toBe("text-amber-700 dark:text-amber-300")
     expect(priorityToneClass("MEDIUM")).toBe("text-muted-foreground")
     expect(priorityToneClass("LOW")).toBe("text-muted-foreground")
     expect(priorityToneClass("NOPE")).toBe("text-muted-foreground")

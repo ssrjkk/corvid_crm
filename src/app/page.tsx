@@ -15,9 +15,9 @@ import { Brand, BrandMark } from "@/components/layout/brand"
 
 const stats = [
   { value: "188", label: "тестов Vitest" },
-  { value: "20", label: "сценариев Playwright" },
+  { value: "21", label: "сценариев Playwright" },
   { value: "0", label: "serious a11y-нарушений (axe-core)" },
-  { value: "0", label: "уязвимостей в prod-зависимостях" },
+  { value: "0", label: "critical-уязвимостей (npm audit)" },
 ] // Синхронизировать с README.md при изменении количества тестов.
 
 const engineering = [
@@ -81,7 +81,10 @@ export default function Home() {
       <main>
         {/* Герой: заголовок, одна строка сути, два CTA, реальный интерфейс */}
         <header className="container mx-auto max-w-7xl px-6 pb-20 pt-24 text-center">
-          <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700 flex flex-col items-center">
+          {/* V35: вход лишь сдвигом (transform), БЕЗ fade-in/opacity — axe-core
+              снимает цвета во время анимации, полупрозрачный бленд фейково
+              ловится как color-contrast serious (тот же закон, что у .rev на сайте). */}
+          <div className="motion-safe:animate-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700 flex flex-col items-center">
             <h1 className="text-5xl font-bold tracking-tight">Corvid — CRM для фриланса</h1>
             <p className="text-muted-foreground mt-5 max-w-xl text-lg">
               Сделки, счета, задачи и клиенты — в одном окне, на своём сервере.

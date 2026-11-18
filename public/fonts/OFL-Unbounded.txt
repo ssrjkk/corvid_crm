@@ -1,0 +1,3 @@
+Unbounded — шрифт OG-карточки (wordmark), вес 600, подмножество latin.
+© The Unbounded Project Authors, SIL Open Font License 1.1.
+Источник: Google Fonts CSS API (легаси UA отдаёт TTF — fontkit в next/og не читает woff2).

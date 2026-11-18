@@ -43,6 +43,16 @@ export default defineConfig({
       },
     },
     {
+      // Регресс кастомных полей (V33): полный круг «поле → сделка → удаление».
+      // Тоже одна сессия из setup — своих логинов у спека нет.
+      name: "fields",
+      testMatch: /(^|[\\/])custom-fields\.spec\.ts$/,
+      dependencies: ["setup"],
+      use: {
+        storageState: "e2e/.auth.json",
+      },
+    },
+    {
       name: "setup-viewer",
       testMatch: /(^|[\\/])viewer-auth\.setup\.ts$/,
     },

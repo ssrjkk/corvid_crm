@@ -1,24 +1,33 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Geist_Mono } from "next/font/google";
+import { Unbounded, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({
-  variable: "--font-inter",
+/**
+ * Айдентика «ворон на бумаге» (V35, единый с docs/index.html): Unbounded —
+ * заголовки и вордмарк (характерный, с кириллицей), IBM Plex Sans — текст UI
+ * (инженерный гротеск), IBM Plex Mono — цифры, код и kbd. Все три — с
+ * кириллическим подмножеством: Geist Mono держал только latin, кириллица в
+ * mono выпадала в системный fallback. next/font скачивает файлы на билде —
+ * внешний CDN не нужен (CSP connect-src 'self' остаётся честным).
+ */
+const unbounded = Unbounded({
+  variable: "--font-display",
   subsets: ["latin", "cyrillic"],
 });
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin", "cyrillic"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600"],
 });
 
 /**
@@ -71,7 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${inter.variable} ${manrope.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${unbounded.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider

@@ -5,10 +5,11 @@ description: Дизайн-система и UI-стандарты CRM Corvid (Ne
 
 # Corvid Design System
 
-Corvid — CRM для фриланса. Бренд: ворон → строгая «чернильная» база, один фиолетовый акцент
-(отлив оперения), много воздуха, минимум бордеров, Linear-подобная сдержанность.
+Corvid — CRM для фриланса. Бренд: ворон → айдентика «ворон на бумаге» (V35, единая с сайтом):
+тёплая бумага, чернила, вороний отлив (petrol) как фирменный штрих, много воздуха,
+минимум бордеров, Linear-подобная сдержанность.
 Стек: Next.js 16 (App Router, Cache Components), Tailwind v4, shadcn-токены + Base UI,
-Inter (latin+cyrillic), recharts, sonner, next-themes.
+Unbounded + IBM Plex Sans + IBM Plex Mono (все latin+cyrillic), recharts, sonner, next-themes.
 
 ## Токены — единственный источник стиля
 
@@ -16,17 +17,24 @@ Inter (latin+cyrillic), recharts, sonner, next-themes.
 (`--background`, `--primary`, `--sidebar-*`, `--chart-*` …). Компоненты ссылаются на токены
 через утилиты Tailwind (`bg-primary`, `text-muted-foreground`, `fill="var(--chart-1)"`).
 
-Фирменный акцент — фиолетовый ~hue 285. Светлая и тёмная темы описаны в `:root` / `.dark`.
-Добавляя новый цвет (например, статус), добавляй токен в ОБЕ темы, а в компоненте используй
-только его.
+Палитра (V35): бумага/чернила — hue 90 (тёплый белый) и hue 260 (нейтрально-чернильный);
+фирменный штрих — petrol ~hue 210 (светлая тема: тонированные `--accent`/`--ring`,
+тёмная: petrol как `--primary`/`--sidebar-primary`). Дефолтный фиолетовый shadcn (hue 285)
+запрещён. `--chart-1..5` НЕ трогать в обоих блоках — семантика статусов и amber-закон.
+Светлая и тёмная темы описаны в `:root` / `.dark`. Добавляя новый цвет (например, статус),
+добавляй токен в ОБЕ темы, а в компоненте используй только его.
 
 ## Типографика
 
-- Пара шрифтов: **Inter** (`--font-inter`, subsets latin+cyrillic) — тело текста,
-  **Manrope** (`--font-manrope`, weights 500-800, cyrillic) — заголовки и бренд.
-  В `@theme inline`: `--font-sans: var(--font-inter)`, `--font-heading: var(--font-manrope)`.
+- Трио шрифтов (V35, то же, что на сайте `docs/index.html`): **Unbounded** (`--font-display`,
+  subsets latin+cyrillic) — заголовки и бренд, **IBM Plex Sans** (`--font-plex-sans`,
+  weights 400-700, cyrillic) — тело текста, **IBM Plex Mono** (`--font-plex-mono`,
+  weights 400-600, cyrillic) — цифры, kbd, технические подписи.
+  В `@theme inline`: `--font-sans: var(--font-plex-sans)`, `--font-heading: var(--font-display)`,
+  `--font-mono: var(--font-plex-mono)`.
   НЕ называть переменную шрифта `--font-sans` в layout.tsx — цикл = serif-фолбэк
-  (эта ошибка уже была).
+  (эта ошибка уже была). Geist Mono запрещён: у него нет кириллического подмножества —
+  mono-текст на русском выпадал в системный фолбэк (дефект исправлен в V35).
 - Заголовки h1-h4 получают `font-heading` + `letter-spacing: -0.02em` +
   `text-wrap: balance` автоматически из `@layer base` в globals.css. Параграфы —
   `text-wrap: pretty`. `CardTitle` — div, поэтому `font-heading` прописан в нём
@@ -34,7 +42,7 @@ Inter (latin+cyrillic), recharts, sonner, next-themes.
 - Иерархия: h1 `text-3xl font-bold tracking-tight`, h2 `text-xl font-semibold`,
   подписи `text-sm text-muted-foreground`. Крупнее — только на лендинге (`text-4xl/5xl`).
 - Деньги и числа в таблицах: `tabular-nums`. Клавиши/технические подписи: `font-mono`
-  (Geist Mono, уже подключён). Денежный формат — `formatMoney` из `@/lib/labels`.
+  (IBM Plex Mono). Денежный формат — `formatMoney` из `@/lib/labels`.
 
 ## Макет и ритм
 
@@ -79,8 +87,11 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 - hex в `pipeline.ts`-сидах и `settings/page.tsx` (`useState` цвета): данные пользователя,
   `<input type=color>` принимает только hex; рендер идёт через токен-фолбэк
   (`bg-muted-foreground` + условный `style`).
-- `text-amber-700 dark:text-amber-300` поверх `bg-chart-4/20`: янтарь-текст для
-  контраста (`--chart-4` слишком светлый для текста).
+- WAIT-бейдж: текст `text-amber-800 dark:text-amber-300` поверх `bg-chart-4/20`
+  (V35 a11y-фикс: amber-700 давал 4.31:1 на подложке — ниже 4.5, гейт ловил;
+  `--chart-4` как ТЕКСТ запрещён — 2.26:1 на белом, теперь только подложка).
+  Эталон подбора текста бейджа: ≥4.5:1 на своей подложке (SUCCESS emerald-700
+  4.65, ERROR destructive 5.04, WORK primary 11.57).
 - `text-[10px]`, `w-72`, `min-h-28`, `max-h-[85vh]/[360px]`: плотность kanban/календаря
   и диалогов, не типографика (заголовки групп — строго `text-xs`).
 - CSV-экспорт: сырые числа без `formatMoney`, лейблы из `@/lib/labels.ts` (канон с ё:
@@ -135,7 +146,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (188 тестов, 26 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue/customEntityTypeLabels + общий resolveFieldValues для DEAL/COMPANY/CONTACT через makeCaller)) + Playwright E2E (20: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (188 тестов, 26 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue/customEntityTypeLabels + общий resolveFieldValues для DEAL/COMPANY/CONTACT через makeCaller)) + Playwright E2E (21: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5, кастомные поля: полный круг поле→сделка→удаление с самоочисткой). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -168,7 +179,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   SQLite-надёжность: `prisma.ts` выставляет `journal_mode=WAL` (персистентно, один раз)
   + `timeout: 5000` (busy_timeout) в адаптере. a11y: e2e-проект `a11y` (axe-core 4,
   WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета) —
-  20 e2e всего: 2 setup + 9 crm + 4 viewer + 5 a11y.
+  21 e2e всего: 2 setup + 9 crm + 1 fields + 4 viewer + 5 a11y.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
   транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
@@ -178,7 +189,15 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   живёт только в dev-графе; алерт закрыт как tolerable risk с причиной.
   vitest 5.1.0 ПРИНЯТ (интеграция с Dependabot-мёржами remote, ребейз V22-V26 поверх):
   tinypool и @vitest/mocker исчезли из дерева целиком — 2 critical устранены без
-  overrides; итог `npm audit` = 3 low, `--omit=dev` = 0. Смена пути импорта
+  overrides; исторически `npm audit` = 3 low, `--omit=dev` = 0. V35-регресс
+  18.11.2026: свежий picomatch ReDoS (CVE-2026-112366 / GHSA-fc5q-39xc-vjpf,
+  vulnerable `<= 4.0.7`, «Patched versions: None») накрыл всю glob-цепочку
+  (21 high; `--omit=dev` = 5 из-за `peerOptional` vitest у better-auth).
+  Это tolerable risk с доказательством: в `.next` нет `require("picomatch")`
+  (Next везёт свой compiled-набор), ReDoS требует attacker-controlled glob,
+  приложение их не парсит; `npm audit fix --force` предлагает откат vitest
+  на 3.1.4 — ЗАПРЕЩЁН. При выходе патча — overrides на пропатченную версию.
+  Смена пути импорта
   сгенерённого клиента Prisma: `@/generated/prisma/client` (было `@/generated/prisma`) —
   затрагивает prisma.ts, trpc.ts и всё, что импортирует типы/клиент; regen = `npx prisma generate`.
   SQLite не любит параллельные записи → `fileParallelism: false` в vitest.config.ts;
@@ -239,8 +258,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
   сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
   width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
-  при поднятой `npm run start`); далее strip цифр (188 Vitest · 20
-  Playwright · 0 serious a11y · 0 prod-уязвимостей — синхронизировать
+  при поднятой `npm run start`); далее strip цифр (188 Vitest · 21
+  Playwright · 0 serious a11y · 0 critical-уязвимостей — синхронизировать
   с README) и 2 чередующихся строки «скриншот + фактический текст»,
   блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
   подвал. (1) Метаданные в layout.tsx: metadataBase из
@@ -262,8 +281,10 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   видят контент сразу, обёрнуто в prefers-reduced-motion. (4) `BrandMark alt`:
   внутри ссылки-бренда логотип декоративен (`alt=""` в `Brand`), иначе имя
   ссылки дублируется («Corvid Corvid»). (5) Hero-анимация входа —
-  `motion-safe:animate-in` из уже установленной tw-animate-css; новых
-  анимационных зависимостей НЕ добавлять (аудит остаётся 3 low/prod 0).
+  `motion-safe:animate-in slide-in-from-bottom-3` из уже установленной
+  tw-animate-css; `fade-in`/opacity ЗАПРЕЩЁН (V35: axe снимает цвет посреди
+  анимации, бленд даёт ложный color-contrast serious — 4.03 на лендинге);
+  новых анимационных зависимостей НЕ добавлять (аудит не должен расти).
   (6) E2E-замки визитки: h1 содержит «Corvid» и строка
   «© 2026 ssrjkk · Corvid CRM» в подвале — не переименовать.
 - Ввод tRPC (V31): ЕДИНСТВЕННЫЙ источник схем ввода — `src/server/validation.ts`
@@ -315,12 +336,29 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   счета.») + НАСТОЯЩИЙ скриншот из `docs/screenshots/` (копия
   `public/screenshots/`, пересъёмка `node scripts/screenshots.mjs` при
   поднятом `npm run start`, потом снова Copy-Item в docs); (4) цифры
-  «188/20/0/0» синхронизировать с README и `src/app/page.tsx` stats;
+  «188/21/0/0 critical» синхронизировать с README и `src/app/page.tsx` stats;
   (5) команды запуска в блоке «Запуск» — только существующие скрипты
   package.json (db:seed-demo отдельной командой, «учебная сделка после
   первого запуска» — ложь, запрещена); og:image на несуществующий файл
   не ссылаться; тест переименования: если копия переживает замену бренда
   без потери смысла — это слоп, переписывать про механику.
+- Айдентика приложения = айдентика сайта (V35): layout.tsx подключает то же трио
+  через next/font (self-hosted на билде, CSP `connect-src 'self'` остаётся честным):
+  Unbounded `--font-display`, IBM Plex Sans `--font-plex-sans`, IBM Plex Mono
+  `--font-plex-mono` — ВСЕ с cyrillic-подмножеством. Палитра `:root`/`.dark`
+  в globals.css = зеркала site-палитры: бумага `oklch(0.977 0.006 90)` /
+  чернила `oklch(0.245 0.015 260)`, sidebar тёмно-чернильный в обеих темах;
+  тёмная тема — petrol как primary/ring, sidebar `oklch(0.14 0.012 260)`.
+  OG-карточка (`opengraph-image.tsx`) — inline-hex КОПИИ тёмных токенов
+  (#0D0E12/#6FB2BC/#F2F1EA/#9C9EA9 — hex-исключение, satori не видит CSS),
+  шрифт вордмарка — vendored TTF `public/fonts/unbounded-latin-600.ttf`
+  (легаси-UA трюк, OFL рядом); Manrope TTF оставлен для истории, OG больше
+  его не использует. icon.svg и corvid-logo.svg — плоский силуэт ворона
+  (бумага #F6F4EE, чернила #23252B, единственный цветовой штрих — клюв
+  #B45309); градиентные маскоты с румянцами запрещены. Число e2e = 21
+  (2 setup + 9 crm + 1 fields + 4 viewer + 5 a11y): регресс кастомных полей
+  `e2e/custom-fields.spec.ts` — самоочистка try/finally, dev.db без сирот,
+  проект `fields` в playwright.config (anchored testMatch, одна сессия setup).
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —
   раньше сьют молча полагался на данные локального dev.db (INV-0001, этапы):
   «печать счёта» падала кликом по несуществующему INV-0001, CSP-тест — отсутствием
@@ -354,7 +392,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 - [ ] `npm test` — все тесты зелёные (unit + server/роли)
 - [ ] `npm run lint` — 0 ошибок
 - [ ] `npx tsc --noEmit` — 0 ошибок типов (tsconfig не включает tests/ — их валидирует Vitest)
-- [ ] `npm audit` — уязвимости только в dev-цепочках (vitest/tinypool через peerOptional better-auth, shadcn/ts-morph в devDeps, eslint/typescript-eslint); production-бандл проверен grep'ом .next — vitest/tinypool отсутствуют
+- [ ] `npm audit` — 0 critical; известный high picomatch (CVE-2026-112366, патча нет) — только dev-цепочка vite/vitest, в `.next` нет `require("picomatch")`; новых high быть не должно
 - [ ] `npm run build` — production-сборка проходит (prerender ловит client-хуки)
 - [ ] `npm run e2e` на свежем `npm run start` (старые серверы → chunk-mismatch)
 - [ ] E2E-смоук в браузере: дашборд, воронка, счета открываются, шрифты/тема на месте

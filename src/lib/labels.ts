@@ -88,20 +88,26 @@ export const invoiceStatusLabels: Record<string, string> = {
 }
 
 // Единый источник семантики бейджей (мягкая заливка + текст того же тона).
+// Текст подобран по WCAG-контрасту 4.5:1+ на своей подложке (axe-core гейт):
+// emerald-700 = 4.65 на emerald-500/15 (600 давал 3.16 — ловилось a11y-гейтом
+// как гонка загрузки), amber-800 = 6.08 на chart-4/20. Тёмные варианты на
+// dark-подложках и так >6:1 — не тронуты.
 // className === "" означает нейтральный статус → рендерить <Badge variant="secondary">.
 export const SOFT_SUCCESS_BADGE =
-  "border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+  "border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
 export const SOFT_ERROR_BADGE = "border-transparent bg-destructive/15 text-destructive"
 export const SOFT_WORK_BADGE = "border-transparent bg-primary/15 text-primary"
 export const SOFT_WAIT_BADGE =
-  "border-transparent bg-chart-4/20 text-amber-700 dark:text-amber-300"
+  "border-transparent bg-chart-4/20 text-amber-800 dark:text-amber-300"
 
 export type BadgeSpec = { label: string; className: string }
 
 // Тон приоритета задачи (текст, не бейдж): срочное — destructive, высокое — янтарь.
+// HIGH: text-chart-4 читался на белой карточке 2.26:1 (FAIL) — янтарь-палитра
+// даёт 5.03 (light) / 12.02 (dark), тот же ход, что у WAIT-бейджа.
 export function priorityToneClass(priority: string): string {
   if (priority === "URGENT") return "text-destructive"
-  if (priority === "HIGH") return "text-chart-4"
+  if (priority === "HIGH") return "text-amber-700 dark:text-amber-300"
   return "text-muted-foreground"
 }
 

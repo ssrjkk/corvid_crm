@@ -3,16 +3,17 @@ import path from "node:path"
 import { ImageResponse } from "next/og"
 
 /**
- * OG-визитка (V30 «Визитка»): бренд-карточка для соцсетей и мессенджеров.
- * Рендерится next/og (satori) в статический /opengraph-image на билде.
- * Шрифт — брендовый Manrope 800 в формате TTF (vendored в public/fonts,
- * OFL-лицензия рядом): fontkit в рантайме next/og не читает woff2
+ * OG-визитка (V30, перекрашена в V35 под айдентику «ворон на бумаге»):
+ * бренд-карточка для соцсетей и мессенджеров. Рендерится next/og (satori)
+ * в статический /opengraph-image на билде. Шрифт — брендовый Unbounded 600
+ * (тот же, что в лендинге и docs/index.html), TTF vendored в public/fonts,
+ * OFL-лицензия рядом: fontkit в рантайме next/og не читает woff2
  * («Unsupported OpenType signature wOF2»), TTF отдаёт CSS API Google Fonts
- * по легаси User-Agent. Точные копии токенов тёмной темы:
- *   --background oklch(0.155 0.008 285) = #0C0C10
- *   --primary    oklch(0.67 0.17 285)  = #8D82F8
- *   --foreground oklch(0.96 0.005 285) = #F1F1F5
- *   --muted-foreground oklch(0.7 0.015 285) = #9D9DA8
+ * по легаси User-Agent (Android 2.2). Точные копии токенов тёмной темы:
+ *   --background oklch(0.16 0.01 260)  = #0D0E12
+ *   --primary    oklch(0.74 0.075 210) = #6FB2BC
+ *   --foreground oklch(0.955 0.006 90) = #F2F1EA
+ *   --muted-foreground oklch(0.7 0.014 260) = #9C9EA9
  * Текст — только латиница: русские заголовки отдаёт og:title из metadata,
  * это обычный HTML.
  */
@@ -21,8 +22,8 @@ export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
 export default async function OpengraphImage() {
-  const manrope = await readFile(
-    path.join(process.cwd(), "public", "fonts", "manrope-latin-800.ttf")
+  const unbounded = await readFile(
+    path.join(process.cwd(), "public", "fonts", "unbounded-latin-600.ttf")
   )
 
   return new ImageResponse(
@@ -36,7 +37,7 @@ export default async function OpengraphImage() {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          background: "#0C0C10",
+          background: "#0D0E12",
           overflow: "hidden",
         }}
       >
@@ -48,7 +49,7 @@ export default async function OpengraphImage() {
             height: 900,
             top: -560,
             borderRadius: 9999,
-            background: "rgba(141,130,248,0.07)",
+            background: "rgba(111,178,188,0.07)",
             display: "flex",
           }}
         />
@@ -59,7 +60,7 @@ export default async function OpengraphImage() {
             height: 520,
             top: -370,
             borderRadius: 9999,
-            background: "rgba(141,130,248,0.09)",
+            background: "rgba(111,178,188,0.09)",
             display: "flex",
           }}
         />
@@ -70,7 +71,7 @@ export default async function OpengraphImage() {
             height: 300,
             top: -250,
             borderRadius: 9999,
-            background: "rgba(141,130,248,0.13)",
+            background: "rgba(111,178,188,0.13)",
             display: "flex",
           }}
         />
@@ -87,18 +88,18 @@ export default async function OpengraphImage() {
               width: 84,
               height: 6,
               borderRadius: 9999,
-              background: "#8D82F8",
+              background: "#6FB2BC",
               marginBottom: 44,
               display: "flex",
             }}
           />
           <div
             style={{
-              fontFamily: "Manrope",
-              fontWeight: 800,
-              fontSize: 176,
-              letterSpacing: -6,
-              color: "#F1F1F5",
+              fontFamily: "Unbounded",
+              fontWeight: 600,
+              fontSize: 168,
+              letterSpacing: -4,
+              color: "#F2F1EA",
               display: "flex",
             }}
           >
@@ -106,12 +107,12 @@ export default async function OpengraphImage() {
           </div>
           <div
             style={{
-              fontFamily: "Manrope",
-              fontWeight: 800,
-              marginTop: 30,
-              fontSize: 30,
-              letterSpacing: 14,
-              color: "#9D9DA8",
+              fontFamily: "Unbounded",
+              fontWeight: 600,
+              marginTop: 34,
+              fontSize: 27,
+              letterSpacing: 12,
+              color: "#9C9EA9",
               display: "flex",
             }}
           >
@@ -127,11 +128,11 @@ export default async function OpengraphImage() {
             right: 64,
             display: "flex",
             justifyContent: "space-between",
-            fontFamily: "Manrope",
-            fontWeight: 800,
-            fontSize: 24,
+            fontFamily: "Unbounded",
+            fontWeight: 600,
+            fontSize: 22,
             letterSpacing: 3,
-            color: "#9D9DA8",
+            color: "#9C9EA9",
           }}
         >
           <div style={{ display: "flex" }}>CORVID CRM</div>
@@ -141,7 +142,7 @@ export default async function OpengraphImage() {
     ),
     {
       ...size,
-      fonts: [{ name: "Manrope", data: manrope, weight: 800, style: "normal" }],
+      fonts: [{ name: "Unbounded", data: unbounded, weight: 600, style: "normal" }],
     }
   )
 }

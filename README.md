@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-188%20vitest%20%2B%2020%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-188%20vitest%20%2B%2021%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -58,13 +58,13 @@ npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvi
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 188 vitest + 20 e2e, всё зелёное
+## Качество: 188 vitest + 21 e2e, всё зелёное
 
 ```bash
 npm test        # Vitest: 188 тестов — вся чистая логика + ВСЕ 12 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31), кастомные поля сделок (V32) и компаний/контактов (V33: общий resolver, FK-каскад, полная замена)
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright (20): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, read-only матрица VIEWER
+npm run e2e     # Playwright (21): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, кастомные поля (полный круг), read-only матрица VIEWER
 npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах
 ```
 
@@ -107,7 +107,7 @@ Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · Type
 - **Секрет**: без `BETTER_AUTH_SECRET` в production процесс падает при старте (fail-closed), поддельные сессии невозможны.
 - **CSV**: инъекции формул (`= + - @ Tab CR`, CWE-1236) нейтрализуются префиксом `'`; импорт ограничен 5 МБ.
 - **Русский интерфейс ошибок**: локаль zod (русская), читаемое сообщение вместо JSON от tRPC, маппинг кодов better-auth — сырые английские тексты до пользователя не доходят (проверено e2e).
-- **Аудит зависимостей**: продакшен-дерево `dependencies` без известных уязвимостей (см. SKILL.md про dev-цепочки).
+- **Аудит зависимостей**: 0 critical. По состоянию на 18.11.2026 открыт один high без патча — picomatch ≤ 4.0.7 ([CVE-2026-112366](https://github.com/advisories/GHSA-fc5q-39xc-vjpf), «Patched versions: None»). Он живёт в dev-цепочке vite/vitest (в отчёте `--omit=dev` всплывает через `peerOptional` better-auth) и не попадает в рантайм: в собранном `.next` нет ни одного `require("picomatch")`, а ReDoS требует attacker-controlled glob — приложение такие шаблоны не парсит. Как только выйдет пропатченная версия, `overrides`/обновление закрывает алерт; до тех пор это документированный tolerable risk, а не «0 уязвимостей».
 
 ## Деплой
 
