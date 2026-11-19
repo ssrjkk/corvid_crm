@@ -14,8 +14,8 @@ import { Brand, BrandMark } from "@/components/layout/brand"
  */
 
 const stats = [
-  { value: "188", label: "тестов Vitest" },
-  { value: "21", label: "сценариев Playwright" },
+  { value: "200", label: "тестов Vitest" },
+  { value: "22", label: "сценариев Playwright" },
   { value: "0", label: "serious a11y-нарушений (axe-core)" },
   { value: "0", label: "critical-уязвимостей (npm audit)" },
 ] // Синхронизировать с README.md при изменении количества тестов.

@@ -11,6 +11,7 @@ import { analyticsRouter } from "./analytics"
 import { usersRouter } from "./users"
 import { invoicesRouter } from "./invoices"
 import { customFieldsRouter } from "./custom-fields"
+import { presetsRouter } from "./presets"
 
 export const appRouter = router({
   deals: dealsRouter,
@@ -24,6 +25,7 @@ export const appRouter = router({
   users: usersRouter,
   invoices: invoicesRouter,
   customFields: customFieldsRouter,
+  presets: presetsRouter,
 })
 
 export type AppRouter = typeof appRouter

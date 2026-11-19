@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-188%20vitest%20%2B%2021%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-200%20vitest%20%2B%2022%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -17,7 +17,7 @@
 
 ---
 
-Тёмная «чернильная» база + один фиолетовый акцент (отлив воронова пера), типографика Manrope + Inter с кириллицей, светлая и тёмная темы из oklch-токенов. Сдержанность уровня Linear — ноль каруселей и градиентных баннеров.
+Тёплая «бумажная» база + чернильный текст и один petrol-акцент (отлив воронова пера), типографика Unbounded + IBM Plex Sans/Mono с кириллицей, светлая и тёмная темы из oklch-токенов. Сдержанность уровня Linear — ноль каруселей и градиентных баннеров.
 
 ## Что умеет
 
@@ -32,7 +32,7 @@
 | 📅 **Календарь** | задачи и дедлайны проектов по месяцам |
 | 📁 **Проекты** | привязка к сделке 1:1 (уровень БД), статусы |
 | 💬 **Активности** | звонки, письма, встречи, заметки — по сделкам, контактам, компаниям |
-| ⚙️ **Настройки** | этапы воронки: названия, цвета, порядок drag-and-drop |
+| ⚙️ **Настройки** | шаблоны бизнеса (этапы + поля в один клик), этапы воронки, кастомные поля |
 | 🔎 **⌘K** | командная палитра: навигация + глобальный поиск по сделкам, контактам, счетам |
 | 🌓 **Темы** | светлая и тёмная из oklch-токенов, переключатель в сайдбаре |
 | 👤 **Роли** | ADMIN / MANAGER / VIEWER — зритель только читает (проверено матрицей тестов) |
@@ -58,13 +58,13 @@ npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvi
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 188 vitest + 21 e2e, всё зелёное
+## Качество: 200 vitest + 22 e2e, всё зелёное
 
 ```bash
-npm test        # Vitest: 188 тестов — вся чистая логика + ВСЕ 12 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31), кастомные поля сделок (V32) и компаний/контактов (V33: общий resolver, FK-каскад, полная замена)
+npm test        # Vitest: 200 тестов — вся чистая логика + ВСЕ 13 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31), кастомные поля сделок (V32) и компаний/контактов (V33: общий resolver, FK-каскад, полная замена), шаблоны бизнеса (V36: роли, идемпотентность, порядок, ноль фейковых сущностей)
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright (21): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, кастомные поля (полный круг), read-only матрица VIEWER
+npm run e2e     # Playwright (22): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, кастомные поля (полный круг), read-only матрица VIEWER, a11y настроек
 npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах
 ```
 

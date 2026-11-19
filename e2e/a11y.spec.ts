@@ -52,4 +52,12 @@ test.describe("a11y: авторизованная зона", () => {
     await expect(page.getByRole("heading", { name: "Счета" })).toBeVisible()
     expect(await seriousViolations(page)).toEqual([])
   })
+
+  test("настройки без serious/critical нарушений", async ({ page }) => {
+    await page.goto("/settings")
+    await expect(page.getByRole("heading", { name: "Настройки" })).toBeVisible()
+    // Карточка пресетов (V36) — заодно проверяет подпись Select и контраст.
+    await expect(page.getByText("Шаблон бизнеса")).toBeVisible()
+    expect(await seriousViolations(page)).toEqual([])
+  })
 })

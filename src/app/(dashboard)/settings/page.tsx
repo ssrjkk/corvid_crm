@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { customEntityTypeLabels, customFieldTypeLabels, fieldOptions } from "@/lib/custom-fields"
+import { businessPresets } from "@/lib/business-presets"
 import type { CustomEntityType, CustomFieldType } from "@/generated/prisma/client"
 import { usePermissions } from "@/lib/use-permissions"
 
@@ -141,6 +142,37 @@ export default function SettingsPage() {
     onError: (error) => toast.error(error.message),
   })
 
+  // ===== Шаблоны бизнеса (V36) =====
+  // Пресет — чистые определения из @/lib/business-presets; сервер применяет
+  // их аддитивно и идемпотентно. UI-гейт тот же, что у adminProcedure.
+  const [presetId, setPresetId] = useState<string | null>(null)
+  const selectedPreset = businessPresets.find((preset) => preset.id === presetId)
+
+  const applyPreset = trpc.presets.applyPreset.useMutation({
+    onSuccess: (result) => {
+      utils.pipeline.getStages.invalidate()
+      utils.deals.getAll.invalidate()
+      utils.customFields.getAll.invalidate()
+      utils.deals.getById.invalidate()
+      utils.companies.getById.invalidate()
+      utils.contacts.getById.invalidate()
+
+      const added = result.stagesCreated + result.fieldsCreated
+      const skipped = result.stagesSkipped + result.fieldsSkipped
+      if (added === 0) {
+        toast.success("Шаблон уже применён — новых этапов и полей нет")
+        return
+      }
+      const message = `Добавлено: этапов ${result.stagesCreated}, полей ${result.fieldsCreated}`
+      if (skipped > 0) {
+        toast.success(message, { description: `${skipped} уже было — не тронуто` })
+      } else {
+        toast.success(message)
+      }
+    },
+    onError: (error) => toast.error(error.message),
+  })
+
   const moveField = (index: number, direction: -1 | 1) => {
     const next = index + direction
     if (next < 0 || next >= fields.length) return
@@ -173,8 +205,87 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Настройки</h1>
-        <p className="text-muted-foreground">Этапы воронки продаж и поля сделок</p>
+        <p className="text-muted-foreground">Этапы воронки, поля и шаблоны бизнеса</p>
       </div>
+
+      {canDelete && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Шаблон бизнеса</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Готовый набор этапов и полей под отрасль. Применяется поверх текущих
+              настроек: одноимённые этапы и поля пропускаются, ничего не удаляется и не
+              переименовывается.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,20rem)_1fr]">
+              <div className="grid content-start gap-2">
+                <Label htmlFor="business-preset">Отрасль</Label>
+                <Select
+                  value={presetId}
+                  onValueChange={(next: string | null) => setPresetId(next)}
+                  items={Object.fromEntries(
+                    businessPresets.map((preset) => [preset.id, preset.name])
+                  )}
+                >
+                  <SelectTrigger id="business-preset" className="w-full">
+                    <SelectValue placeholder="Выберите шаблон" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {businessPresets.map((preset) => (
+                      <SelectItem key={preset.id} value={preset.id}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="rounded-lg border bg-muted/30 p-3 text-sm">
+                {selectedPreset ? (
+                  <div className="space-y-3">
+                    <p>{selectedPreset.tagline}</p>
+                    <div>
+                      <p className="text-xs tracking-wider text-muted-foreground uppercase">
+                        Этапы
+                      </p>
+                      <p>{selectedPreset.stages.map((stage) => stage.name).join(" → ")}</p>
+                    </div>
+                    {selectedPreset.fields.length > 0 && (
+                      <div>
+                        <p className="text-xs tracking-wider text-muted-foreground uppercase">
+                          Поля
+                        </p>
+                        <p>
+                          {selectedPreset.fields
+                            .map(
+                              (field) =>
+                                `${customEntityTypeLabels[field.entityType]}: ${field.label} (${customFieldTypeLabels[field.type]})`
+                            )
+                            .join(" · ")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Выберите отрасль — покажу этапы и поля, которые добавятся.
+                    Существующие останутся как есть.
+                  </p>
+                )}
+              </div>
+            </div>
+            <Button
+              type="button"
+              disabled={!presetId || applyPreset.isPending}
+              onClick={() => presetId && applyPreset.mutate({ presetId })}
+            >
+              {applyPreset.isPending ? "Применяю…" : "Применить шаблон"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {canDelete && (
         <Card>
@@ -343,13 +454,13 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Тип</Label>
+                  <Label htmlFor="field-type">Тип</Label>
                   <Select
                     value={newFieldType}
                     onValueChange={(next: string) => setNewFieldType(next as CustomFieldType)}
                     items={{ TEXT: "Текст", NUMBER: "Число", DATE: "Дата", SELECT: "Список" }}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger id="field-type" className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

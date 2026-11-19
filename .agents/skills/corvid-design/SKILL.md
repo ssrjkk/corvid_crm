@@ -84,7 +84,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Принятые исключения (не «чинить», зафиксировано)
 
-- hex в `pipeline.ts`-сидах и `settings/page.tsx` (`useState` цвета): данные пользователя,
+- hex в `pipeline.ts`-сидах, `business-presets.ts` (цвета этапов пресетов) и
+  `settings/page.tsx` (`useState` цвета): данные пользователя,
   `<input type=color>` принимает только hex; рендер идёт через токен-фолбэк
   (`bg-muted-foreground` + условный `style`).
 - WAIT-бейдж: текст `text-amber-800 dark:text-amber-300` поверх `bg-chart-4/20`
@@ -146,7 +147,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 
 ## Тестирование (обязательно перед сдачей)
 
-Проект покрыт Vitest (188 тестов, 26 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue/customEntityTypeLabels + общий resolveFieldValues для DEAL/COMPANY/CONTACT через makeCaller)) + Playwright E2E (21: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×5, кастомные поля: полный круг поле→сделка→удаление с самоочисткой). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
+Проект покрыт Vitest (200 тестов, 28 файлов: labels/formatMoney/formatDate/formatCompactMoney/cn + маппинги бейджей/приоритета + рендер StatusBadge + CSV-экспорт/инъекции/импорт (importCsvRows) + fail-closed секрет + NaN-guard + матрица прав permissionsFor + русские сообщения ошибок (zod-локаль, trpcToastMessage, ruAuthError) + money-арифметика (roundMoney/lineTotal/invoiceTotal) + валюты (CURRENCY_CODE/sumByCurrency + нормализация в роутерах) + генерация номера счёта (formatInvoiceNumber/isUniqueViolation/createInvoiceWithNumber) + сводка дашборда analytics.getSummary + ротация бэкапов db-backup + схемы ввода validation.ts (юнит + интеграция через makeCaller) + кастомные поля (normalizeFieldValue/fieldOptions/formatCustomValue/customEntityTypeLabels + общий resolveFieldValues для DEAL/COMPANY/CONTACT через makeCaller + шаблоны бизнеса (V36: целостность определений + серверное применение — роли, идемпотентность, порядок, ноль фейка)) + Playwright E2E (22: setup-логины админ+viewer, лендинг, 307-защита, неверный пароль→русский тост, security-заголовки + CSP-гидрация, OG-мета и robots.txt визитки, счета, печать, read-only матрица VIEWER, a11y-аудит axe-core ×6, кастомные поля: полный круг поле→сделка→удаление с самоочисткой). Запуск: `npm test`, `npm run test:watch`, `npm run e2e` (нужен запущенный `npm run start` на :3000; демо: `npm run db:seed-demo` — админ + зритель, оба Test12345!), отдельный a11y-проект: `npx playwright test --project=a11y`. E2E включает print-медиа тест (при emulateMedia(print) aside скрыт), security-заголовки тест (X-Frame-Options/nosniff/Referrer-Policy/Permissions-Policy/CSP из next.config headers()) и CSP-детектор (нарушения CSP → ошибки консоли → тест падает). Конфиг: проекты `setup`/`setup-viewer` (по одному логину, storage → gitignored `e2e/.auth*.json`) + проекты `crm`/`viewer`/`a11y` с зависимостями, `retries: 1` как страховка; в CI webServer поднимает сервер сам (`CI=true`). Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in* за 10 секунд (после перехода на 2 логина сьют идёт 20/20 за ~20с). Грабли: `testMatch` анкеровать `/…/auth\.setup\.ts$/` — без якоря `auth\.setup\.ts` совпадает и с `viewer-auth.setup.ts` (общий хвост), проекты задваивают логины и ловят 429.
 
 - `tests/unit/` — чистая логика: `formatMoney`, `formatDate`, `cn` (tailwind-merge),
   `error-messages.test.ts` (русские тосты: zod-локаль + trpcToastMessage + ruAuthError).
@@ -178,8 +179,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   `app/global-error.tsx` (краш root-layout, свой <html>), `app/not-found.tsx` (404).
   SQLite-надёжность: `prisma.ts` выставляет `journal_mode=WAL` (персистентно, один раз)
   + `timeout: 5000` (busy_timeout) в адаптере. a11y: e2e-проект `a11y` (axe-core 4,
-  WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета) —
-  21 e2e всего: 2 setup + 9 crm + 1 fields + 4 viewer + 5 a11y.
+  WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета, настройки) —
+  22 e2e всего: 2 setup + 9 crm + 1 fields + 4 viewer + 6 a11y.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
   транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
@@ -258,7 +259,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
   сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
   width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
-  при поднятой `npm run start`); далее strip цифр (188 Vitest · 21
+  при поднятой `npm run start`); далее strip цифр (200 Vitest · 21
   Playwright · 0 serious a11y · 0 critical-уязвимостей — синхронизировать
   с README) и 2 чередующихся строки «скриншот + фактический текст»,
   блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
@@ -287,6 +288,23 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   новых анимационных зависимостей НЕ добавлять (аудит не должен расти).
   (6) E2E-замки визитки: h1 содержит «Corvid» и строка
   «© 2026 ssrjkk · Corvid CRM» в подвале — не переименовать.
+- Пресеты бизнеса (V36 «Любой бизнес»): один клик в Настройках превращает
+  установку в рабочий процесс отрасли. (1) определения — ТОЛЬКО чистый
+  `src/lib/business-presets.ts` (id/name/tagline/stages/fields), его импортируют
+  и клиент для превью, и сервер для записи; (2) сервер `presets.applyPreset`
+  (adminProcedure) работает в транзакции и АДДИТИВНО: этапы пропускаются по
+  имени, поля — по `[entityType,label]`, новые продолжают максимальный `order`,
+  ничего не переименовывается/не удаляется; повторное применение = 0 created
+  (идемпотентность); (3) НОЛЬ ФЕЙКА: создаются только определения, ни одной
+  выдуманной сделки/компании/контакта; (4) UI-гейт `canDelete` совпадает с
+  adminProcedure, превью показывает этапы и поля выбранного шаблона, кнопка
+  заблокирована без выбора; (5) ГРАБЛЯ tRPC: ключ роутера `apply` запрещён
+  (`Reserved words used in router({}) call`) — процедура называется
+  `applyPreset`; (6) тесты: `tests/unit/business-presets.test.ts` (уникальные
+  id/имена/лейблы, hex, SELECT-варианты) + `tests/server/presets.test.ts`
+  (ADMIN-only, идемпотентность, сохранение существующих, порядок, 0 фейка).
+  Новый пресет = запись в массиве + прогон этих тестов; схемные миграции не
+  нужны, таблицы переиспользуются (PipelineStage/CustomField).
 - Ввод tRPC (V31): ЕДИНСТВЕННЫЙ источник схем ввода — `src/server/validation.ts`
   (`LIMITS`, `moneySchema`, `titleSchema` = `requiredText("название")`,
   `requiredText(label, max?)`, `optionalText/optionalNullableText`,
@@ -336,7 +354,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   счета.») + НАСТОЯЩИЙ скриншот из `docs/screenshots/` (копия
   `public/screenshots/`, пересъёмка `node scripts/screenshots.mjs` при
   поднятом `npm run start`, потом снова Copy-Item в docs); (4) цифры
-  «188/21/0/0 critical» синхронизировать с README и `src/app/page.tsx` stats;
+  «200/22/0/0 critical» синхронизировать с README и `src/app/page.tsx` stats;
   (5) команды запуска в блоке «Запуск» — только существующие скрипты
   package.json (db:seed-demo отдельной командой, «учебная сделка после
   первого запуска» — ложь, запрещена); og:image на несуществующий файл
@@ -356,7 +374,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   его не использует. icon.svg и corvid-logo.svg — плоский силуэт ворона
   (бумага #F6F4EE, чернила #23252B, единственный цветовой штрих — клюв
   #B45309); градиентные маскоты с румянцами запрещены. Число e2e = 21
-  (2 setup + 9 crm + 1 fields + 4 viewer + 5 a11y): регресс кастомных полей
+  (2 setup + 9 crm + 1 fields + 4 viewer + 6 a11y): регресс кастомных полей
   `e2e/custom-fields.spec.ts` — самоочистка try/finally, dev.db без сирот,
   проект `fields` в playwright.config (anchored testMatch, одна сессия setup).
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —

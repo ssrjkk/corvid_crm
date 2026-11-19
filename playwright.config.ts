@@ -4,12 +4,17 @@ import { defineConfig } from "@playwright/test"
  * E2E-тесты гоняются против ЗАПУЩЕННОГО сервера (npm run start на :3000)
  * и реального dev.db. Демо-аккаунт: test@corvid.dev / Test12345!.
  *
+ * Порт можно переопределить E2E_PORT (локально :3000 бывает занят другим
+ * проектом) — сервер тогда поднимается на том же порту, что и baseURL.
+ *
  * Проект setup: один логин на весь сьют → e2e/.auth.json (gitignored).
  * Причина: дефолтный rate-limit better-auth — max 3 запроса к /sign-in*
  * за 10 секунд; 4 отдельных логина в пачке упирались в 429 (доказано:
  * 5 быстрых POST → 403,403,403,429,429). retries: 1 оставлен как страховка
  * от настоящего окруженческого флейка.
  */
+const e2ePort = Number(process.env.E2E_PORT ?? 3000)
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
@@ -20,8 +25,8 @@ export default defineConfig({
   ...(process.env.CI
     ? {
         webServer: {
-          command: "npm run start",
-          port: 3000,
+          command: `npm run start -- -p ${e2ePort}`,
+          port: e2ePort,
           timeout: 120_000,
           reuseExistingServer: false,
         },
@@ -76,7 +81,7 @@ export default defineConfig({
     },
   ],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: `http://localhost:${e2ePort}`,
     headless: true,
   },
 })

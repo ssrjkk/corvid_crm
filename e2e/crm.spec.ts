@@ -25,7 +25,7 @@ test.describe("Публичные страницы и гость", () => {
   })
 
   test("security-заголовки отдаются сервером (регресс V22)", async ({ request }) => {
-    const res = await request.get("http://localhost:3000/")
+    const res = await request.get("/")
     expect(res.headers()["x-frame-options"]).toBe("DENY")
     expect(res.headers()["x-content-type-options"]).toBe("nosniff")
     expect(res.headers()["referrer-policy"]).toBe("strict-origin-when-cross-origin")
@@ -34,19 +34,19 @@ test.describe("Публичные страницы и гость", () => {
   })
 
   test("визитка: OG-мета и robots.txt отдаются (регресс V30)", async ({ request }) => {
-    const home = await request.get("http://localhost:3000/")
+    const home = await request.get("/")
     const html = await home.text()
     expect(html).toContain('property="og:title"')
     expect(html).toContain('property="og:image"')
     expect(html).toContain('name="twitter:card"')
 
     // OG-изображение рендерится next/og в статический маршрут.
-    const og = await request.get("http://localhost:3000/opengraph-image")
+    const og = await request.get("/opengraph-image")
     expect(og.status()).toBe(200)
     expect(og.headers()["content-type"]).toContain("image/png")
 
     // Приватная зона закрыта от индексации, лендинг открыт.
-    const robots = await request.get("http://localhost:3000/robots.txt")
+    const robots = await request.get("/robots.txt")
     expect(robots.status()).toBe(200)
     const robotsText = await robots.text()
     expect(robotsText).toContain("Disallow: /dashboard")
