@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import { CustomEntityType, CustomFieldType } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { fieldOptions } from "@/lib/custom-fields"
@@ -23,7 +24,10 @@ export type CustomFieldDef = {
 /**
  * Нормализует значение по типу поля. Пустая/пробельная строка → "" (поле
  * не заполнено, вызывающий код пропускает/удаляет значение).
- * Бросает Error с русским сообщением — его отдаёт errorFormatter (V25).
+ *
+ * V38: ожидаемые ошибки бросаются TRPCError(BAD_REQUEST), а не plain Error —
+ * иначе errorFormatter прячет русский текст за «Внутренняя ошибка сервера»
+ * и пользователь не понимает, что именно не так в форме.
  */
 export function normalizeFieldValue(field: CustomFieldDef, raw: string): string {
   const value = raw.trim()
@@ -37,17 +41,17 @@ export function normalizeFieldValue(field: CustomFieldDef, raw: string): string 
       // Удобство ru-ввода: запятая и пробелы-разделители («64,5», «1 200»).
       const parsed = Number(value.replace(/\s+/g, "").replace(",", "."))
       if (!Number.isFinite(parsed)) {
-        throw new Error("Введите число (например, 64,5)")
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Введите число (например, 64,5)" })
       }
       if (Math.abs(parsed) > MAX_NUMBER) {
-        throw new Error("Слишком большое число")
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Слишком большое число" })
       }
       return String(parsed)
     }
 
     case "DATE": {
       if (Number.isNaN(new Date(value).getTime())) {
-        throw new Error("Некорректная дата")
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Некорректная дата" })
       }
       // Храним как ввёл пользователь («2026-11-17») — без сдвига часовых поясов.
       return value
@@ -56,7 +60,7 @@ export function normalizeFieldValue(field: CustomFieldDef, raw: string): string 
     case "SELECT": {
       const options = field.options ?? []
       if (!options.includes(value)) {
-        throw new Error("Выберите вариант из списка")
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Выберите вариант из списка" })
       }
       return value
     }
@@ -79,7 +83,7 @@ export async function resolveFieldValues(
     where: { id: { in: ids }, entityType },
   })
   if (defs.length !== ids.length) {
-    throw new Error("Неизвестное поле — обновите страницу")
+    throw new TRPCError({ code: "BAD_REQUEST", message: "Неизвестное поле — обновите страницу" })
   }
   const rows: { fieldId: string; value: string }[] = []
   for (const f of filled) {

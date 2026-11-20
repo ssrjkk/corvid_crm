@@ -107,7 +107,7 @@ Next.js 16 (App Router, Cache Components, Partial Prerender) · React 19 · Type
 - **Секрет**: без `BETTER_AUTH_SECRET` в production процесс падает при старте (fail-closed), поддельные сессии невозможны.
 - **CSV**: инъекции формул (`= + - @ Tab CR`, CWE-1236) нейтрализуются префиксом `'`; импорт ограничен 5 МБ.
 - **Русский интерфейс ошибок**: локаль zod (русская), читаемое сообщение вместо JSON от tRPC, маппинг кодов better-auth — сырые английские тексты до пользователя не доходят (проверено e2e).
-- **Аудит зависимостей**: 0 critical. По состоянию на 18.11.2026 открыт один high без патча — picomatch ≤ 4.0.7 ([CVE-2026-112366](https://github.com/advisories/GHSA-fc5q-39xc-vjpf), «Patched versions: None»). Он живёт в dev-цепочке vite/vitest (в отчёте `--omit=dev` всплывает через `peerOptional` better-auth) и не попадает в рантайм: в собранном `.next` нет ни одного `require("picomatch")`, а ReDoS требует attacker-controlled glob — приложение такие шаблоны не парсит. Как только выйдет пропатченная версия, `overrides`/обновление закрывает алерт; до тех пор это документированный tolerable risk, а не «0 уязвимостей».
+- **Аудит зависимостей**: 0 уязвимостей — и `npm audit`, и `npm audit --omit=dev` (проверено 19.11.2026). Прежний high по picomatch (CVE-2026-112366) оказался ложным: 18.11.2026 совет отозван как «not a security issue», алерт снят реестром без изменения зависимостей. Откат vitest через `npm audit fix --force` не нужен и запрещён.
 
 ## Деплой
 

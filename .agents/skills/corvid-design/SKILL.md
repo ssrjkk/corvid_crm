@@ -190,14 +190,12 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   живёт только в dev-графе; алерт закрыт как tolerable risk с причиной.
   vitest 5.1.0 ПРИНЯТ (интеграция с Dependabot-мёржами remote, ребейз V22-V26 поверх):
   tinypool и @vitest/mocker исчезли из дерева целиком — 2 critical устранены без
-  overrides; исторически `npm audit` = 3 low, `--omit=dev` = 0. V35-регресс
-  18.11.2026: свежий picomatch ReDoS (CVE-2026-112366 / GHSA-fc5q-39xc-vjpf,
-  vulnerable `<= 4.0.7`, «Patched versions: None») накрыл всю glob-цепочку
-  (21 high; `--omit=dev` = 5 из-за `peerOptional` vitest у better-auth).
-  Это tolerable risk с доказательством: в `.next` нет `require("picomatch")`
-  (Next везёт свой compiled-набор), ReDoS требует attacker-controlled glob,
-  приложение их не парсит; `npm audit fix --force` предлагает откат vitest
-  на 3.1.4 — ЗАПРЕЩЁН. При выходе патча — overrides на пропатченную версию.
+  overrides; исторически `npm audit` = 3 low, `--omit=dev` = 0. 18.11.2026
+  picomatch ReDoS (CVE-2026-112366 / GHSA-fc5q-39xc-vjpf) накрыл всю glob-цепочку
+  (21 high), но в тот же день совет ОТОЗВАН как «not a security issue»;
+  19.11.2026 `npm audit` и `--omit=dev` = 0 уязвимостей без изменения зависимостей.
+  Урок: перед «tolerable risk» сверять статус advisory (Withdrawn) и не откатывать
+  vitest через `npm audit fix --force` ради уже снятого алерта.
   Смена пути импорта
   сгенерённого клиента Prisma: `@/generated/prisma/client` (было `@/generated/prisma`) —
   затрагивает prisma.ts, trpc.ts и всё, что импортирует типы/клиент; regen = `npx prisma generate`.
@@ -259,8 +257,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   скриншоты приложения в `public/screenshots` (воронка/счёт/дашборд,
   сняты с демо-данных, dsf=2 2880px, next/image `unoptimized` + реальные
   width/height против CLS; пересъёмка: `node scripts/screenshots.mjs`
-  при поднятой `npm run start`); далее strip цифр (200 Vitest · 21
-  Playwright · 0 serious a11y · 0 critical-уязвимостей — синхронизировать
+  при поднятой `npm run start`); далее strip цифр (200 Vitest · 22
+  Playwright · 0 serious a11y · 0 уязвимостей — синхронизировать
   с README) и 2 чередующихся строки «скриншот + фактический текст»,
   блок «Инженерия» списком без карточек/иконок, финальный CTA, плотный
   подвал. (1) Метаданные в layout.tsx: metadataBase из
@@ -305,6 +303,20 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   (ADMIN-only, идемпотентность, сохранение существующих, порядок, 0 фейка).
   Новый пресет = запись в массиве + прогон этих тестов; схемные миграции не
   нужны, таблицы переиспользуются (PipelineStage/CustomField).
+- Первый запуск воронки (V37 «Без сюрпризов»): `pipeline/page.tsx` НЕ вызывает
+  `initDefault` автоматически на монтировании (раньше MANAGER/VIEWER получали
+  FORBIDDEN-тост при каждом заходе, а выбранный шаблон потом дублировал этапы).
+  Пустая воронка показывает карточку «Этапы ещё не заданы»: админу — кнопки
+  «Выбрать шаблон» (ведёт в Настройки) и «Создать базовые этапы» (initDefault,
+  тосты успеха/ошибки), остальным — «Попросите администратора…» без мёртвых
+  кнопок. Гейт — `canDelete` (совпадает с adminProcedure).
+- Ожидаемые ошибки ≠ INTERNAL (V38): бизнес-ошибки бросаются `TRPCError` с
+  кодом — BAD_REQUEST (значение кастомного поля, неизвестный fieldId, пустой
+  SELECT), CONFLICT (дубликат названия поля/этапа, этап со сделками),
+  NOT_FOUND (устаревшая вкладка: поле/этап уже удалён). Plain Error оставляем
+  только для неожиданных сбоев: errorFormatter превращает его в общий
+  «Внутренняя ошибка сервера» и прячет причину в лог. Тесты проверяют и код,
+  и что `trpcToastMessage` отдаёт русский текст как есть.
 - Ввод tRPC (V31): ЕДИНСТВЕННЫЙ источник схем ввода — `src/server/validation.ts`
   (`LIMITS`, `moneySchema`, `titleSchema` = `requiredText("название")`,
   `requiredText(label, max?)`, `optionalText/optionalNullableText`,
@@ -354,7 +366,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   счета.») + НАСТОЯЩИЙ скриншот из `docs/screenshots/` (копия
   `public/screenshots/`, пересъёмка `node scripts/screenshots.mjs` при
   поднятом `npm run start`, потом снова Copy-Item в docs); (4) цифры
-  «200/22/0/0 critical» синхронизировать с README и `src/app/page.tsx` stats;
+  «200/22/0/0 уязвимостей» синхронизировать с README и `src/app/page.tsx` stats;
   (5) команды запуска в блоке «Запуск» — только существующие скрипты
   package.json (db:seed-demo отдельной командой, «учебная сделка после
   первого запуска» — ложь, запрещена); og:image на несуществующий файл
@@ -410,7 +422,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
 - [ ] `npm test` — все тесты зелёные (unit + server/роли)
 - [ ] `npm run lint` — 0 ошибок
 - [ ] `npx tsc --noEmit` — 0 ошибок типов (tsconfig не включает tests/ — их валидирует Vitest)
-- [ ] `npm audit` — 0 critical; известный high picomatch (CVE-2026-112366, патча нет) — только dev-цепочка vite/vitest, в `.next` нет `require("picomatch")`; новых high быть не должно
+- [ ] `npm audit` — 0 уязвимостей (и `--omit=dev` = 0); бывший picomatch-high отозван 18.11.2026 как не-security issue; новых high быть не должно
 - [ ] `npm run build` — production-сборка проходит (prerender ловит client-хуки)
 - [ ] `npm run e2e` на свежем `npm run start` (старые серверы → chunk-mismatch)
 - [ ] E2E-смоук в браузере: дашборд, воронка, счета открываются, шрифты/тема на месте

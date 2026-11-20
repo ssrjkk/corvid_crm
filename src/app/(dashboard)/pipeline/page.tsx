@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import {
   DndContext,
@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import type { RouterOutputs } from "@/server/routers/_app"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { formatMoney } from "@/lib/labels"
 import { usePermissions } from "@/lib/use-permissions"
 
@@ -99,11 +100,15 @@ function StageColumn({ stage, disabled }: { stage: Stage; disabled: boolean }) {
 }
 
 export default function PipelinePage() {
-  const { canWrite } = usePermissions()
+  const { canWrite, canDelete } = usePermissions()
   const utils = trpc.useUtils()
   const { data: stages, isLoading } = trpc.pipeline.getStages.useQuery()
   const initStages = trpc.pipeline.initDefault.useMutation({
-    onSuccess: () => utils.pipeline.getStages.invalidate(),
+    onSuccess: () => {
+      utils.pipeline.getStages.invalidate()
+      toast.success("Базовые этапы созданы")
+    },
+    onError: (error) => toast.error(error.message),
   })
 
   const updateStage = trpc.deals.updateStage.useMutation({
@@ -137,12 +142,6 @@ export default function PipelinePage() {
     },
   })
 
-  useEffect(() => {
-    if (!isLoading && stages && stages.length === 0 && !initStages.isPending) {
-      initStages.mutate()
-    }
-  }, [isLoading, stages, initStages])
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   )
@@ -173,7 +172,9 @@ export default function PipelinePage() {
     return <div className="py-10 text-center text-sm text-muted-foreground">Загрузка воронки...</div>
   }
 
-  const activeDeal = stages?.flatMap((stage) => stage.deals).find((deal) => deal.id === activeId)
+  const stageList = stages ?? []
+  const activeDeal = stageList.flatMap((stage) => stage.deals).find((deal) => deal.id === activeId)
+  const isEmpty = stageList.length === 0
 
   return (
     <div className="space-y-6">
@@ -181,29 +182,61 @@ export default function PipelinePage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Воронка сделок</h1>
           <p className="text-muted-foreground">
-            Перетаскивайте карточки между этапами. Попадание в «Выиграна» или «Проиграна» обновляет статус
-            сделки.
+            {isEmpty
+              ? "Колонки появятся, когда будут заданы этапы."
+              : "Перетаскивайте карточки между этапами. Попадание в «Выиграна» или «Проиграна» обновляет статус сделки."}
           </p>
         </div>
-        <div className="text-sm text-muted-foreground">
-          Всего сделок: {stages?.reduce((sum, stage) => sum + stage.deals.length, 0) ?? 0}
-        </div>
+        {!isEmpty && (
+          <div className="text-sm text-muted-foreground">
+            Всего сделок: {stageList.reduce((sum, stage) => sum + stage.deals.length, 0)}
+          </div>
+        )}
       </div>
 
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {stages?.map((stage) => (
-            <StageColumn key={stage.id} stage={stage} disabled={!canWrite} />
-          ))}
-        </div>
-        <DragOverlay>
-          {activeDeal ? (
-            <div className="w-72">
-              <DealCardBody deal={activeDeal} />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+      {isEmpty ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Этапы ещё не заданы</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {canDelete
+                ? "Выберите готовый шаблон бизнеса — этапы и поля добавятся в один клик. Или создайте базовые этапы и переименуйте их под себя."
+                : "Попросите администратора настроить воронку в разделе «Настройки»."}
+            </p>
+            {canDelete && (
+              <div className="flex flex-wrap gap-2">
+                <Button nativeButton={false} render={<Link href="/settings" />}>
+                  Выбрать шаблон
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={initStages.isPending}
+                  onClick={() => initStages.mutate()}
+                >
+                  {initStages.isPending ? "Создаю…" : "Создать базовые этапы"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {stageList.map((stage) => (
+              <StageColumn key={stage.id} stage={stage} disabled={!canWrite} />
+            ))}
+          </div>
+          <DragOverlay>
+            {activeDeal ? (
+              <div className="w-72">
+                <DealCardBody deal={activeDeal} />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
     </div>
   )
 }

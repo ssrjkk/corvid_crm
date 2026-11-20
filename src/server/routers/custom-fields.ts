@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
@@ -24,7 +25,7 @@ const optionsSchema = z
 
 function friendlyCreateError(error: unknown): never {
   if (isUniqueViolation(error)) {
-    throw new Error("Поле с таким названием уже есть")
+    throw new TRPCError({ code: "CONFLICT", message: "Поле с таким названием уже есть" })
   }
   throw error
 }
@@ -52,7 +53,7 @@ export const customFieldsRouter = router({
     .mutation(async ({ input }) => {
       const options = input.type === "SELECT" ? input.options : undefined
       if (input.type === "SELECT" && !options) {
-        throw new Error("Для списка нужен хотя бы один вариант")
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Для списка нужен хотя бы один вариант" })
       }
       try {
         return await prisma.customField.create({
@@ -81,7 +82,9 @@ export const customFieldsRouter = router({
     .mutation(async ({ input }) => {
       const { id, label, options, order } = input
       const field = await prisma.customField.findUnique({ where: { id } })
-      if (!field) throw new Error("Поле не найдено")
+      if (!field) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Поле не найдено — обновите страницу" })
+      }
 
       try {
         return await prisma.$transaction(async (tx) => {
@@ -122,6 +125,13 @@ export const customFieldsRouter = router({
 
   /** Удаление каскадом убирает и сохранённые значения (FK onDelete: Cascade). */
   delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+    const field = await prisma.customField.findUnique({
+      where: { id: input.id },
+      select: { id: true },
+    })
+    if (!field) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Поле не найдено — обновите страницу" })
+    }
     return prisma.customField.delete({ where: { id: input.id } })
   }),
 })

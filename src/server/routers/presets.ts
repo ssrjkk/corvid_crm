@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { router, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
@@ -26,7 +27,7 @@ export const presetsRouter = router({
     )
     .mutation(async ({ input }) => {
       const preset = findBusinessPreset(input.presetId)
-      if (!preset) throw new Error("Шаблон не найден") // недостижимо: проверено схемой
+      if (!preset) throw new TRPCError({ code: "BAD_REQUEST", message: "Шаблон не найден" }) // недостижимо: проверено схемой
 
       return prisma.$transaction(async (tx) => {
         const [existingStages, existingFields] = await Promise.all([

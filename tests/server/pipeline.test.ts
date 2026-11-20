@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest"
+import { trpcToastMessage } from "@/server/error-format"
 import { makeCaller, resetDb, seedStages } from "../helpers"
 
 beforeAll(async () => {
@@ -47,10 +48,20 @@ describe("pipeline: управление этапами", () => {
     const admin = makeCaller("ADMIN")
     const deal = await admin.deals.create({ title: "Занятый этап" })
     const busyId = deal.stageId as string
-    await expect(admin.pipeline.deleteStage({ id: busyId })).rejects.toThrow(/сделок/)
+    const busyError = await admin.pipeline
+      .deleteStage({ id: busyId })
+      .catch((error: unknown) => error)
+    expect(busyError).toMatchObject({ code: "CONFLICT" })
+    // V38: русский текст ожидаемой ошибки доходит до тоста, а не подменяется
+    // общим «Внутренняя ошибка сервера» (plain Error раньше давал именно это).
+    expect(trpcToastMessage(busyError as { code: string; message: string })).toMatch(/сделок/)
 
     const empty = await admin.pipeline.createStage({ name: "Пустой" })
     await expect(admin.pipeline.deleteStage({ id: empty.id })).resolves.toBeDefined()
+    // Устаревшая вкладка: этап уже удалён → понятный NOT_FOUND, не INTERNAL.
+    await expect(admin.pipeline.deleteStage({ id: empty.id })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    })
   })
 
   it("VIEWER не может управлять этапами", async () => {

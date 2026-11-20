@@ -17,7 +17,7 @@ const stats = [
   { value: "200", label: "тестов Vitest" },
   { value: "22", label: "сценариев Playwright" },
   { value: "0", label: "serious a11y-нарушений (axe-core)" },
-  { value: "0", label: "critical-уязвимостей (npm audit)" },
+  { value: "0", label: "уязвимостей (npm audit, и prod)" },
 ] // Синхронизировать с README.md при изменении количества тестов.
 
 const engineering = [

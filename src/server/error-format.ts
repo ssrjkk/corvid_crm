@@ -15,6 +15,11 @@ import { ZodError } from "zod"
  * 2. INTERNAL_SERVER_ERROR: технические тексты (Prisma/SQLite и т.п.)
  *    не должны утекать в тост пользователю — общий русский текст;
  *    причину пишет в лог сервера errorFormatter (в trpc.ts).
+ *
+ * V38: ожидаемые бизнес-ошибки (неверное значение поля, дубликат названия,
+ * устаревшая страница) бросаются TRPCError с кодом BAD_REQUEST/CONFLICT/
+ * NOT_FOUND — их message проходит сюда как есть. Plain Error допустим только
+ * для действительно неожиданных сбоев: он станет INTERNAL и будет скрыт.
  */
 export function trpcToastMessage(error: {
   code: string

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ChevronDown, ChevronUp, Pencil, Plus, Save, Trash2, X } from "lucide-react"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
@@ -147,6 +148,9 @@ export default function SettingsPage() {
   // их аддитивно и идемпотентно. UI-гейт тот же, что у adminProcedure.
   const [presetId, setPresetId] = useState<string | null>(null)
   const selectedPreset = businessPresets.find((preset) => preset.id === presetId)
+  const router = useRouter()
+  // После применения шаблона — сразу к делу: воронка уже с этапами.
+  const openPipelineAction = { label: "Открыть воронку", onClick: () => router.push("/pipeline") }
 
   const applyPreset = trpc.presets.applyPreset.useMutation({
     onSuccess: (result) => {
@@ -160,14 +164,19 @@ export default function SettingsPage() {
       const added = result.stagesCreated + result.fieldsCreated
       const skipped = result.stagesSkipped + result.fieldsSkipped
       if (added === 0) {
-        toast.success("Шаблон уже применён — новых этапов и полей нет")
+        toast.success("Шаблон уже применён — новых этапов и полей нет", {
+          action: openPipelineAction,
+        })
         return
       }
       const message = `Добавлено: этапов ${result.stagesCreated}, полей ${result.fieldsCreated}`
       if (skipped > 0) {
-        toast.success(message, { description: `${skipped} уже было — не тронуто` })
+        toast.success(message, {
+          description: `${skipped} уже было — не тронуто`,
+          action: openPipelineAction,
+        })
       } else {
-        toast.success(message)
+        toast.success(message, { action: openPipelineAction })
       }
     },
     onError: (error) => toast.error(error.message),

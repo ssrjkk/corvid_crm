@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { router, authedProcedure, adminProcedure } from "../trpc"
 import { prisma } from "@/lib/prisma"
@@ -40,6 +41,10 @@ export const pipelineRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, ...data } = input
+      const stage = await prisma.pipelineStage.findUnique({ where: { id }, select: { id: true } })
+      if (!stage) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Этап не найден — обновите страницу" })
+      }
       return prisma.pipelineStage.update({ where: { id }, data })
     }),
 
@@ -57,9 +62,16 @@ export const pipelineRouter = router({
 
   /** Удаление разрешено только для пустого этапа. */
   deleteStage: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+    const stage = await prisma.pipelineStage.findUnique({ where: { id: input.id }, select: { id: true } })
+    if (!stage) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Этап не найден — обновите страницу" })
+    }
     const dealsCount = await prisma.deal.count({ where: { stageId: input.id } })
     if (dealsCount > 0) {
-      throw new Error(`На этапе ${dealsCount} сделок — сначала перенесите их`)
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `На этапе ${dealsCount} сделок — сначала перенесите их`,
+      })
     }
     return prisma.pipelineStage.delete({ where: { id: input.id } })
   }),

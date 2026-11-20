@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest"
 import { prisma } from "@/lib/prisma"
+import { trpcToastMessage } from "@/server/error-format"
 import { makeCaller, resetDb } from "../helpers"
 
 /**
@@ -38,9 +39,14 @@ describe("customFields: определения", () => {
 
   it("дубликат названия поля отклоняется по-русски", async () => {
     const admin = makeCaller("ADMIN")
-    await expect(
-      admin.customFields.create({ entityType: "DEAL", label: "Площадь, м²", type: "TEXT" })
-    ).rejects.toThrow(/таким названием/)
+    const duplicateError = await admin.customFields
+      .create({ entityType: "DEAL", label: "Площадь, м²", type: "TEXT" })
+      .catch((error: unknown) => error)
+    expect(duplicateError).toMatchObject({ code: "CONFLICT" })
+    // V38: текст ожидаемой ошибки доходит до тоста, а не прячется за INTERNAL.
+    expect(trpcToastMessage(duplicateError as { code: string; message: string })).toMatch(
+      /таким названием/
+    )
   })
 
   it("MANAGER и VIEWER не правят определения (FORBIDDEN), но читают", async () => {
@@ -65,9 +71,16 @@ describe("customFields: определения", () => {
 
   it("переименование в дубликат отклоняется", async () => {
     const admin = makeCaller("ADMIN")
-    await expect(admin.customFields.update({ id: typeFieldId, label: "Площадь, м²" })).rejects.toThrow(
-      /таким названием/
+    await expect(admin.customFields.update({ id: typeFieldId, label: "Площадь, м²" })).rejects.toMatchObject(
+      { code: "CONFLICT" }
     )
+    // Устаревшая вкладка: поля уже нет → NOT_FOUND, а не INTERNAL.
+    await expect(admin.customFields.update({ id: "nope", label: "X" })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    })
+    await expect(admin.customFields.delete({ id: "nope" })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    })
   })
 })
 
@@ -107,7 +120,7 @@ describe("deals.create с кастомными полями", () => {
         title: "Битая площадь",
         fields: [{ fieldId: areaFieldId, value: "не число" }],
       })
-    ).rejects.toThrow(/Введите число/)
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", message: expect.stringMatching(/Введите число/) })
     expect(await prisma.deal.count()).toBe(before)
   })
 
@@ -115,7 +128,10 @@ describe("deals.create с кастомными полями", () => {
     const admin = makeCaller("ADMIN")
     await expect(
       admin.deals.create({ title: "Мусорное поле", fields: [{ fieldId: "nope", value: "1" }] })
-    ).rejects.toThrow(/Неизвестное поле/)
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringMatching(/Неизвестное поле/),
+    })
   })
 })
 
