@@ -19,6 +19,22 @@
 
 Тёплая «бумажная» база + чернильный текст и один petrol-акцент (отлив воронова пера), типографика Unbounded + IBM Plex Sans/Mono с кириллицей, светлая и тёмная темы из oklch-токенов. Сдержанность уровня Linear — ноль каруселей и градиентных баннеров.
 
+**Сайт:** https://ssrjkk.github.io/corvid_crm/
+
+## Скриншоты
+
+Сняты с опубликованного сайта в настоящем браузере (Chrome, 1440×900 и 390×844).
+
+| Главная | Разделы |
+| --- | --- |
+| <img src="docs/screenshots/home.jpg" width="420" alt="Corvid CRM — главная страница"> | <img src="docs/screenshots/content.jpg" width="420" alt="Corvid CRM — разделы сайта"> |
+
+<p align="center"><img src="docs/screenshots/mobile.jpg" width="320" alt="Corvid CRM — мобильная версия"></p>
+
+Интерфейс приложения, который собирается из этого репозитория:
+
+<img src="docs/screenshots/dashboard.png" width="420" alt="Corvid CRM — dashboard"> <img src="docs/screenshots/pipeline.png" width="420" alt="Corvid CRM — pipeline"> <img src="docs/screenshots/invoice.png" width="420" alt="Corvid CRM — invoice">
+
 ## Что умеет
 
 | Модуль | Коротко |
