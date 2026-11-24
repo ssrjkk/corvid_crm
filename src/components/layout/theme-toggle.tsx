@@ -4,10 +4,11 @@ import { useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 const emptySubscribe = () => () => {}
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme()
   // Гидрация без рассинхрона: на сервере false, после монтирования true.
   const mounted = useSyncExternalStore(
@@ -17,7 +18,15 @@ export function ThemeToggle() {
   )
 
   if (!mounted) {
-    return <Button variant="ghost" size="icon" aria-label="Переключить тему" disabled />
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Переключить тему"
+        className={className}
+        disabled
+      />
+    )
   }
 
   const isDark = resolvedTheme === "dark"
@@ -27,7 +36,10 @@ export function ThemeToggle() {
       size="icon"
       aria-label="Переключить тему"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+      className={cn(
+        "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+        className
+      )}
     >
       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>

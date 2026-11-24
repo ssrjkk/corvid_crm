@@ -109,12 +109,12 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Проекты</h1>
           <p className="text-muted-foreground">Управление проектами</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             CSV
@@ -233,16 +233,20 @@ export default function ProjectsPage() {
       ) : (
         <>
           {filteredProjects?.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Нет проектов по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {activeFilterCount > 0
+                ? "Нет проектов по выбранным фильтрам"
+                : "Проектов пока нет — создайте первый"}
+            </p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredProjects?.map((project) => (
-            <Card key={project.id} className="hover:shadow-md transition-shadow">
+            <Card key={project.id} className="transition-colors hover:border-primary/40">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <FolderKanban className="h-5 w-5" />
-                    <Link href={`/projects/${project.id}`} className="hover:underline">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <CardTitle className="text-lg flex min-w-0 items-center gap-2">
+                    <FolderKanban className="h-5 w-5 shrink-0" />
+                    <Link href={`/projects/${project.id}`} className="min-w-0 break-words hover:underline">
                       {project.name}
                     </Link>
                   </CardTitle>

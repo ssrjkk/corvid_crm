@@ -67,7 +67,7 @@ export default function ActivitiesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Активности</h1>
           <p className="text-muted-foreground">История взаимодействий с клиентами</p>
@@ -131,19 +131,21 @@ export default function ActivitiesPage() {
           {activities?.map((activity) => (
             <Card key={activity.id}>
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <CardTitle className="text-base flex min-w-0 items-center gap-2">
                     {getIcon(activity.type)}
-                    {activity.title || (activityTypeLabels[activity.type] ?? activity.type)}
+                    <span className="min-w-0 break-words">
+                      {activity.title || (activityTypeLabels[activity.type] ?? activity.type)}
+                    </span>
                   </CardTitle>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="shrink-0 text-xs text-muted-foreground">
                     {format(new Date(activity.createdAt), "dd MMM yyyy HH:mm", { locale: ru })}
                   </span>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="text-sm whitespace-pre-wrap">{activity.content}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-muted-foreground">
                   {activity.deal && <span>Сделка: {activity.deal.title}</span>}
                   {activity.contact && (
                     <span>

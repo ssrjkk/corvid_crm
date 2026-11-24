@@ -54,7 +54,13 @@ const navGroups = [
   },
 ]
 
-function NavGroups({ pathname }: { pathname: string | null }) {
+function NavGroups({
+  pathname,
+  onNavigate,
+}: {
+  pathname: string | null
+  onNavigate?: () => void
+}) {
   return (
     <nav className="flex-1 overflow-y-auto px-3 pb-3">
       {navGroups.map((group) => (
@@ -72,6 +78,8 @@ function NavGroups({ pathname }: { pathname: string | null }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                     isActive
@@ -91,9 +99,9 @@ function NavGroups({ pathname }: { pathname: string | null }) {
   )
 }
 
-export function SidebarNav() {
+export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
-  return <NavGroups pathname={pathname} />
+  return <NavGroups pathname={pathname} onNavigate={onNavigate} />
 }
 
 /**

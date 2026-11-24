@@ -46,18 +46,20 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
         <Button nativeButton={false} variant="ghost" size="icon" render={<Link href="/invoices" aria-label="Назад" />}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">Счёт {invoice.number}</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">Счёт {invoice.number}</h1>
           <p className="text-muted-foreground">
             Выставлен: {new Date(invoice.issueDate).toLocaleDateString("ru-RU")}
             {invoice.dueDate ? ` · Оплатить до: ${new Date(invoice.dueDate).toLocaleDateString("ru-RU")}` : ""}
           </p>
         </div>
-        <StatusBadge kind="invoice" status={invoice.status} />
-        <Button variant="outline" onClick={() => window.print()}>
-          <Printer className="mr-2 h-4 w-4" />
-          Печать / PDF
-        </Button>
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <StatusBadge kind="invoice" status={invoice.status} />
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="mr-2 h-4 w-4" />
+            Печать / PDF
+          </Button>
+        </div>
       </div>
 
       <div className="no-print flex flex-wrap gap-2">
@@ -114,8 +116,34 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          {/* На телефоне таблица из пяти колонок не помещается: те же позиции
+              показываем карточками, таблица остаётся для sm+ и печати. */}
+          <div className="space-y-2 sm:hidden print:hidden">
+            {invoice.items.map((item, index) => (
+              <div key={item.id} className="rounded-lg border p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="min-w-0 break-words text-sm font-medium">
+                    {index + 1}. {item.name}
+                  </p>
+                  <p className="shrink-0 text-sm font-semibold tabular-nums">
+                    {formatMoney(lineTotal(item), invoice.currency)}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground tabular-nums">
+                  {item.qty} × {formatMoney(item.price, invoice.currency)}
+                </p>
+              </div>
+            ))}
+            <div className="flex items-center justify-between gap-3 border-t pt-3 text-sm">
+              <span className="font-semibold">Итого к оплате</span>
+              <span className="text-lg font-bold tabular-nums">
+                {formatMoney(total, invoice.currency)}
+              </span>
+            </div>
+          </div>
+
+          <div className="hidden overflow-x-auto sm:block print:block">
+            <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
                   <th className="py-2 pr-4 font-medium">#</th>

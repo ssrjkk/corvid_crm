@@ -32,7 +32,7 @@ const quickLinks = [
   { href: "/calendar", label: "Календарь", icon: CalendarDays },
 ]
 
-export function CommandMenu() {
+export function CommandMenu({ onNavigate }: { onNavigate?: () => void }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -54,6 +54,7 @@ export function CommandMenu() {
 
   const go = (href: string) => {
     setOpen(false)
+    onNavigate?.()
     router.push(href)
   }
 
@@ -66,7 +67,7 @@ export function CommandMenu() {
       >
         <Search className="h-4 w-4" />
         Поиск...
-        <kbd className="ml-auto rounded border border-sidebar-border bg-sidebar-accent/60 px-1.5 py-0.5 text-[10px] font-medium">⌘K</kbd>
+        <kbd className="ml-auto hidden rounded border border-sidebar-border bg-sidebar-accent/60 px-1.5 py-0.5 text-[10px] font-medium lg:inline-block">Ctrl K</kbd>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>

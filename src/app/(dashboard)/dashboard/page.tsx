@@ -25,6 +25,13 @@ export default function DashboardPage() {
   const totalContacts = summary?.totalContacts ?? 0
   const activeProjects = summary?.activeProjects ?? 0
 
+  const statCards = [
+    { title: "Сделки", value: totalDeals, hint: `На сумму ${valueLine}`, Icon: Handshake },
+    { title: "Активные задачи", value: openTasks, Icon: CheckSquare },
+    { title: "Контакты", value: totalContacts, Icon: Users },
+    { title: "Проекты в работе", value: activeProjects, Icon: FolderKanban },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -32,36 +39,63 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Обзор вашей CRM</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Сделки</CardTitle><Handshake className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold tabular-nums">{totalDeals}</div><p className="text-xs text-muted-foreground tabular-nums">На сумму {valueLine}</p></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Активные задачи</CardTitle><CheckSquare className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{openTasks}</div></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Контакты</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalContacts}</div></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Проекты в работе</CardTitle><FolderKanban className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{activeProjects}</div></CardContent></Card>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        {statCards.map(({ title, value, hint, Icon }) => (
+          <Card key={title} className="gap-3 py-4 lg:gap-6 lg:py-6">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 pb-1 lg:px-6 lg:pb-2">
+              <CardTitle className="text-xs font-medium sm:text-sm">{title}</CardTitle>
+              <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="px-4 lg:px-6">
+              <div className="text-2xl font-bold tabular-nums">{value}</div>
+              {hint && (
+                <p className="mt-1 text-xs text-muted-foreground tabular-nums">{hint}</p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>Воронка продаж</CardTitle></CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="sm:h-64">
             {funnel && funnel.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={funnel}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="name" fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} />
-                  <YAxis allowDecimals={false} fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={32} />
-                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: "8px" }} />
-                  <Bar dataKey="count" fill="var(--chart-1)" name="Сделок" radius={[6, 6, 0, 0]} isAnimationActive={false} />
-                </BarChart>
-              </ResponsiveContainer>
+              <>
+                {/* На телефоне подписи этапов в столбчатой диаграмме обрезаются:
+                    тот же честный срез данных показываем списком, без скролла. */}
+                <div className="space-y-2 sm:hidden">
+                  {funnel.map((stage) => (
+                    <div
+                      key={stage.name}
+                      className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
+                    >
+                      <span className="truncate">{stage.name}</span>
+                      <span className="shrink-0 font-medium tabular-nums">{stage.count}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="hidden h-full sm:block">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={funnel}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="name" fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} />
+                      <YAxis allowDecimals={false} fontSize={12} tick={{ fill: "var(--muted-foreground)" }} tickLine={false} axisLine={{ stroke: "var(--border)" }} width={32} />
+                      <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: "8px" }} />
+                      <Bar dataKey="count" fill="var(--chart-1)" name="Сделок" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Нет данных</div>
+              <div className="flex h-full min-h-40 items-center justify-center text-sm text-muted-foreground">Нет данных</div>
             )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle>Выручка по месяцам</CardTitle></CardHeader>
-          <CardContent className="h-64">
+          <CardContent className={revenue && revenue.length > 0 ? "h-64" : "flex flex-1 flex-col items-center justify-center gap-1 py-8 text-center"}>
             {revenue && revenue.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={revenue}>
@@ -73,7 +107,12 @@ export default function DashboardPage() {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Нет закрытых сделок</div>
+              <>
+                <p className="text-sm text-muted-foreground">Нет закрытых сделок</p>
+                <p className="max-w-xs text-xs text-muted-foreground">
+                  Отметьте сделку «Выиграна» — и здесь появится динамика по месяцам.
+                </p>
+              </>
             )}
           </CardContent>
         </Card>

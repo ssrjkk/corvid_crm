@@ -123,12 +123,12 @@ export default function DealsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Сделки</h1>
           <p className="text-muted-foreground">Управление сделками и заказами</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             CSV
@@ -240,15 +240,19 @@ export default function DealsPage() {
       ) : (
         <>
           {filteredDeals?.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Нет сделок по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {activeFilterCount > 0
+                ? "Нет сделок по выбранным фильтрам"
+                : "Сделок пока нет — создайте первую"}
+            </p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredDeals?.map((deal) => (
-            <Card key={deal.id} className="hover:shadow-md transition-shadow">
+            <Card key={deal.id} className="transition-colors hover:border-primary/40">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">
-                    <Link href={`/deals/${deal.id}`} className="hover:underline">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <CardTitle className="min-w-0 text-lg">
+                    <Link href={`/deals/${deal.id}`} className="break-words hover:underline">
                       {deal.title}
                     </Link>
                   </CardTitle>

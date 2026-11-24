@@ -108,3 +108,24 @@ test.describe("Авторизованная зона (сессия из setup-п
     expect(violations).toEqual([])
   })
 })
+
+test.describe("Мобильная оболочка (360px)", () => {
+  test.use({ viewport: { width: 360, height: 800 } })
+
+  test("контент не сжат, меню открывается и закрывается после перехода", async ({ page }) => {
+    await page.goto("/dashboard")
+
+    // Регресс: раньше сайдбар 256px оставался в потоке и сжимал контент до ~100px.
+    await expect(page.locator("aside")).toBeHidden()
+    const mainBox = await page.getByRole("main").boundingBox()
+    expect(mainBox?.width ?? 0).toBeGreaterThan(320)
+
+    await page.getByRole("button", { name: "Открыть меню" }).click()
+    const dialog = page.getByRole("dialog", { name: "Навигация" })
+    await expect(dialog).toBeVisible()
+
+    await dialog.getByRole("link", { name: "Сделки", exact: true }).click()
+    await expect(page).toHaveURL(/\/deals$/)
+    await expect(dialog).toBeHidden()
+  })
+})

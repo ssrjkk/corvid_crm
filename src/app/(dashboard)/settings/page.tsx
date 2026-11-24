@@ -303,7 +303,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <form
-              className="flex flex-wrap items-end gap-3"
+              className="grid gap-3 sm:flex sm:flex-wrap sm:items-end"
               onSubmit={(event) => {
                 event.preventDefault()
                 if (!newName.trim()) return
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                 })
               }}
             >
-              <div className="grid flex-1 gap-2">
+              <div className="grid gap-2 sm:min-w-0 sm:flex-1">
                 <Label htmlFor="stage-name">Название</Label>
                 <Input
                   id="stage-name"
@@ -324,20 +324,22 @@ export default function SettingsPage() {
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="stage-color">Цвет</Label>
-                <input
-                  id="stage-color"
-                  type="color"
-                  value={newColor}
-                  onChange={(event) => setNewColor(event.target.value)}
-                  className="h-9 w-16 cursor-pointer rounded-md border bg-transparent"
-                />
+              <div className="flex items-end gap-3">
+                <div className="grid gap-2">
+                  <Label htmlFor="stage-color">Цвет</Label>
+                  <input
+                    id="stage-color"
+                    type="color"
+                    value={newColor}
+                    onChange={(event) => setNewColor(event.target.value)}
+                    className="h-9 w-16 cursor-pointer rounded-md border bg-transparent"
+                  />
+                </div>
+                <Button type="submit" disabled={createStage.isPending}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Добавить
+                </Button>
               </div>
-              <Button type="submit" disabled={createStage.isPending}>
-                <Plus className="mr-2 h-4 w-4" />
-                Добавить
-              </Button>
             </form>
           </CardContent>
         </Card>

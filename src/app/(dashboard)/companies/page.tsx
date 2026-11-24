@@ -106,12 +106,12 @@ export default function CompaniesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Компании</h1>
           <p className="text-muted-foreground">Управление компаниями-клиентами</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             CSV
@@ -207,14 +207,18 @@ export default function CompaniesPage() {
       ) : (
         <>
           {filteredCompanies?.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Нет компаний по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {activeFilterCount > 0
+                ? "Нет компаний по выбранным фильтрам"
+                : "Компаний пока нет — добавьте первую"}
+            </p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredCompanies?.map((company) => (
-            <Card key={company.id} className="hover:shadow-md transition-shadow">
+            <Card key={company.id} className="transition-colors hover:border-primary/40">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
+                  <Building2 className="h-5 w-5 shrink-0" />
                   <Link href={`/companies/${company.id}`} className="hover:underline">
                     {company.name}
                   </Link>
@@ -222,15 +226,15 @@ export default function CompaniesPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {company.email && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    {company.email}
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="break-all">{company.email}</span>
                   </div>
                 )}
                 {company.phone && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    {company.phone}
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                    <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="break-all">{company.phone}</span>
                   </div>
                 )}
                 {company.website && (

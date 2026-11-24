@@ -103,12 +103,12 @@ export default function ContactsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Контакты</h1>
           <p className="text-muted-foreground">База контактов</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             CSV
@@ -218,7 +218,11 @@ export default function ContactsPage() {
       ) : (
         <>
           {filteredContacts?.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Нет контактов по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {activeFilterCount > 0
+                ? "Нет контактов по выбранным фильтрам"
+                : "Контактов пока нет — добавьте первый"}
+            </p>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredContacts?.map((contact) => (
@@ -235,15 +239,15 @@ export default function ContactsPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {contact.email && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    {contact.email}
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="break-all">{contact.email}</span>
                   </div>
                 )}
                 {contact.phone && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    {contact.phone}
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                    <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="break-all">{contact.phone}</span>
                   </div>
                 )}
                 {contact.company && <div className="text-sm text-muted-foreground">{contact.company.name}</div>}

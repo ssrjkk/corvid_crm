@@ -98,7 +98,7 @@ export default function CalendarPage() {
             Задачи и дедлайны проектов · событий в месяце: {monthEvents.length}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="icon" aria-label="Предыдущий месяц" onClick={() => setCurrentMonth((month) => (month ? subMonths(month, 1) : month))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -128,7 +128,11 @@ export default function CalendarPage() {
             </span>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="overflow-x-auto">
+          <p className="mb-2 text-xs text-muted-foreground lg:hidden">
+            Прокрутите вбок, чтобы увидеть всю неделю
+          </p>
+          <div className="min-w-[640px] space-y-2 pb-1">
           <div className="grid grid-cols-7 gap-2 text-center text-xs font-medium text-muted-foreground">
             {weekDays.map((day) => (
               <div key={day} className="py-1">
@@ -192,6 +196,7 @@ export default function CalendarPage() {
               })}
             </div>
           )}
+          </div>
         </CardContent>
       </Card>
     </div>

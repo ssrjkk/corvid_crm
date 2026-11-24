@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml/badge.svg)](https://github.com/ssrjkk/corvid_crm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c5cff.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-200%20vitest%20%2B%2022%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
+[![Tests](https://img.shields.io/badge/tests-200%20vitest%20%2B%2023%20e2e-10b981)](https://github.com/ssrjkk/corvid_crm/actions)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4)](https://tailwindcss.com)
@@ -74,17 +74,19 @@ npm run db:seed-demo # демо-аккаунты (test@corvid.dev / viewer@corvi
 Для e2e нужны запущенный `npm run start` и демо-аккаунты: `npm run db:seed-demo`
 сеет ОБА аккаунта идемпотентно (админ test@corvid.dev и зритель viewer@corvid.dev) — оба `Test12345!`.
 
-## Качество: 200 vitest + 22 e2e, всё зелёное
+## Качество: 200 vitest + 23 e2e, всё зелёное
 
 ```bash
 npm test        # Vitest: 200 тестов — вся чистая логика + ВСЕ 13 tRPC-роутеров на изолированной test.db, матрица ролей, русские тосты, money-арифметика, гонка номеров счетов, сводка дашборда, ротация бэкапов, мультивалютные сводки, схемы ввода (V31), кастомные поля сделок (V32) и компаний/контактов (V33: общий resolver, FK-каскад, полная замена), шаблоны бизнеса (V36: роли, идемпотентность, порядок, ноль фейковых сущностей)
 npm run lint    # ESLint: 0 ошибок, 0 варнингов
+npx tsc --noEmit # TypeScript: 0 ошибок
+npm audit       # 0 high/critical (этот же гейт стоит в CI)
 npm run build   # Next.js 16 production-сборка: prerender ловит то, что dev прощает
-npm run e2e     # Playwright (22): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, кастомные поля (полный круг), read-only матрица VIEWER, a11y настроек
-npx playwright test --project=a11y  # axe-core a11y-аудит (5): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах
+npm run e2e     # Playwright (23): setup-логины (админ + VIEWER), лендинг, OG-мета и robots.txt, 307-защита, неверный пароль→тост, security-заголовки и CSP, счета, печать, кастомные поля (полный круг), read-only матрица VIEWER, a11y настроек, мобильное меню (360px)
+npx playwright test --project=a11y  # axe-core a11y-аудит (6): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах, настройках
 ```
 
-- CI гоняет ВСЁ: drift guard (`npm run db:check` — схема обязана соответствовать миграциям, иначе красный) → test → lint → **build ДО e2e** (webServer в e2e стартует собранный `.next`) → полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`); новый пуш отменяет устаревший прогон ветки.
+- CI гоняет ВСЁ: audit (`high/critical = 0`) → drift guard (`npm run db:check` — схема обязана соответствовать миграциям, иначе красный) → test → tsc → lint → **build ДО e2e** (webServer в e2e стартует собранный `.next`) → полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`); новый пуш отменяет устаревший прогон ветки.
 - Один логин на роль в e2e (setup-проекты + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.

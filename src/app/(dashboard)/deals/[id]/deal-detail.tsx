@@ -266,16 +266,17 @@ export default function DealDetail({ dealId }: { dealId: string }) {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <CheckSquare className="h-5 w-5" />
+            <CardHeader className="flex flex-wrap items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <CheckSquare className="h-5 w-5 shrink-0" />
                 Задачи ({deal.tasks.length})
               </CardTitle>
               <Dialog open={taskOpen} onOpenChange={setTaskOpen}>
                 {canWrite && (
                   <DialogTrigger render={<Button size="sm" />}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Добавить задачу
+                    <Plus className="mr-1 h-4 w-4 sm:mr-2" />
+                    <span className="sm:hidden">Добавить</span>
+                    <span className="hidden sm:inline">Добавить задачу</span>
                   </DialogTrigger>
                 )}
                 <DialogContent>
@@ -395,8 +396,8 @@ export default function DealDetail({ dealId }: { dealId: string }) {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>История активностей</CardTitle>
+            <CardHeader className="flex flex-wrap items-center justify-between gap-2">
+              <CardTitle className="text-base sm:text-lg">История активностей</CardTitle>
               <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
                 {canWrite && (
                   <DialogTrigger render={<Button size="sm" variant="outline" />}>

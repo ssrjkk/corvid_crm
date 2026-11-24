@@ -37,11 +37,19 @@ jobs:
       # V28: правка schema.prisma без миграции проходила CI молча — migrate deploy
       # применял СТАРЫЕ миграции успешно, а падение случалось бы только в рантайме
       # при первом запросе к новой колонке. Дифф миграций ↔ схемы: exit 2 = дрейф = красный.
+      # Обещание «0 уязвимостей» из README/лендинга должно быть гейтом, а не текстом.
+      # high/critical в любом дереве (prod и dev) = красный CI.
+      - name: Аудит зависимостей
+        run: npm audit --audit-level=high
+
       - name: Схема соответствует миграциям (drift guard)
         run: npm run db:check
 
       - name: Миграции тестовой БД + тесты
         run: npm test
+
+      - name: Проверка типов
+        run: npx tsc --noEmit
 
       - name: Линт
         run: npm run lint

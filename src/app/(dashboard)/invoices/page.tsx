@@ -99,7 +99,11 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="grid gap-2">
               <Label>Компания</Label>
-              <Select value={companyId} onValueChange={(v: string) => setCompanyId(v)}>
+              <Select
+                value={companyId}
+                onValueChange={(v: string) => setCompanyId(v)}
+                items={{ none: "Без компании", ...Object.fromEntries(companies.map((c) => [c.id, c.name])) }}
+              >
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Без компании</SelectItem>
@@ -109,7 +113,11 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
             </div>
             <div className="grid gap-2">
               <Label>Контакт</Label>
-              <Select value={contactId} onValueChange={(v: string) => setContactId(v)}>
+              <Select
+                value={contactId}
+                onValueChange={(v: string) => setContactId(v)}
+                items={{ none: "Без контакта", ...Object.fromEntries(contacts.map((c) => [c.id, `${c.firstName} ${c.lastName}`])) }}
+              >
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Без контакта</SelectItem>
@@ -119,7 +127,11 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
             </div>
             <div className="grid gap-2">
               <Label>Сделка</Label>
-              <Select value={dealId} onValueChange={(v: string) => setDealId(v)}>
+              <Select
+                value={dealId}
+                onValueChange={(v: string) => setDealId(v)}
+                items={{ none: "Без сделки", ...Object.fromEntries(deals.map((d) => [d.id, d.title])) }}
+              >
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Без сделки</SelectItem>
@@ -132,32 +144,37 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
           <div className="space-y-2">
             <Label>Позиции счёта</Label>
             {items.map((item, index) => (
-              <div key={index} className="flex gap-2">
+              <div
+                key={index}
+                className="grid gap-2 rounded-lg border p-2 sm:flex sm:items-center sm:border-0 sm:p-0"
+              >
                 <Input
                   placeholder="Наименование работ"
                   value={item.name}
                   onChange={(e) => updateItem(index, { name: e.target.value })}
-                  className="flex-1"
+                  className="sm:flex-1"
                 />
-                <Input
-                  type="number" min="0" step="0.01" placeholder="Кол-во"
-                  value={item.qty}
-                  onChange={(e) => updateItem(index, { qty: e.target.value })}
-                  className="w-24"
-                />
-                <Input
-                  type="number" min="0" step="0.01" placeholder="Цена"
-                  value={item.price}
-                  onChange={(e) => updateItem(index, { price: e.target.value })}
-                  className="w-32"
-                />
-                <Button
-                  type="button" variant="ghost" size="icon" aria-label="Удалить позицию"
-                  disabled={items.length === 1}
-                  onClick={() => setItems((current) => current.filter((_, i) => i !== index))}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number" min="0" step="0.01" placeholder="Кол-во"
+                    value={item.qty}
+                    onChange={(e) => updateItem(index, { qty: e.target.value })}
+                    className="w-20 sm:w-24"
+                  />
+                  <Input
+                    type="number" min="0" step="0.01" placeholder="Цена"
+                    value={item.price}
+                    onChange={(e) => updateItem(index, { price: e.target.value })}
+                    className="min-w-0 flex-1 sm:w-32 sm:flex-none"
+                  />
+                  <Button
+                    type="button" variant="ghost" size="icon" aria-label="Удалить позицию"
+                    disabled={items.length === 1}
+                    onClick={() => setItems((current) => current.filter((_, i) => i !== index))}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
             <Button type="button" variant="outline" size="sm" onClick={() => setItems((c) => [...c, { ...emptyItem }])}>
@@ -173,7 +190,11 @@ function CreateInvoiceDialog({ onCreated }: { onCreated: () => void }) {
             </div>
             <div className="grid gap-2">
               <Label>Валюта</Label>
-              <Select value={currency} onValueChange={(v: string) => setCurrency(v)}>
+              <Select
+                value={currency}
+                onValueChange={(v: string) => setCurrency(v)}
+                items={{ RUB: "RUB", USD: "USD", EUR: "EUR" }}
+              >
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="RUB">RUB</SelectItem>
@@ -276,17 +297,17 @@ export default function InvoicesPage() {
         <CreateInvoiceDialog onCreated={() => refetch()} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Выставлено</CardTitle>
+            <CardTitle className="text-xs font-medium sm:text-sm">Выставлено</CardTitle>
             <ReceiptText className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>{moneyLines(totalsFor("SENT"))}</CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Получено</CardTitle>
+            <CardTitle className="text-xs font-medium sm:text-sm">Получено</CardTitle>
           </CardHeader>
           <CardContent>
             {moneyLines(totalsFor("PAID"), "text-emerald-600 dark:text-emerald-400")}
@@ -294,7 +315,7 @@ export default function InvoicesPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Просрочено</CardTitle>
+            <CardTitle className="text-xs font-medium sm:text-sm">Просрочено</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold tabular-nums text-destructive">
@@ -304,7 +325,7 @@ export default function InvoicesPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Всего счетов</CardTitle>
+            <CardTitle className="text-xs font-medium sm:text-sm">Всего счетов</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{list.length}</div>

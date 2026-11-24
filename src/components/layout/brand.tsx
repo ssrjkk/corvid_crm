@@ -27,12 +27,19 @@ export function BrandMark({
 export function Brand({
   size = 36,
   className,
+  onNavigate,
 }: {
   size?: number
   className?: string
+  /** Закрыть мобильное меню после перехода по бренду. */
+  onNavigate?: () => void
 }) {
   return (
-    <Link href="/dashboard" className={cn("flex items-center gap-2.5", className)}>
+    <Link
+      href="/dashboard"
+      onClick={onNavigate}
+      className={cn("flex items-center gap-2.5", className)}
+    >
       <BrandMark size={size} alt="" />
       <span className="font-heading text-xl font-bold tracking-tight">Corvid</span>
     </Link>

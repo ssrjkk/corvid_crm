@@ -180,7 +180,7 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   SQLite-надёжность: `prisma.ts` выставляет `journal_mode=WAL` (персистентно, один раз)
   + `timeout: 5000` (busy_timeout) в адаптере. a11y: e2e-проект `a11y` (axe-core 4,
   WCAG 2 A/AA, гейт serious+critical = 0: лендинг, вход, 404, дашборд, счета, настройки) —
-  22 e2e всего: 2 setup + 9 crm + 1 fields + 4 viewer + 6 a11y.
+  23 e2e всего: 2 setup + 10 crm + 1 fields + 4 viewer + 6 a11y.
 - Нюансы: vitest exclude e2e/** (иначе подберёт Playwright-спеки); Next 16 не типчекает tests/ (исключены из tsconfig — их проверяет Vitest);
   аудит зависимостей (`npm audit`, Dependabot) закрыт по факту, а не игнорированием:
   транзитивный minimatch принудительно ^11.0.1 через `overrides` для eslint,
@@ -385,8 +385,8 @@ status>` из `@/components/status-badge`, цвета/лейблы — толь�
   (легаси-UA трюк, OFL рядом); Manrope TTF оставлен для истории, OG больше
   его не использует. icon.svg и corvid-logo.svg — плоский силуэт ворона
   (бумага #F6F4EE, чернила #23252B, единственный цветовой штрих — клюв
-  #B45309); градиентные маскоты с румянцами запрещены. Число e2e = 21
-  (2 setup + 9 crm + 1 fields + 4 viewer + 6 a11y): регресс кастомных полей
+  #B45309); градиентные маскоты с румянцами запрещены. Число e2e = 23
+  (2 setup + 10 crm + 1 fields + 4 viewer + 6 a11y): регресс кастомных полей
   `e2e/custom-fields.spec.ts` — самоочистка try/finally, dev.db без сирот,
   проект `fields` в playwright.config (anchored testMatch, одна сессия setup).
 - E2E-данные (V28, вторая пробоина): e2e в CI гоняется против ПУСТОЙ ci.db —

@@ -117,12 +117,12 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Задачи</h1>
           <p className="text-muted-foreground">Управление задачами</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={exportCsv}>
             <Download className="mr-2 h-4 w-4" />
             CSV
@@ -248,22 +248,26 @@ export default function TasksPage() {
       ) : (
         <>
           {filteredTasks?.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">Нет задач по выбранным фильтрам</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {activeFilterCount > 0
+                ? "Нет задач по выбранным фильтрам"
+                : "Задач пока нет — создайте первую"}
+            </p>
           )}
           <div className="space-y-2">
             {filteredTasks?.map((task) => (
             <Card key={task.id}>
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <CardTitle className="text-base flex min-w-0 items-center gap-2">
                     {task.status === "DONE" ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                     ) : (
-                      <Clock className="h-5 w-5 text-muted-foreground" />
+                      <Clock className="h-5 w-5 shrink-0 text-muted-foreground" />
                     )}
-                    {task.title}
+                    <span className="min-w-0 break-words">{task.title}</span>
                   </CardTitle>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-xs font-medium ${priorityToneClass(task.priority)}`}>
                       {priorityLabels[task.priority] ?? task.priority}
                     </span>
@@ -285,7 +289,7 @@ export default function TasksPage() {
                 {task.description && (
                   <p className="text-sm text-muted-foreground mb-2">{task.description}</p>
                 )}
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                   {task.dueDate && (
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
