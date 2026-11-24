@@ -48,6 +48,11 @@ jobs:
       - name: Миграции тестовой БД + тесты
         run: npm test
 
+      # Next 16 генерирует LayoutProps/PageProps в .next/types; на чистом
+      # раннере до сборки их нет, поэтому tsc обязан идти после typegen.
+      - name: Генерация типов маршрутов
+        run: npx next typegen
+
       - name: Проверка типов
         run: npx tsc --noEmit
 

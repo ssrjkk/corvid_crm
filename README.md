@@ -86,7 +86,7 @@ npm run e2e     # Playwright (23): setup-логины (админ + VIEWER), л�
 npx playwright test --project=a11y  # axe-core a11y-аудит (6): WCAG 2 A/AA, serious/critical = 0 на лендинге, входе, 404, дашборде, счетах, настройках
 ```
 
-- CI гоняет ВСЁ: audit (`high/critical = 0`) → drift guard (`npm run db:check` — схема обязана соответствовать миграциям, иначе красный) → test → tsc → lint → **build ДО e2e** (webServer в e2e стартует собранный `.next`) → полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`); новый пуш отменяет устаревший прогон ветки.
+- CI гоняет ВСЁ: audit (`high/critical = 0`) → drift guard (`npm run db:check` — схема обязана соответствовать миграциям, иначе красный) → test → typegen → tsc → lint → **build ДО e2e** (webServer в e2e стартует собранный `.next`) → полный e2e (Playwright сам поднимает сервер через webServer, `CI=true`); новый пуш отменяет устаревший прогон ветки.
 - Один логин на роль в e2e (setup-проекты + shared storage): дефолтный rate-limit better-auth — max 3 запроса к `/sign-in*` за 10 секунд.
 - CSV-инъекции нейтрализуются (`'`-префикс, CWE-1236), импорт ограничен 5 МБ.
 - Без `BETTER_AUTH_SECRET` production-сборка падает сразу (fail-closed), а не раздаёт forgeable-сессии.
