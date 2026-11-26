@@ -6,7 +6,12 @@ CRM for freelance work: deals, invoices, clients, tasks, projects, activities an
 analytics in one application. The full Russian documentation is in
 [README.ru.md](README.ru.md).
 
-**Site:** https://ssrjkk.github.io/corvid_crm/
+**Site:** https://ssrjkk.github.io/corvid_crm/  
+**Source:** https://github.com/ssrjkk/corvid_crm
+
+## Screenshot
+
+![Corvid CRM](docs/screenshots/home.jpg)
 
 ## Features
 
