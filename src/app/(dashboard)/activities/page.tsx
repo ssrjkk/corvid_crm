@@ -51,15 +51,15 @@ export default function ActivitiesPage() {
   const getIcon = (activityType: string) => {
     switch (activityType) {
       case "CALL":
-        return <Phone className="h-4 w-4" />
+        return <Phone className="h-4 w-4 shrink-0" />
       case "EMAIL":
-        return <Mail className="h-4 w-4" />
+        return <Mail className="h-4 w-4 shrink-0" />
       case "MEETING":
-        return <Users className="h-4 w-4" />
+        return <Users className="h-4 w-4 shrink-0" />
       case "MESSAGE":
-        return <MessageSquare className="h-4 w-4" />
+        return <MessageSquare className="h-4 w-4 shrink-0" />
       default:
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4 shrink-0" />
     }
   }
 
@@ -144,11 +144,13 @@ export default function ActivitiesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-sm whitespace-pre-wrap">{activity.content}</p>
-                <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-muted-foreground">
-                  {activity.deal && <span>Сделка: {activity.deal.title}</span>}
+                <p className="whitespace-pre-wrap text-sm [overflow-wrap:anywhere]">{activity.content}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                  {activity.deal && (
+                    <span className="[overflow-wrap:anywhere]">Сделка: {activity.deal.title}</span>
+                  )}
                   {activity.contact && (
-                    <span>
+                    <span className="[overflow-wrap:anywhere]">
                       Контакт: {activity.contact.firstName} {activity.contact.lastName}
                     </span>
                   )}

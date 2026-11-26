@@ -87,32 +87,41 @@ export default function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
         <CardContent className="space-y-6 print:p-0">
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Клиент</span>
-              <span className="font-medium">{clientName ?? "Не указан"}</span>
+              <span className="shrink-0 text-muted-foreground">Клиент</span>
+              <span className="min-w-0 text-right font-medium [overflow-wrap:anywhere]">
+                {clientName ?? "Не указан"}
+              </span>
             </div>
             {invoice.company?.address && (
               <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Адрес</span>
-                <span>{invoice.company.address}</span>
+                <span className="shrink-0 text-muted-foreground">Адрес</span>
+                <span className="min-w-0 text-right [overflow-wrap:anywhere]">
+                  {invoice.company.address}
+                </span>
               </div>
             )}
             {invoice.company?.email && (
               <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Email</span>
-                <span>{invoice.company.email}</span>
+                <span className="shrink-0 text-muted-foreground">Email</span>
+                <span className="min-w-0 text-right [overflow-wrap:anywhere]">
+                  {invoice.company.email}
+                </span>
               </div>
             )}
             {invoice.deal && (
               <div className="no-print flex justify-between gap-4">
-                <span className="text-muted-foreground">Сделка</span>
-                <Link href={`/deals/${invoice.deal.id}`} className="text-primary hover:underline">
+                <span className="shrink-0 text-muted-foreground">Сделка</span>
+                <Link
+                  href={`/deals/${invoice.deal.id}`}
+                  className="min-w-0 text-right text-primary [overflow-wrap:anywhere] hover:underline"
+                >
                   {invoice.deal.title}
                 </Link>
               </div>
             )}
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Статус</span>
-              <span>{invoiceStatusLabels[invoice.status] ?? invoice.status}</span>
+              <span className="shrink-0 text-muted-foreground">Статус</span>
+              <span className="min-w-0 text-right">{invoiceStatusLabels[invoice.status] ?? invoice.status}</span>
             </div>
           </div>
 

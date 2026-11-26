@@ -359,7 +359,7 @@ export default function InvoicesPage() {
                       <Link href={`/invoices/${inv.id}`} className="font-medium hover:underline">
                         {inv.number}
                       </Link>
-                      <div className="mt-0.5 text-xs text-muted-foreground">
+                      <div className="mt-0.5 text-xs text-muted-foreground [overflow-wrap:anywhere]">
                         {inv.company?.name ?? inv.contact ? [inv.company?.name, inv.contact ? `${inv.contact.firstName} ${inv.contact.lastName ?? ""}`.trim() : null].filter(Boolean).join(" · ") : "Без клиента"}
                         {inv.dueDate ? ` · до ${new Date(inv.dueDate).toLocaleDateString("ru-RU")}` : ""}
                       </div>

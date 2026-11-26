@@ -24,17 +24,23 @@ export function ActivityTimeline({ activities }: { activities: TimelineActivity[
         <div key={activity.id} className="relative border-l-2 border-primary/30 pl-4 pb-4 last:pb-0">
           <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-primary" />
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <Badge variant="secondary">{activityTypeLabels[activity.type] ?? activity.type}</Badge>
-              {activity.title && <span className="text-sm font-medium">{activity.title}</span>}
+              {activity.title && (
+                <span className="min-w-0 text-sm font-medium [overflow-wrap:anywhere]">
+                  {activity.title}
+                </span>
+              )}
             </div>
             <span className="text-xs text-muted-foreground">
               {format(new Date(activity.createdAt), "dd MMM yyyy, HH:mm", { locale: ru })}
             </span>
           </div>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{activity.content}</p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground [overflow-wrap:anywhere]">
+            {activity.content}
+          </p>
           {(activity.user || activity.deal) && (
-            <div className="mt-1 text-xs text-muted-foreground">
+            <div className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">
               {activity.user?.name && <>Автор: {activity.user.name}</>}
               {activity.user?.name && activity.deal && " · "}
               {activity.deal && <>Сделка: {activity.deal.title}</>}

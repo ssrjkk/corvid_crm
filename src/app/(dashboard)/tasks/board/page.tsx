@@ -7,12 +7,13 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
   useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { SortableContext, useSortable } from "@dnd-kit/sortable"
+import { SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
@@ -20,6 +21,7 @@ import type { RouterOutputs } from "@/server/routers/_app"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { GripVertical } from "lucide-react"
 import { formatDate, priorityLabels, taskStatusLabels } from "@/lib/labels"
 import { usePermissions } from "@/lib/use-permissions"
 
@@ -43,8 +45,8 @@ function priorityVariant(priority: string): "default" | "secondary" | "destructi
 
 function TaskCardBody({ task }: { task: Task }) {
   return (
-    <Card className="cursor-grab active:cursor-grabbing">
-      <CardContent className="space-y-2 p-3">
+    <Card>
+      <CardContent className="space-y-2 p-3 pr-10">
         <div className="text-sm font-medium">{task.title}</div>
         {task.description && (
           <p className="line-clamp-2 text-xs text-muted-foreground">{task.description}</p>
@@ -95,8 +97,19 @@ function SortableTaskCard({ task, disabled }: { task: Task; disabled: boolean })
     opacity: isDragging ? 0.4 : 1,
   }
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} className="relative">
       <TaskCardBody task={task} />
+      {!disabled && (
+        <button
+          type="button"
+          aria-label={`Перетащить задачу «${task.title}»`}
+          className="absolute right-1 top-1 rounded-md p-1.5 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" aria-hidden="true" />
+        </button>
+      )}
     </div>
   )
 }
@@ -166,7 +179,8 @@ export default function TasksBoardPage() {
   })
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -212,8 +226,17 @@ export default function TasksBoardPage() {
         </Button>
       </div>
 
+      <p className="text-xs text-muted-foreground min-[1800px]:hidden">
+        Прокрутите доску вбок, чтобы увидеть все колонки.
+      </p>
+
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div
+          className="flex gap-4 overflow-x-auto pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          tabIndex={0}
+          role="region"
+          aria-label="Колонки доски задач"
+        >
           {columns.map((column) => (
             <TaskColumn
               key={column.id}

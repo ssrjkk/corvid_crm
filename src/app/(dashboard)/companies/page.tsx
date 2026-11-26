@@ -215,36 +215,46 @@ export default function CompaniesPage() {
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredCompanies?.map((company) => (
-            <Card key={company.id} className="transition-colors hover:border-primary/40">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Building2 className="h-5 w-5 shrink-0" />
-                  <Link href={`/companies/${company.id}`} className="hover:underline">
+            <Card key={company.id} className="min-w-0 transition-colors hover:border-primary/40">
+              <CardHeader className="min-w-0">
+                <CardTitle className="flex min-w-0 items-start gap-2 text-lg">
+                  <Building2 className="mt-0.5 h-5 w-5 shrink-0" />
+                  <Link
+                    href={`/companies/${company.id}`}
+                    className="min-w-0 [overflow-wrap:anywhere] hover:underline"
+                  >
                     {company.name}
                   </Link>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="min-w-0 space-y-2">
                 {company.email && (
                   <div className="flex min-w-0 items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="break-all">{company.email}</span>
+                    <span className="min-w-0 break-all">{company.email}</span>
                   </div>
                 )}
                 {company.phone && (
                   <div className="flex min-w-0 items-center gap-2 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="break-all">{company.phone}</span>
+                    <span className="min-w-0 break-all">{company.phone}</span>
                   </div>
                 )}
                 {company.website && (
-                  <div className="text-sm text-primary hover:underline truncate">
-                    <a href={company.website} target="_blank" rel="noopener noreferrer">
+                  <div className="min-w-0 truncate text-sm text-primary hover:underline">
+                    <a
+                      href={company.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block truncate"
+                    >
                       {company.website}
                     </a>
                   </div>
                 )}
-                <div className="text-xs text-muted-foreground pt-2">Контактов: {company._count?.contacts || 0} • Сделок: {company._count?.deals || 0}</div>
+                <div className="break-words pt-2 text-xs text-muted-foreground">
+                  Контактов: {company._count?.contacts || 0} • Сделок: {company._count?.deals || 0}
+                </div>
               </CardContent>
             </Card>
           ))}

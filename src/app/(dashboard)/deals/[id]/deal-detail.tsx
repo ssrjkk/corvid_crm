@@ -144,11 +144,17 @@ export default function DealDetail({ dealId }: { dealId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <Button nativeButton={false} variant="ghost" size="icon" render={<Link href="/deals" aria-label="Назад" />}>
+        <Button
+          nativeButton={false}
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          render={<Link href="/deals" aria-label="Назад" />}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">{deal.title}</h1>
+        <div className="order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1">
+          <h1 className="text-3xl font-bold tracking-tight [overflow-wrap:anywhere]">{deal.title}</h1>
           <p className="text-muted-foreground">Карточка сделки</p>
           {deal.tags && (
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -161,13 +167,13 @@ export default function DealDetail({ dealId }: { dealId: string }) {
             </div>
           )}
         </div>
-        <div className="text-right">
+        <div className="ml-auto shrink-0 text-right sm:ml-0">
           <div className="text-2xl font-bold">{formatMoney(deal.value, deal.currency)}</div>
           <div className="mt-1 flex justify-end"><StatusBadge kind="deal" status={deal.status} /></div>
         </div>
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           {canWrite && (
-            <SheetTrigger render={<Button variant="outline" />}>
+            <SheetTrigger render={<Button variant="outline" className="shrink-0" />}>
               <Pencil className="mr-2 h-4 w-4" />
               Редактировать
             </SheetTrigger>
@@ -218,48 +224,58 @@ export default function DealDetail({ dealId }: { dealId: string }) {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Основная информация</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {deal.description && (
-                <p className="whitespace-pre-wrap text-muted-foreground">{deal.description}</p>
+                <p className="whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">
+                  {deal.description}
+                </p>
               )}
               {/* V32: кастомные поля — свойства, которые админ завёл под свой бизнес. */}
               {deal.customFields.length > 0 && (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {deal.customFields.map(({ field, value }) => (
                     <div key={field.id} className="min-w-0">
-                      <div className="text-xs text-muted-foreground">{field.label}</div>
-                      <div className="text-sm font-medium">{formatCustomValue(field.type, value)}</div>
+                      <div className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                        {field.label}
+                      </div>
+                      <div className="text-sm font-medium [overflow-wrap:anywhere]">
+                        {formatCustomValue(field.type, value)}
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                Этап: {deal.stage?.name ?? "Не указан"}
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 [overflow-wrap:anywhere]">
+                  Этап: {deal.stage?.name ?? "Не указан"}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
                 Создана: {formatDate(deal.createdAt)}
               </div>
               {deal.closedAt && (
                 <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
                   Закрыта: {formatDate(deal.closedAt)}
                 </div>
               )}
               {deal.project && (
-                <div className="flex items-center gap-2">
-                  <CheckSquare className="h-4 w-4 text-muted-foreground" />
-                  Проект:{" "}
-                  <Link className="text-primary hover:underline" href={`/projects/${deal.project.id}`}>
-                    {deal.project.name}
-                  </Link>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <CheckSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    Проект:{" "}
+                    <Link className="text-primary hover:underline" href={`/projects/${deal.project.id}`}>
+                      {deal.project.name}
+                    </Link>
+                  </span>
                 </div>
               )}
             </CardContent>
@@ -364,8 +380,8 @@ export default function DealDetail({ dealId }: { dealId: string }) {
                       key={task.id}
                       className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
                     >
-                      <div>
-                        <div className="font-medium">{task.title}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium [overflow-wrap:anywhere]">{task.title}</div>
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span>{taskStatusLabels[task.status] ?? task.status}</span>
                           <span>·</span>
@@ -382,6 +398,7 @@ export default function DealDetail({ dealId }: { dealId: string }) {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="shrink-0"
                           disabled={completeTask.isPending}
                           onClick={() => completeTask.mutate({ id: task.id, status: "DONE" })}
                         >
@@ -472,7 +489,7 @@ export default function DealDetail({ dealId }: { dealId: string }) {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Связи</CardTitle>
@@ -481,11 +498,13 @@ export default function DealDetail({ dealId }: { dealId: string }) {
               {deal.company && (
                 <Link
                   href={`/companies/${deal.company.id}`}
-                  className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent"
+                  className="flex min-w-0 items-center gap-3 rounded-lg p-2 hover:bg-accent"
                 >
-                  <Building2 className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <div className="text-sm font-medium">{deal.company.name}</div>
+                  <Building2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium [overflow-wrap:anywhere]">
+                      {deal.company.name}
+                    </div>
                     <div className="text-xs text-muted-foreground">Компания</div>
                   </div>
                 </Link>
@@ -493,11 +512,11 @@ export default function DealDetail({ dealId }: { dealId: string }) {
               {deal.contact && (
                 <Link
                   href={`/contacts/${deal.contact.id}`}
-                  className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent"
+                  className="flex min-w-0 items-center gap-3 rounded-lg p-2 hover:bg-accent"
                 >
-                  <UserIcon className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <div className="text-sm font-medium">
+                  <UserIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium [overflow-wrap:anywhere]">
                       {deal.contact.firstName} {deal.contact.lastName}
                     </div>
                     <div className="text-xs text-muted-foreground">Контакт</div>
@@ -516,9 +535,9 @@ export default function DealDetail({ dealId }: { dealId: string }) {
             </CardHeader>
             <CardContent className="text-sm">
               {deal.owner ? (
-                <div>
-                  <div className="font-medium">{deal.owner.name}</div>
-                  <div className="text-muted-foreground">{deal.owner.email}</div>
+                <div className="min-w-0">
+                  <div className="font-medium [overflow-wrap:anywhere]">{deal.owner.name}</div>
+                  <div className="text-muted-foreground [overflow-wrap:anywhere]">{deal.owner.email}</div>
                 </div>
               ) : (
                 <p className="text-muted-foreground">Не назначен</p>

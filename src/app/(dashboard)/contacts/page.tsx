@@ -226,31 +226,40 @@ export default function ContactsPage() {
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredContacts?.map((contact) => (
-            <Card key={contact.id}>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  <Link href={`/contacts/${contact.id}`} className="hover:underline">
+            <Card key={contact.id} className="min-w-0">
+              <CardHeader className="min-w-0">
+                <CardTitle className="min-w-0 text-lg">
+                  <Link
+                    href={`/contacts/${contact.id}`}
+                    className="block min-w-0 [overflow-wrap:anywhere] hover:underline"
+                  >
                     {contact.firstName} {contact.lastName}
                   </Link>
                 </CardTitle>
                 {contact.position && (
-                  <p className="text-sm text-muted-foreground">{contact.position}</p>
+                  <p className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                    {contact.position}
+                  </p>
                 )}
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="min-w-0 space-y-2">
                 {contact.email && (
                   <div className="flex min-w-0 items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="break-all">{contact.email}</span>
+                    <span className="min-w-0 break-all">{contact.email}</span>
                   </div>
                 )}
                 {contact.phone && (
                   <div className="flex min-w-0 items-center gap-2 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="break-all">{contact.phone}</span>
+                    <span className="min-w-0 break-all">{contact.phone}</span>
                   </div>
                 )}
-                {contact.company && <div className="text-sm text-muted-foreground">{contact.company.name}</div>}
+                {contact.company && (
+                  <div className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                    {contact.company.name}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

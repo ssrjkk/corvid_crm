@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 /**
  * Глобальная граница ошибок: краш рендера любого маршрута вместо белого
@@ -26,7 +26,7 @@ export default function GlobalError({
     <main className="container mx-auto flex max-w-7xl flex-1 items-center justify-center p-6">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">Что-то сломалось</CardTitle>
+          <h1 className="font-heading text-xl font-semibold">Что-то сломалось</h1>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">

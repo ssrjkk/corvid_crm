@@ -124,19 +124,25 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <Button nativeButton={false} variant="ghost" size="icon" render={<Link href="/projects" aria-label="Назад" />}>
+        <Button
+          nativeButton={false}
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          render={<Link href="/projects" aria-label="Назад" />}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-          <div className="mt-1 flex items-center gap-2">
+        <div className="order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1">
+          <h1 className="text-3xl font-bold tracking-tight [overflow-wrap:anywhere]">{project.name}</h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
             <p className="text-muted-foreground">Карточка проекта</p>
             <StatusBadge kind="project" status={project.status} />
           </div>
         </div>
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           {canWrite && (
-            <SheetTrigger render={<Button variant="outline" />}>
+            <SheetTrigger render={<Button variant="outline" className="ml-auto shrink-0 sm:ml-0" />}>
               <Pencil className="mr-2 h-4 w-4" />
               Редактировать
             </SheetTrigger>
@@ -147,15 +153,17 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
         </Sheet>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Основная информация</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {project.description ? (
-                <p className="whitespace-pre-wrap text-muted-foreground">{project.description}</p>
+                <p className="whitespace-pre-wrap text-muted-foreground [overflow-wrap:anywhere]">
+                  {project.description}
+                </p>
               ) : (
                 <p className="text-muted-foreground">Описание не заполнено</p>
               )}
@@ -174,8 +182,8 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+              <CardTitle className="flex min-w-0 items-center gap-2">
                 <CheckSquare className="h-5 w-5" />
                 Задачи ({activeTasks.length} активных / {completedTasks} завершено)
               </CardTitle>
@@ -271,8 +279,8 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
                       key={task.id}
                       className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
                     >
-                      <div>
-                        <div className="font-medium">{task.title}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium [overflow-wrap:anywhere]">{task.title}</div>
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span>{taskStatusLabels[task.status] ?? task.status}</span>
                           <span>·</span>
@@ -289,6 +297,7 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="shrink-0"
                           disabled={completeTask.isPending}
                           onClick={() => completeTask.mutate({ id: task.id, status: "DONE" })}
                         >
@@ -303,21 +312,24 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Handshake className="h-5 w-5" />
+                <Handshake className="h-5 w-5 shrink-0" />
                 Сделка
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              <Link href={`/deals/${project.deal.id}`} className="font-medium text-primary hover:underline">
+              <Link
+                href={`/deals/${project.deal.id}`}
+                className="block font-medium text-primary [overflow-wrap:anywhere] hover:underline"
+              >
                 {project.deal.title}
               </Link>
               <div>Сумма: {formatMoney(project.deal.value, project.deal.currency)}</div>
               {project.deal.company && (
-                <div>
+                <div className="[overflow-wrap:anywhere]">
                   Компания:{" "}
                   <Link
                     href={`/companies/${project.deal.company.id}`}
@@ -328,7 +340,7 @@ export default function ProjectDetail({ projectId }: { projectId: string }) {
                 </div>
               )}
               {project.deal.contact && (
-                <div>
+                <div className="[overflow-wrap:anywhere]">
                   Контакт:{" "}
                   <Link
                     href={`/contacts/${project.deal.contact.id}`}

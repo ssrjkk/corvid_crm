@@ -61,16 +61,22 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        <Button nativeButton={false} variant="ghost" size="icon" render={<Link href="/companies" aria-label="Назад" />}>
+        <Button
+          nativeButton={false}
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          render={<Link href="/companies" aria-label="Назад" />}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
+        <div className="order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1">
+          <h1 className="text-3xl font-bold tracking-tight [overflow-wrap:anywhere]">{company.name}</h1>
           <p className="text-muted-foreground">Карточка компании</p>
         </div>
         <Sheet open={editOpen} onOpenChange={setEditOpen}>
           {canWrite && (
-            <SheetTrigger render={<Button variant="outline" />}>
+            <SheetTrigger render={<Button variant="outline" className="ml-auto shrink-0 sm:ml-0" />}>
               <Pencil className="mr-2 h-4 w-4" />
               Редактировать
             </SheetTrigger>
@@ -83,8 +89,8 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
         </Sheet>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Сделки компании ({company.deals.length})</CardTitle>
@@ -100,14 +106,14 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
                       href={`/deals/${deal.id}`}
                       className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 hover:bg-accent"
                     >
-                      <div>
-                        <div className="font-medium">{deal.title}</div>
-                        <div className="mt-1 text-xs text-muted-foreground">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium [overflow-wrap:anywhere]">{deal.title}</div>
+                        <div className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">
                           {deal.stage?.name ?? "Без этапа"}
                           {deal.contact && ` · ${deal.contact.firstName} ${deal.contact.lastName ?? ""}`}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex w-full shrink-0 flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end">
                         <span className="text-sm font-medium">{formatMoney(deal.value, deal.currency)}</span>
                         <StatusBadge kind="deal" status={deal.status} />
                       </div>
@@ -131,14 +137,14 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
                     <Link
                       key={contact.id}
                       href={`/contacts/${contact.id}`}
-                      className="flex items-center gap-3 rounded-lg border p-3 hover:bg-accent"
+                      className="flex min-w-0 items-center gap-3 rounded-lg border p-3 hover:bg-accent"
                     >
-                      <UserIcon className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <div className="text-sm font-medium">
+                      <UserIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium [overflow-wrap:anywhere]">
                           {contact.firstName} {contact.lastName}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
                           {contact.position || contact.email || "Контакт"}
                         </div>
                       </div>
@@ -159,21 +165,27 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Реквизиты</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {company.email && (
-                <a href={`mailto:${company.email}`} className="flex items-center gap-2 hover:underline">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
+                <a
+                  href={`mailto:${company.email}`}
+                  className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere] hover:underline"
+                >
+                  <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
                   {company.email}
                 </a>
               )}
               {company.phone && (
-                <a href={`tel:${company.phone}`} className="flex items-center gap-2 hover:underline">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
+                <a
+                  href={`tel:${company.phone}`}
+                  className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere] hover:underline"
+                >
+                  <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
                   {company.phone}
                 </a>
               )}
@@ -182,16 +194,16 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
                   href={company.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 hover:underline"
+                  className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere] hover:underline"
                 >
-                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <Globe className="h-4 w-4 shrink-0 text-muted-foreground" />
                   {company.website}
                 </a>
               )}
               {company.address && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  {company.address}
+                <div className="flex min-w-0 items-start gap-2">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{company.address}</span>
                 </div>
               )}
               {!company.email && !company.phone && !company.website && !company.address && (
@@ -201,9 +213,13 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
               {company.customFields.length > 0 && (
                 <div className="grid gap-2 border-t pt-3">
                   {company.customFields.map(({ field, value }) => (
-                    <div key={field.id} className="flex items-center justify-between gap-2">
-                      <span className="text-muted-foreground">{field.label}</span>
-                      <span className="font-medium tabular-nums">{formatCustomValue(field.type, value)}</span>
+                    <div key={field.id} className="flex flex-wrap items-baseline justify-between gap-2">
+                      <span className="min-w-0 text-muted-foreground [overflow-wrap:anywhere]">
+                        {field.label}
+                      </span>
+                      <span className="min-w-0 text-right font-medium tabular-nums [overflow-wrap:anywhere]">
+                        {formatCustomValue(field.type, value)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -217,7 +233,9 @@ export default function CompanyDetail({ companyId }: { companyId: string }) {
                 <CardTitle>Описание</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap text-sm text-muted-foreground">{company.description}</p>
+                <p className="whitespace-pre-wrap text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                  {company.description}
+                </p>
               </CardContent>
             </Card>
           )}

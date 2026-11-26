@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Bird } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 /**
  * Брендированная 404: несуществующие маршруты (в том числе под /dashboard)
@@ -13,7 +13,7 @@ export default function NotFound() {
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <Bird className="mx-auto mb-2 h-8 w-8 text-muted-foreground" aria-hidden="true" />
-          <CardTitle className="text-xl font-semibold">Страница не найдена</CardTitle>
+          <h1 className="font-heading text-xl font-semibold">Страница не найдена</h1>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">

@@ -7,17 +7,19 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
   useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { SortableContext, useSortable } from "@dnd-kit/sortable"
+import { SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import type { RouterOutputs } from "@/server/routers/_app"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { GripVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatMoney } from "@/lib/labels"
 import { usePermissions } from "@/lib/use-permissions"
@@ -27,8 +29,8 @@ type StageDeal = Stage["deals"][number]
 
 function DealCardBody({ deal }: { deal: StageDeal }) {
   return (
-    <Card className="cursor-grab active:cursor-grabbing">
-      <CardContent className="space-y-1 p-3">
+    <Card>
+      <CardContent className="space-y-1 p-3 pr-10">
         <Link
           href={`/deals/${deal.id}`}
           className="block text-sm font-medium hover:underline"
@@ -61,8 +63,19 @@ function SortableDealCard({ deal, disabled }: { deal: StageDeal; disabled: boole
     opacity: isDragging ? 0.4 : 1,
   }
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} className="relative">
       <DealCardBody deal={deal} />
+      {!disabled && (
+        <button
+          type="button"
+          aria-label={`Перетащить сделку «${deal.title}»`}
+          className="absolute right-1 top-1 rounded-md p-1.5 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" aria-hidden="true" />
+        </button>
+      )}
     </div>
   )
 }
@@ -143,7 +156,8 @@ export default function PipelinePage() {
   })
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -194,6 +208,12 @@ export default function PipelinePage() {
         )}
       </div>
 
+      {!isEmpty && (
+        <p className="text-xs text-muted-foreground min-[1800px]:hidden">
+          Прокрутите воронку вбок, чтобы увидеть все этапы.
+        </p>
+      )}
+
       {isEmpty ? (
         <Card>
           <CardHeader>
@@ -223,7 +243,12 @@ export default function PipelinePage() {
         </Card>
       ) : (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <div className="flex gap-4 overflow-x-auto pb-4">
+          <div
+            className="flex gap-4 overflow-x-auto pb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Этапы воронки"
+          >
             {stageList.map((stage) => (
               <StageColumn key={stage.id} stage={stage} disabled={!canWrite} />
             ))}

@@ -112,7 +112,7 @@ export default function CalendarPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 capitalize">
             <CalendarDays className="h-5 w-5" />
             {format(currentMonth, "LLLL yyyy", { locale: ru })}
@@ -128,7 +128,12 @@ export default function CalendarPage() {
             </span>
           </div>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent
+          className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          tabIndex={0}
+          role="region"
+          aria-label="Календарь"
+        >
           <p className="mb-2 text-xs text-muted-foreground lg:hidden">
             Прокрутите вбок, чтобы увидеть всю неделю
           </p>
@@ -182,7 +187,7 @@ export default function CalendarPage() {
                           ) : (
                             <FolderKanban className="mt-0.5 h-2.5 w-2.5 shrink-0" />
                           )}
-                          <span className="line-clamp-2">{event.title}</span>
+                          <span className="line-clamp-2 min-w-0 [overflow-wrap:anywhere]">{event.title}</span>
                         </Link>
                       ))}
                       {dayEvents.length > 3 && (

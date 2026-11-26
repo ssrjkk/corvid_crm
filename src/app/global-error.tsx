@@ -44,8 +44,8 @@ export default function GlobalError({
               padding: "8px 16px",
               borderRadius: 8,
               border: "none",
-              background: "oklch(0.55 0.2 285)",
-              color: "white",
+              background: "oklch(0.74 0.075 210)",
+              color: "oklch(0.18 0.015 260)",
               cursor: "pointer",
               fontSize: "14px",
             }}

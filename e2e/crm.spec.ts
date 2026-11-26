@@ -1,4 +1,12 @@
-import { expect, test } from "@playwright/test"
+import { expect, test, type Page } from "@playwright/test"
+
+async function expectNoPageOverflow(page: Page) {
+  const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }))
+  expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
+}
 
 test.describe("Публичные страницы и гость", () => {
   test.use({ storageState: { cookies: [], origins: [] } })
@@ -31,6 +39,12 @@ test.describe("Публичные страницы и гость", () => {
     expect(res.headers()["referrer-policy"]).toBe("strict-origin-when-cross-origin")
     expect(res.headers()["permissions-policy"]).toContain("camera=()")
     expect(res.headers()["content-security-policy"]).toContain("default-src 'self'")
+  })
+
+  test("404 — брендированная страница с семантическим h1", async ({ page }) => {
+    await page.goto("/this-page-does-not-exist")
+    await expect(page.getByRole("heading", { level: 1, name: "Страница не найдена" })).toBeVisible()
+    await expect(page.getByRole("link", { name: "К дашборду" })).toBeVisible()
   })
 
   test("визитка: OG-мета и robots.txt отдаются (регресс V30)", async ({ request }) => {
@@ -127,5 +141,41 @@ test.describe("Мобильная оболочка (360px)", () => {
     await dialog.getByRole("link", { name: "Сделки", exact: true }).click()
     await expect(page).toHaveURL(/\/deals$/)
     await expect(dialog).toBeHidden()
+  })
+
+  test("длинные названия компаний и контактов не ломают ширину", async ({ page }) => {
+    const longCompany =
+      "ООО «Северо-Западная промышленно-производственная интеграционная компания»"
+    const longContact = "Оченьдлиннофамильная-Сверхдлинная"
+
+    await page.goto("/companies")
+    await page.getByRole("button", { name: "Добавить компанию" }).click()
+    const companyDialog = page.getByRole("dialog", { name: "Добавить компанию" })
+    await companyDialog.getByLabel("Название *").fill(longCompany)
+    await companyDialog.getByLabel("Email").fill("long.company@example-production-domain.test")
+    await companyDialog.getByLabel("Сайт").fill("https://example-production-domain.test/very/long/path")
+    await companyDialog.getByRole("button", { name: "Создать" }).click()
+    await expect(page.getByText("Компания создана")).toBeVisible()
+
+    await expectNoPageOverflow(page)
+    await page.getByRole("link", { name: longCompany }).first().click()
+    await expect(page.getByRole("heading", { level: 1, name: longCompany })).toBeVisible()
+    await expect(page.getByLabel("Назад")).toBeVisible()
+    await expectNoPageOverflow(page)
+
+    await page.goto("/contacts")
+    await page.getByRole("button", { name: "Добавить контакт" }).click()
+    const contactDialog = page.getByRole("dialog", { name: "Добавить контакт" })
+    await contactDialog.getByLabel("Имя *").fill("Анна-Мария")
+    await contactDialog.getByLabel("Фамилия").fill(longContact)
+    await contactDialog.getByLabel("Email").fill("anna.maria@example-production-domain.test")
+    await contactDialog.getByRole("button", { name: "Создать" }).click()
+    await expect(page.getByText("Контакт создан")).toBeVisible()
+
+    await expectNoPageOverflow(page)
+    await page.getByRole("link", { name: `Анна-Мария ${longContact}` }).first().click()
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(longContact)
+    await expect(page.getByLabel("Назад")).toBeVisible()
+    await expectNoPageOverflow(page)
   })
 })

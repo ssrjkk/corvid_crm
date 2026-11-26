@@ -53,6 +53,18 @@ test.describe("a11y: авторизованная зона", () => {
     expect(await seriousViolations(page)).toEqual([])
   })
 
+  test("доска задач без serious/critical нарушений", async ({ page }) => {
+    await page.goto("/tasks/board")
+    await expect(page.getByRole("heading", { name: "Доска задач" })).toBeVisible()
+    expect(await seriousViolations(page)).toEqual([])
+  })
+
+  test("воронка без serious/critical нарушений", async ({ page }) => {
+    await page.goto("/pipeline")
+    await expect(page.getByRole("heading", { name: "Воронка сделок" })).toBeVisible()
+    expect(await seriousViolations(page)).toEqual([])
+  })
+
   test("настройки без serious/critical нарушений", async ({ page }) => {
     await page.goto("/settings")
     await expect(page.getByRole("heading", { name: "Настройки" })).toBeVisible()
